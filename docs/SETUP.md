@@ -19,8 +19,8 @@ Deploy your own OpenSync instance using Convex Cloud.
 ## Step 1: Clone and Install
 
 ```bash
-git clone https://github.com/your-org/opencode-sync.git
-cd opencode-sync
+git clone https://github.com/waynesutton/opensync.git
+cd opensync
 npm install
 ```
 

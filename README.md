@@ -1,6 +1,6 @@
 # OpenSync
 
-Sync, search, and share your OpenCode sessions. Built with Convex.
+Sync, search, and share your AI coding sessions. Built with Convex.
 
 ```
    ____                   _____                 
@@ -15,14 +15,15 @@ Sync, search, and share your OpenCode sessions. Built with Convex.
 
 ## What is this?
 
-OpenSync stores your OpenCode (Claude Code, Cursor, etc.) sessions in the cloud:
+OpenSync stores your AI coding sessions from OpenCode and Claude Code in the cloud:
 
-- **Automatic sync** as you code
+- **Automatic sync** as you code with OpenCode or Claude Code
 - **Full-text search** across all sessions
 - **Semantic search** to find sessions by meaning
 - **Public sharing** with one click
 - **API access** for context engineering and integrations
 - **Usage stats** including tokens, cost, time
+- **Eval exports** for DeepEval, OpenAI Evals, and Promptfoo (coming soon)
 
 ## Quick Start
 
@@ -30,8 +31,8 @@ OpenSync stores your OpenCode (Claude Code, Cursor, etc.) sessions in the cloud:
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-org/opencode-sync.git
-cd opencode-sync
+git clone https://github.com/waynesutton/opensync.git
+cd opensync
 
 # Install dependencies
 npm install
@@ -42,21 +43,16 @@ npx convex dev
 
 See [SETUP.md](docs/SETUP.md) for detailed instructions.
 
-### 2. Install the Plugin
+### 2. Install a Plugin
+
+**For OpenCode:**
 
 ```bash
 npm install -g opencode-sync-plugin
-```
-
-### 3. Authenticate
-
-```bash
 opencode-sync login
 ```
 
-Enter your Convex URL and WorkOS Client ID when prompted.
-
-### 4. Add to OpenCode Config
+Then add to your `opencode.json`:
 
 ```json
 {
@@ -64,9 +60,24 @@ Enter your Convex URL and WorkOS Client ID when prompted.
 }
 ```
 
-### 5. Start Coding
+**For Claude Code:**
 
-Your sessions sync automatically.
+```bash
+/plugin install yourusername/claude-code-sync
+```
+
+Or configure via `~/.claude-code-sync.json`:
+
+```json
+{
+  "convex_url": "https://your-deployment.convex.cloud",
+  "auto_sync": true
+}
+```
+
+### 3. Start Coding
+
+Your sessions sync automatically from either tool.
 
 ## Features
 
@@ -76,30 +87,46 @@ Your sessions sync automatically.
 | Full-Text Search | Search by keywords across all sessions |
 | Semantic Search | Search by meaning using vector embeddings |
 | Hybrid Search | Combines full-text and semantic for best results |
-| Public Sharing | Share sessions with a single click |
+| Public Sharing | Share sessions with a single click (`/s/:slug`) |
 | Markdown Export | Download sessions as Markdown files |
-| API Access | Secure API for external integrations |
+| API Access | Secure API for external integrations (API key auth) |
 | Usage Stats | Track tokens, cost, time per session and overall |
 | RAG Support | Built-in retrieval for context engineering |
+| Session Management | View, search, and delete sessions |
 
 ## Architecture
 
 ```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   OpenCode      │────▶│   Plugin        │────▶│   Convex        │
-│   (CLI/IDE)     │     │   (Sync)        │     │   (Backend)     │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-                                                        │
-                                                        ▼
-                                                ┌─────────────────┐
-                                                │   Web UI        │
-                                                │   (React+Vite)  │
-                                                └─────────────────┘
+┌─────────────────┐     ┌─────────────────┐
+│    OpenCode     │────▶│ opencode-sync   │──┐
+│    (CLI)        │     │    plugin       │  │
+└─────────────────┘     └─────────────────┘  │     ┌─────────────────┐
+                                             ├────▶│   Convex        │
+┌─────────────────┐     ┌─────────────────┐  │     │   (Backend)     │
+│  Claude Code    │────▶│ claude-code-sync│──┘     └─────────────────┘
+│    (CLI)        │     │    plugin       │                │
+└─────────────────┘     └─────────────────┘                │
+                                              ┌────────────┼────────────┐
+                                              ▼            ▼            ▼
+                                       ┌──────────┐ ┌──────────┐ ┌──────────┐
+                                       │  Web UI  │ │ API      │ │ OpenAI   │
+                                       │  (React) │ │ (/api/*) │ │ Embed    │
+                                       └──────────┘ └──────────┘ └──────────┘
 ```
 
 ## API Endpoints
 
 All endpoints require authentication via Bearer token (JWT or API key).
+
+### Sync Endpoints (for plugin)
+
+| Endpoint | Description |
+|----------|-------------|
+| `POST /sync/session` | Sync a session |
+| `POST /sync/message` | Sync a message |
+| `POST /sync/batch` | Batch sync sessions and messages |
+
+### Public API
 
 | Endpoint | Description |
 |----------|-------------|
@@ -109,28 +136,39 @@ All endpoints require authentication via Bearer token (JWT or API key).
 | `GET /api/context?q=` | Get relevant context for LLM |
 | `GET /api/export?id=&format=` | Export session (json/markdown/jsonl) |
 | `GET /api/stats` | Get usage statistics |
+| `GET /health` | Health check (no auth required) |
 
 Generate an API key in Settings to use these endpoints.
 
 ## Project Structure
 
 ```
-opencode-sync/           # This repo - Convex backend + React UI
+opensync/                # This repo - Convex backend + React UI
 ├── convex/              # Convex functions
 │   ├── schema.ts        # Database schema
 │   ├── sessions.ts      # Session queries/mutations
+│   ├── messages.ts      # Message mutations
 │   ├── search.ts        # Full-text and semantic search
-│   ├── http.ts          # HTTP endpoints
-│   └── api.ts           # Secure API functions
+│   ├── embeddings.ts    # Vector embedding generation
+│   ├── http.ts          # HTTP endpoints (sync + API)
+│   ├── api.ts           # Secure API functions
+│   └── rag.ts           # RAG retrieval functions
 ├── src/                 # React frontend
-│   ├── pages/           # Login, Dashboard, Settings, Docs
-│   └── components/      # Header, Sidebar, SessionViewer
+│   ├── pages/           # Login, Dashboard, Settings, Docs, PublicSession
+│   ├── components/      # Header, Sidebar, SessionViewer
+│   └── lib/             # Auth utilities
 └── docs/                # Documentation
 
-opencode-sync-plugin/    # Separate repo - npm package
+opencode-sync-plugin/    # Separate repo - npm package for OpenCode
 ├── src/
 │   ├── index.ts         # Plugin hooks
 │   └── cli.ts           # CLI commands
+└── README.md
+
+claude-code-sync/        # Separate repo - Claude Code plugin
+├── src/
+│   ├── plugin.py        # Plugin hooks
+│   └── config.py        # Configuration
 └── README.md
 ```
 
@@ -138,7 +176,10 @@ opencode-sync-plugin/    # Separate repo - npm package
 
 - [Setup Guide](docs/SETUP.md) - Full deployment instructions
 - [API Reference](docs/API.md) - API endpoint documentation
-- [Plugin README](https://github.com/your-org/opencode-sync-plugin) - Plugin installation
+- [OpenCode Plugin](docs/OPENCODE-PLUGIN.md) - OpenCode plugin installation
+- [Claude Code Plugin](docs/CLAUDE-CODE-PLUGIN.md) - Claude Code plugin installation
+- [Sync for Evals PRD](docs/SYNC-FOR-EVALS-PRD.md) - Eval export feature specification
+- `/docs` route in the web app provides interactive API documentation
 
 ## Tech Stack
 
@@ -157,4 +198,3 @@ opencode-sync-plugin/    # Separate repo - npm package
 ## License
 
 MIT
-# opensync
