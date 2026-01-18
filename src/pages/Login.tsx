@@ -1,4 +1,5 @@
 import { useAuth } from "../lib/auth";
+import { useAuth as useAuthKit } from "@workos-inc/authkit-react";
 import { Navigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 
@@ -19,10 +20,12 @@ const MOCK_SESSIONS = [
 ];
 
 export function LoginPage() {
-  const { isAuthenticated, isLoading, signIn } = useAuth();
+  const { isAuthenticated, isLoading, signIn, signOut } = useAuth();
+  // Get WorkOS user state directly to detect auth sync issues
+  const { user: workosUser, isLoading: workosLoading } = useAuthKit();
 
   // Show loading state while processing callback or checking auth
-  if (isLoading) {
+  if (isLoading || workosLoading) {
     return (
       <div className="min-h-screen bg-[#0E0E0E] flex items-center justify-center">
         <div className="text-center">
@@ -33,9 +36,14 @@ export function LoginPage() {
     );
   }
 
+  // If fully authenticated with both WorkOS and Convex, go to dashboard
   if (isAuthenticated) {
     return <Navigate to="/" replace />;
   }
+
+  // Check if user is logged into WorkOS but Convex auth failed
+  const hasWorkosUser = !!workosUser;
+  const authSyncIssue = hasWorkosUser && !isAuthenticated;
 
   return (
     <div className="min-h-screen bg-[#0E0E0E] text-zinc-100">
@@ -87,12 +95,39 @@ export function LoginPage() {
               </div>
 
               {/* CTA */}
-              <button
-                onClick={signIn}
-                className="mt-8 w-fit rounded-md border border-zinc-700 bg-[#0E0E0E] px-6 py-2.5 text-sm font-medium text-zinc-100 transition-colors hover:border-zinc-600 hover:bg-zinc-900"
-              >
-                Sign in
-              </button>
+              {authSyncIssue ? (
+                <div className="mt-8 space-y-3">
+                  <div className="rounded-md border border-amber-800/50 bg-amber-900/20 px-4 py-3">
+                    <p className="text-sm text-amber-200">
+                      Signed in as {workosUser?.email}
+                    </p>
+                    <p className="mt-1 text-xs text-amber-400/70">
+                      Backend sync pending. Try signing out and back in.
+                    </p>
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={signOut}
+                      className="w-fit rounded-md border border-zinc-700 bg-[#0E0E0E] px-6 py-2.5 text-sm font-medium text-zinc-100 transition-colors hover:border-zinc-600 hover:bg-zinc-900"
+                    >
+                      Sign out
+                    </button>
+                    <button
+                      onClick={signIn}
+                      className="w-fit rounded-md border border-zinc-600 bg-zinc-800 px-6 py-2.5 text-sm font-medium text-zinc-100 transition-colors hover:bg-zinc-700"
+                    >
+                      Try again
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={signIn}
+                  className="mt-8 w-fit rounded-md border border-zinc-700 bg-[#0E0E0E] px-6 py-2.5 text-sm font-medium text-zinc-100 transition-colors hover:border-zinc-600 hover:bg-zinc-900"
+                >
+                  Sign in
+                </button>
+              )}
 
               {/* Export formats */}
               <div className="mt-6 flex flex-wrap gap-4 text-xs text-zinc-600">
@@ -253,25 +288,37 @@ export function LoginPage() {
   );
 }
 
-// Separate component to check env vars
+// Separate component to check env vars and auth status
 function EnvStatus() {
-  const workosId = (import.meta as unknown as { env: Record<string, string> }).env
-    .VITE_WORKOS_CLIENT_ID;
-  const convexUrl = (import.meta as unknown as { env: Record<string, string> }).env
-    .VITE_CONVEX_URL;
+  const workosId = import.meta.env.VITE_WORKOS_CLIENT_ID;
+  const convexUrl = import.meta.env.VITE_CONVEX_URL;
+  const { user: workosUser } = useAuthKit();
+  const { isAuthenticated } = useAuth();
 
   return (
-    <div className="flex items-center gap-3 text-[10px] text-zinc-700">
+    <div className="flex flex-wrap items-center justify-center gap-3 text-[10px] text-zinc-700">
       <span>
         WorkOS:{" "}
         <span className={workosId ? "text-emerald-600" : "text-red-500"}>
-          {workosId ? "configured" : "missing"}
+          {workosId ? "ok" : "missing"}
         </span>
       </span>
       <span>
         Convex:{" "}
         <span className={convexUrl ? "text-emerald-600" : "text-red-500"}>
-          {convexUrl ? "configured" : "missing"}
+          {convexUrl ? "ok" : "missing"}
+        </span>
+      </span>
+      <span>
+        User:{" "}
+        <span className={workosUser ? "text-emerald-600" : "text-zinc-600"}>
+          {workosUser ? "yes" : "no"}
+        </span>
+      </span>
+      <span>
+        Auth:{" "}
+        <span className={isAuthenticated ? "text-emerald-600" : "text-zinc-600"}>
+          {isAuthenticated ? "synced" : "pending"}
         </span>
       </span>
     </div>
