@@ -25,6 +25,13 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 - [x] Fixed Netlify SPA routing 404 errors (_redirects, netlify.toml)
 - [x] Added 404 catch-all route and WorkOS auth sync detection
 - [x] GET /sync/sessions/list endpoint for listing session external IDs (used by sync CLI --all)
+- [x] Dashboard redesign with Overview, Sessions, Analytics views
+- [x] Analytics queries (dailyStats, modelStats, projectStats, providerStats, summaryStats)
+- [x] Reusable chart components (BarChart, AreaChart, DonutChart, Sparkline, ProgressBar, StatCard)
+- [x] Session filtering by model, project, provider
+- [x] Session sorting by date, tokens, cost, duration
+- [x] Settings page redesign with tabbed interface
+- [x] Mobile-responsive dashboard layout
 
 ## In Progress
 
@@ -81,10 +88,11 @@ See [SYNC-FOR-EVALS-PRD.md](docs/SYNC-FOR-EVALS-PRD.md) for full specification.
 
 ### Low Priority (Analytics)
 
-- [ ] Model Comparison Dashboard
-  - [ ] Analytics overview with date range
-  - [ ] Usage charts by model
-  - [ ] Model comparison table
+- [x] Model Comparison Dashboard (basic version implemented)
+  - [x] Analytics overview with 30-day range
+  - [x] Usage charts by model
+  - [x] Model comparison with progress bars
+  - [ ] Date range selector (custom ranges)
   - [ ] Efficiency metrics (tokens per message, cost per 1K tokens)
 
 ### Low Priority (Marketplace)

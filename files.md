@@ -28,6 +28,7 @@ Backend functions and schema.
 | `users.ts` | User queries/mutations: getOrCreate, me, stats, API key management |
 | `sessions.ts` | Session CRUD: list, get, getPublic, setVisibility, remove, getMarkdown, upsert, listExternalIds |
 | `messages.ts` | Message mutations: upsert with parts |
+| `analytics.ts` | Analytics queries: dailyStats, modelStats, projectStats, providerStats, summaryStats, sessionsWithDetails |
 | `search.ts` | Full-text and semantic search: searchSessions, searchMessages, semanticSearch, hybridSearch |
 | `embeddings.ts` | Vector embedding generation for semantic search |
 | `api.ts` | Internal API functions: listSessions, getSession, fullTextSearch, exportSession, getStats, semanticSearch, hybridSearch, getContext |
@@ -43,7 +44,7 @@ React frontend application.
 |------|-------------|
 | `main.tsx` | App entry point with providers (Convex, AuthKit, Router) |
 | `App.tsx` | Route definitions and protected route wrapper |
-| `index.css` | Global styles and Tailwind imports |
+| `index.css` | Global styles, Tailwind imports, dark theme tokens, chart utilities |
 | `vite-env.d.ts` | Vite client type declarations for import.meta.env |
 
 ### src/pages/
@@ -51,8 +52,8 @@ React frontend application.
 | File | Description |
 |------|-------------|
 | `Login.tsx` | Login page with WorkOS AuthKit integration |
-| `Dashboard.tsx` | Main dashboard with session list and viewer |
-| `Settings.tsx` | User profile, usage stats, plugin setup credentials, API key management |
+| `Dashboard.tsx` | Main dashboard with three views: Overview (stats, charts), Sessions (filterable list), Analytics (detailed breakdowns) |
+| `Settings.tsx` | Tabbed settings: Usage (charts, stats), API Access (keys, endpoints), Profile (account info) |
 | `Docs.tsx` | Interactive API documentation page |
 | `PublicSession.tsx` | Public session viewer for shared sessions (/s/:slug) |
 
@@ -63,6 +64,7 @@ React frontend application.
 | `Header.tsx` | Top navigation with search input and user menu |
 | `Sidebar.tsx` | Session list sidebar with search results |
 | `SessionViewer.tsx` | Session detail view with messages and actions |
+| `Charts.tsx` | Reusable chart components: BarChart, AreaChart, DonutChart, Sparkline, ProgressBar, StatCard, DataTable, FilterPill |
 
 ### src/lib/
 

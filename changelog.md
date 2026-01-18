@@ -8,6 +8,17 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Modern dashboard redesign with three view modes: Overview, Sessions, Analytics
+- New analytics Convex queries: dailyStats, modelStats, projectStats, providerStats, summaryStats, sessionsWithDetails
+- Reusable chart components: BarChart, AreaChart, DonutChart, Sparkline, ProgressBar, StatCard, DataTable
+- Token usage visualization with 30-day trend charts
+- Model distribution donut chart and usage breakdown
+- Project-level analytics with token and cost tracking
+- Session filtering by model, project, and provider
+- Session sorting by date, tokens, cost, and duration
+- Settings page redesign with tabbed interface (API Access default, Usage, Profile)
+- Usage statistics page with interactive charts
+- Mobile-responsive dashboard with back navigation for session detail view
 - GET /sync/sessions/list endpoint to list all session external IDs for the authenticated user
 - Used by opencode-sync CLI `sync --all` to check which sessions already exist before syncing
 - Published opencode-sync-plugin to npm: [npmjs.com/package/opencode-sync-plugin](https://www.npmjs.com/package/opencode-sync-plugin)
