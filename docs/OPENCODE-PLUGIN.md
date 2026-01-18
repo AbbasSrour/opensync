@@ -50,9 +50,16 @@ Start an OpenCode session and your sessions sync automatically.
 | Command | Description |
 |---------|-------------|
 | `opencode-sync login` | Configure with Convex URL and API Key |
+| `opencode-sync verify` | Verify credentials and OpenCode config |
+| `opencode-sync sync` | Test connectivity and create a test session |
+| `opencode-sync sync --new` | Sync only new sessions (uses local tracking) |
+| `opencode-sync sync --all` | Sync all sessions (queries backend, skips existing) |
+| `opencode-sync sync --force` | Clear tracking and resync all sessions |
 | `opencode-sync logout` | Clear stored credentials |
 | `opencode-sync status` | Show authentication status |
 | `opencode-sync config` | Show current configuration |
+| `opencode-sync version` | Show installed version |
+| `opencode-sync help` | Show help message |
 
 ## What Gets Synced
 
@@ -70,8 +77,9 @@ Start an OpenCode session and your sessions sync automatically.
 Credentials are stored at:
 
 ```
-~/.config/opencode-sync/
-  config.json       # Convex URL, API Key
+~/.opensync/
+  credentials.json      # Convex URL, API Key
+  synced-sessions.json  # Local tracking for sync --new
 ```
 
 ## URL Format

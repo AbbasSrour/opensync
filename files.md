@@ -26,12 +26,12 @@ Backend functions and schema.
 | `auth.config.ts` | WorkOS JWT validation configuration |
 | `convex.config.ts` | Convex app configuration |
 | `users.ts` | User queries/mutations: getOrCreate, me, stats, API key management |
-| `sessions.ts` | Session CRUD: list, get, getPublic, setVisibility, remove, getMarkdown, upsert |
+| `sessions.ts` | Session CRUD: list, get, getPublic, setVisibility, remove, getMarkdown, upsert, listExternalIds |
 | `messages.ts` | Message mutations: upsert with parts |
 | `search.ts` | Full-text and semantic search: searchSessions, searchMessages, semanticSearch, hybridSearch |
 | `embeddings.ts` | Vector embedding generation for semantic search |
 | `api.ts` | Internal API functions: listSessions, getSession, fullTextSearch, exportSession, getStats, semanticSearch, hybridSearch, getContext |
-| `http.ts` | HTTP endpoints: /sync/*, /api/*, /health |
+| `http.ts` | HTTP endpoints: /sync/* (session, message, batch, sessions/list), /api/*, /health |
 | `rag.ts` | RAG retrieval functions for context engineering |
 | `README.md` | Convex backend documentation |
 
@@ -52,7 +52,7 @@ React frontend application.
 |------|-------------|
 | `Login.tsx` | Login page with WorkOS AuthKit integration |
 | `Dashboard.tsx` | Main dashboard with session list and viewer |
-| `Settings.tsx` | User profile, usage stats, API key management |
+| `Settings.tsx` | User profile, usage stats, plugin setup credentials, API key management |
 | `Docs.tsx` | Interactive API documentation page |
 | `PublicSession.tsx` | Public session viewer for shared sessions (/s/:slug) |
 
@@ -85,6 +85,7 @@ Documentation files.
 | `PRD-FEATURES.md` | Product requirements: Eval Suite, Marketplace, Context Library, Analytics |
 | `SYNC-FOR-EVALS-PRD.md` | Detailed PRD for eval export system with DeepEval/OpenAI Evals support |
 | `workosfix.md` | WorkOS troubleshooting notes |
+| `WORKOS-AUTH.md` | WorkOS AuthKit integration architecture and security model |
 | `NETLIFY-WORKOS-DEPLOYMENT.md` | Deployment guide for Netlify, WorkOS, and Convex integration |
 
 ## public/

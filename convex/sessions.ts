@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { mutation, query, internalMutation } from "./_generated/server";
+import { mutation, query, internalMutation, internalQuery } from "./_generated/server";
 import { nanoid } from "nanoid";
 
 // List sessions for current user
@@ -355,5 +355,19 @@ export const getForEmbedding = internalMutation({
       session,
       textContent: `${session.title || ""}\n\n${textContent}`.trim(),
     };
+  },
+});
+
+// Internal: list all external IDs for a user (used by sync CLI)
+export const listExternalIds = internalQuery({
+  args: { userId: v.id("users") },
+  returns: v.array(v.string()),
+  handler: async (ctx, { userId }) => {
+    const sessions = await ctx.db
+      .query("sessions")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .collect();
+
+    return sessions.map((s) => s.externalId);
   },
 });

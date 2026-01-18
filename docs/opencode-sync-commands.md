@@ -83,38 +83,110 @@ opencode-sync sync
 
 Use this to verify your credentials work before troubleshooting plugin issues.
 
+### sync --new
+
+Sync only new sessions that haven't been synced before.
+
+```bash
+opencode-sync sync --new
+```
+
+**What it does:**
+- Uses local tracking file (`~/.opensync/synced-sessions.json`)
+- Skips sessions that were previously synced
+- Fast because it doesn't query the backend
+
+**Output on success:**
+```
+  OpenSync: Syncing New Local Sessions
+
+  Found 15 local sessions
+  Found 10 in local tracking file
+  Skipping 10 already synced sessions
+  Will sync 5 sessions
+
+  Syncing: New feature request... OK (4 messages)
+  Syncing: Bug fix... OK (8 messages)
+
+  Summary:
+    Sessions synced: 5
+    Messages synced: 32
+    Skipped: 10
+
+  Check your OpenSync dashboard to view synced sessions.
+```
+
+Use this for regular syncing after your initial import.
+
 ### sync --all
 
-Sync all local OpenCode sessions to the cloud.
+Sync all local sessions, checking the backend for existing ones.
 
 ```bash
 opencode-sync sync --all
 ```
 
 **What it does:**
-- Reads all sessions from `~/.local/share/opencode/storage/session/`
-- Reads messages for each session from `~/.local/share/opencode/storage/message/`
-- Syncs sessions with aggregated token counts and costs
-- Syncs all messages for each session
+- Queries the backend for already-synced session IDs
+- Skips sessions that exist on the server
+- Syncs remaining sessions and updates local tracking
+- More accurate than `--new` (works across machines)
 
 **Output on success:**
 ```
   OpenSync: Syncing All Local Sessions
 
-  Found 12 sessions
+  Found 15 local sessions
+  Checking backend for existing sessions...
+  Found 10 already synced on backend
+  Skipping 10 already synced sessions
+  Will sync 5 sessions
 
-  Syncing: What does this app do?... OK (7 messages)
-  Syncing: Cooking tips... OK (3 messages)
-  Syncing: Fix the bug... OK (15 messages)
+  Syncing: New feature request... OK (4 messages)
+  Syncing: Bug fix... OK (8 messages)
 
   Summary:
-    Sessions synced: 12
-    Messages synced: 87
+    Sessions synced: 5
+    Messages synced: 32
+    Skipped: 10
 
   Check your OpenSync dashboard to view synced sessions.
 ```
 
-Use this to bulk import existing OpenCode sessions that were created before installing the plugin.
+Use this to sync from a new machine or verify sync status against the backend.
+
+### sync --force
+
+Clear tracking and resync all sessions.
+
+```bash
+opencode-sync sync --force
+```
+
+**What it does:**
+- Clears the local tracking file
+- Syncs all sessions regardless of previous sync status
+- Updates or creates sessions on the backend
+
+**Output on success:**
+```
+  OpenSync: Force Syncing Local Sessions
+
+  Found 15 local sessions
+  Will sync 15 sessions
+
+  Syncing: What does this app do?... OK (7 messages)
+  Syncing: Cooking tips... OK (3 messages)
+  ...
+
+  Summary:
+    Sessions synced: 15
+    Messages synced: 120
+
+  Check your OpenSync dashboard to view synced sessions.
+```
+
+Use this to refresh all data or fix sync issues.
 
 ### status
 
@@ -193,7 +265,9 @@ opencode-sync --help
 
 6. Sync existing sessions (optional):
    ```bash
-   opencode-sync sync --all
+   opencode-sync sync --new    # Fast: uses local tracking
+   opencode-sync sync --all    # Accurate: checks backend
+   opencode-sync sync --force  # Full: resyncs everything
    ```
 
 7. Start OpenCode:
@@ -229,5 +303,6 @@ opencode-sync version
 ### Config file locations
 
 - Credentials: `~/.opensync/credentials.json`
+- Synced sessions tracking: `~/.opensync/synced-sessions.json`
 - OpenCode config (global): `~/.config/opencode/opencode.json`
 - OpenCode config (project): `./opencode.json`

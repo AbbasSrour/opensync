@@ -24,6 +24,7 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 - [x] Fixed Netlify build errors (vite-env.d.ts, @types/node, tsconfig types)
 - [x] Fixed Netlify SPA routing 404 errors (_redirects, netlify.toml)
 - [x] Added 404 catch-all route and WorkOS auth sync detection
+- [x] GET /sync/sessions/list endpoint for listing session external IDs (used by sync CLI --all)
 
 ## In Progress
 

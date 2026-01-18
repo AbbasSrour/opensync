@@ -14,11 +14,19 @@ import {
   Coins,
   MessageSquare,
   Cpu,
+  Terminal,
+  Eye,
+  EyeOff,
+  ExternalLink,
 } from "lucide-react";
+
+// Convex URL from environment - safe to expose, this is a public endpoint
+const CONVEX_URL = import.meta.env.VITE_CONVEX_URL as string;
 
 export function SettingsPage() {
   const { user, signOut } = useAuth();
-  const [copied, setCopied] = useState(false);
+  const [copiedKey, setCopiedKey] = useState(false);
+  const [copiedUrl, setCopiedUrl] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
   const [newApiKey, setNewApiKey] = useState<string | null>(null);
 
@@ -42,11 +50,21 @@ export function SettingsPage() {
     }
   };
 
+  // Copy API key to clipboard
   const handleCopyKey = async () => {
     if (newApiKey) {
       await navigator.clipboard.writeText(newApiKey);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setCopiedKey(true);
+      setTimeout(() => setCopiedKey(false), 2000);
+    }
+  };
+
+  // Copy Convex URL to clipboard
+  const handleCopyUrl = async () => {
+    if (CONVEX_URL) {
+      await navigator.clipboard.writeText(CONVEX_URL);
+      setCopiedUrl(true);
+      setTimeout(() => setCopiedUrl(false), 2000);
     }
   };
 
@@ -174,6 +192,107 @@ export function SettingsPage() {
           </section>
         )}
 
+        {/* Plugin Setup */}
+        <section>
+          <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+            <Terminal className="h-5 w-5" />
+            Plugin Setup
+          </h2>
+          <div className="p-4 rounded-lg bg-card border border-border">
+            <p className="text-sm text-muted-foreground mb-4">
+              Use these credentials to configure the{" "}
+              <a
+                href="https://www.npmjs.com/package/opencode-sync-plugin"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline inline-flex items-center gap-1"
+              >
+                opencode-sync-plugin
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </p>
+
+            {/* Convex URL */}
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs text-muted-foreground mb-1.5 block">
+                  Convex URL
+                </label>
+                <div className="flex items-center gap-2">
+                  <code className="flex-1 text-sm font-mono text-foreground bg-muted px-3 py-2 rounded border border-border overflow-x-auto">
+                    {CONVEX_URL || "Not configured"}
+                  </code>
+                  <button
+                    onClick={handleCopyUrl}
+                    className="p-2 rounded hover:bg-accent border border-border"
+                    title="Copy Convex URL"
+                  >
+                    {copiedUrl ? (
+                      <Check className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* API Key Status */}
+              <div>
+                <label className="text-xs text-muted-foreground mb-1.5 block">
+                  API Key
+                </label>
+                {currentUser?.hasApiKey || newApiKey ? (
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 text-sm font-mono text-foreground bg-muted px-3 py-2 rounded border border-border">
+                      {newApiKey && showApiKey ? newApiKey : "osk_••••••••••••••••"}
+                    </code>
+                    {newApiKey && (
+                      <>
+                        <button
+                          onClick={() => setShowApiKey(!showApiKey)}
+                          className="p-2 rounded hover:bg-accent border border-border"
+                          title={showApiKey ? "Hide API key" : "Show API key"}
+                        >
+                          {showApiKey ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </button>
+                        <button
+                          onClick={handleCopyKey}
+                          className="p-2 rounded hover:bg-accent border border-border"
+                          title="Copy API key"
+                        >
+                          {copiedKey ? (
+                            <Check className="h-4 w-4 text-green-500" />
+                          ) : (
+                            <Copy className="h-4 w-4" />
+                          )}
+                        </button>
+                      </>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    No API key generated. Create one below.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Quick Setup Instructions */}
+            <div className="mt-4 p-3 rounded bg-background border border-border">
+              <p className="text-xs font-medium text-foreground mb-2">Quick setup</p>
+              <div className="space-y-1 text-xs font-mono text-muted-foreground">
+                <p>npm install -g opencode-sync-plugin</p>
+                <p>opencode-sync login</p>
+                <p className="text-zinc-600"># Paste credentials when prompted</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* API Key */}
         <section>
           <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
@@ -200,8 +319,9 @@ export function SettingsPage() {
                       <button
                         onClick={handleCopyKey}
                         className="p-2 rounded hover:bg-accent"
+                        title="Copy API key"
                       >
-                        {copied ? (
+                        {copiedKey ? (
                           <Check className="h-4 w-4 text-green-500" />
                         ) : (
                           <Copy className="h-4 w-4" />

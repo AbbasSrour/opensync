@@ -207,6 +207,26 @@ http.route({
   }),
 });
 
+// List all session external IDs for the authenticated user
+http.route({
+  path: "/sync/sessions/list",
+  method: "GET",
+  handler: httpAction(async (ctx, request) => {
+    const auth = await validateApiKey(ctx, request);
+    if (auth.error) return json({ error: auth.error }, auth.status);
+
+    try {
+      const sessionIds = await ctx.runQuery(internal.sessions.listExternalIds, {
+        userId: auth.user._id,
+      });
+
+      return json({ sessionIds });
+    } catch (e) {
+      return json({ error: String(e) }, 500);
+    }
+  }),
+});
+
 // ============================================================================
 // SECURE API ENDPOINTS (for external apps)
 // ============================================================================

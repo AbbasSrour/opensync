@@ -8,7 +8,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- GET /sync/sessions/list endpoint to list all session external IDs for the authenticated user
+- Used by opencode-sync CLI `sync --all` to check which sessions already exist before syncing
 - Published opencode-sync-plugin to npm: [npmjs.com/package/opencode-sync-plugin](https://www.npmjs.com/package/opencode-sync-plugin)
+- Added Plugin Setup section to Settings page with Convex URL and API Key display
+- Users can now copy both credentials needed for opencode-sync-plugin directly from Settings
+- Added show/hide toggle for API key in Plugin Setup section
 
 ### Fixed
 
