@@ -12,6 +12,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Source dropdown filter in dashboard header (All Sources / OpenCode / Claude Code)
 - All analytics queries now support source filtering for multi-plugin support
 - Backend support for claude-code-sync plugin (same API key authentication)
+- Source badges on session list items (CC for Claude Code, OC for OpenCode)
+- Source badge in session detail header (full "Claude Code" or "OpenCode" label)
+- sourceStats query in analytics.ts for session distribution by source
+- messages.upsert now accepts source parameter for auto-created sessions
+- CSV export now includes Source column (opencode/claude-code) and exports all sessions regardless of filter
 - ConsumptionBreakdown component with stacked bar chart, credit usage bar, and usage table
 - StackedBarChart component for multi-segment bar visualization with tooltips
 - UsageCreditBar component showing included credit vs on-demand charges
@@ -167,7 +172,7 @@ See [PRD-FEATURES.md](docs/PRD-FEATURES.md), [SYNC-FOR-EVALS-PRD.md](docs/SYNC-F
 
 ### Plugins
 - opencode-sync-plugin: **Published** at [npmjs.com/package/opencode-sync-plugin](https://www.npmjs.com/package/opencode-sync-plugin)
-- claude-code-sync: npm package for Claude Code (API Key auth) - coming soon
+- claude-code-sync: **Published** at [npmjs.com/package/claude-code-sync](https://www.npmjs.com/package/claude-code-sync)
 - Both plugins use simple CLI login with Convex URL and API Key
 
 ### Sync for Evals

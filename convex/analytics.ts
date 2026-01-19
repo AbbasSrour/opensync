@@ -393,6 +393,61 @@ export const sessionsWithDetails = query({
   },
 });
 
+// Source distribution stats (OpenCode vs Claude Code)
+export const sourceStats = query({
+  args: {},
+  returns: v.array(
+    v.object({
+      source: v.string(),
+      sessions: v.number(),
+      totalTokens: v.number(),
+      cost: v.number(),
+    })
+  ),
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return [];
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_workos_id", (q) => q.eq("workosId", identity.subject))
+      .first();
+
+    if (!user) return [];
+
+    const sessions = await ctx.db
+      .query("sessions")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+
+    // Group by source
+    const bySource: Record<string, {
+      sessions: number;
+      totalTokens: number;
+      cost: number;
+    }> = {};
+
+    for (const session of sessions) {
+      // Treat null/undefined source as "opencode" for backward compatibility
+      const source = session.source || "opencode";
+      if (!bySource[source]) {
+        bySource[source] = {
+          sessions: 0,
+          totalTokens: 0,
+          cost: 0,
+        };
+      }
+      bySource[source].sessions += 1;
+      bySource[source].totalTokens += session.totalTokens;
+      bySource[source].cost += session.cost;
+    }
+
+    return Object.entries(bySource)
+      .map(([source, stats]) => ({ source, ...stats }))
+      .sort((a, b) => b.sessions - a.sessions);
+  },
+});
+
 // Summary stats for dashboard header
 export const summaryStats = query({
   args: {

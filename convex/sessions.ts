@@ -420,10 +420,11 @@ export const exportAllDataCSV = query({
       .withIndex("by_user", (q) => q.eq("userId", user._id))
       .collect();
 
-    // Build CSV header
+    // Build CSV header - includes Source field to distinguish OpenCode vs Claude Code
     const headers = [
       "Session ID",
       "External ID",
+      "Source",
       "Title",
       "Project Name",
       "Project Path",
@@ -441,10 +442,11 @@ export const exportAllDataCSV = query({
       "Updated At",
     ];
 
-    // Build CSV rows
+    // Build CSV rows - exports ALL sessions (both OpenCode and Claude Code)
     const rows = sessions.map((s) => [
       s._id,
       s.externalId,
+      s.source || "opencode", // Default to opencode for legacy sessions
       `"${(s.title || "").replace(/"/g, '""')}"`,
       `"${(s.projectName || "").replace(/"/g, '""')}"`,
       `"${(s.projectPath || "").replace(/"/g, '""')}"`,

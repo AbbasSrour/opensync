@@ -14,6 +14,8 @@ export const upsert = internalMutation({
     promptTokens: v.optional(v.number()),
     completionTokens: v.optional(v.number()),
     durationMs: v.optional(v.number()),
+    // Source identifier passed from plugin ("opencode" or "claude-code")
+    source: v.optional(v.string()),
     parts: v.optional(
       v.array(
         v.object({
@@ -36,6 +38,7 @@ export const upsert = internalMutation({
       .first();
 
     // Auto-create session if it doesn't exist (handles out-of-order sync)
+    // Pass source through so auto-created sessions are tagged correctly
     if (!session) {
       const sessionId = await ctx.db.insert("sessions", {
         userId: args.userId,
@@ -45,6 +48,7 @@ export const upsert = internalMutation({
         projectName: undefined,
         model: args.model,
         provider: undefined,
+        source: args.source || "opencode", // Tag with source from plugin
         promptTokens: 0,
         completionTokens: 0,
         totalTokens: 0,

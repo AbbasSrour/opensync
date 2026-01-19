@@ -8,7 +8,6 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 
 - [ ] Fix filter UI alignment
 - [ ] Add API rename and Claude API config
-- [ ] Add claude-code-sync plugin
 - [ ] Notifications UI match existing design system
 
 ## Completed
@@ -74,6 +73,11 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 - [x] Source field added to sessions schema (opencode vs claude-code)
 - [x] Source dropdown filter in dashboard header (All Sources / OpenCode / Claude Code)
 - [x] All analytics queries updated to filter by source
+- [x] claude-code-sync plugin backend integration completed
+- [x] Source badges (CC/OC) on session list items and detail header
+- [x] sourceStats query for session distribution by source
+- [x] messages.upsert accepts source param for auto-created sessions
+- [x] CSV export includes Source column and exports all sessions
 
 ## In Progress
 
@@ -91,12 +95,13 @@ None currently.
   - [x] CLI commands (login, logout, status, config)
   - [x] Config file (~/.config/opencode-sync/config.json)
   - [x] URL normalization (.cloud to .site)
-- [ ] claude-code-sync plugin (npm package for Claude Code)
-  - [ ] API Key authentication (no browser OAuth)
-  - [ ] Event hooks (SessionStart, UserPromptSubmit, PostToolUse, SessionEnd)
-  - [ ] CLI commands (login, logout, status, config)
-  - [ ] Config file (~/.config/claude-code-sync/config.json)
-  - [ ] URL normalization (.cloud to .site)
+- [x] claude-code-sync plugin (npm package for Claude Code) - **Published:** [npmjs.com/package/claude-code-sync](https://www.npmjs.com/package/claude-code-sync)
+  - [x] API Key authentication (no browser OAuth)
+  - [x] Event hooks (SessionStart, UserPromptSubmit, PostToolUse, SessionEnd)
+  - [x] CLI commands (login, logout, status, config, setup, verify, synctest)
+  - [x] Config file (~/.config/claude-code-sync/config.json)
+  - [x] URL normalization (.cloud to .site)
+  - [x] OpenSync backend integration (source field, source badge, sourceStats query)
 - [x] Add source field to sessions schema (opencode vs claude-code)
 
 ### High Priority (Core)
@@ -159,7 +164,7 @@ Deferred. See [PRD-FEATURES.md](docs/PRD-FEATURES.md).
 | Repo | Purpose | Language | Auth | Status |
 |------|---------|----------|------|--------|
 | [opencode-sync-plugin](https://www.npmjs.com/package/opencode-sync-plugin) | npm package for OpenCode CLI | TypeScript | API Key (osk_*) | Published |
-| claude-code-sync | npm package for Claude Code | TypeScript | API Key (osk_*) | Not started |
+| [claude-code-sync](https://www.npmjs.com/package/claude-code-sync) | npm package for Claude Code | TypeScript | API Key (osk_*) | Published |
 
 ## Notes
 

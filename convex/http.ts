@@ -155,6 +155,7 @@ http.route({
         promptTokens: body.promptTokens,
         completionTokens: body.completionTokens,
         durationMs: body.durationMs,
+        source: body.source, // Pass source for auto-created sessions ("opencode" or "claude-code")
         parts: body.parts,
       });
 

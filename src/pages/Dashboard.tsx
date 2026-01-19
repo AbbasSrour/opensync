@@ -871,9 +871,26 @@ function SessionsView({
                 </svg>
               </button>
               <div className="min-w-0">
-                <h2 className={cn("text-sm font-normal truncate", t.textPrimary)}>
-                  {selectedSession.session.title || "Untitled Session"}
-                </h2>
+                <div className="flex items-center gap-2">
+                  <h2 className={cn("text-sm font-normal truncate", t.textPrimary)}>
+                    {selectedSession.session.title || "Untitled Session"}
+                  </h2>
+                  {/* Source badge in detail header */}
+                  {(() => {
+                    const detailSource = selectedSession.session.source || "opencode";
+                    const isClaudeCodeDetail = detailSource === "claude-code";
+                    return (
+                      <span className={cn(
+                        "shrink-0 px-1.5 py-0.5 rounded text-[9px] font-medium uppercase tracking-wide",
+                        isClaudeCodeDetail
+                          ? "bg-amber-500/15 text-amber-500"
+                          : "bg-blue-500/15 text-blue-400"
+                      )}>
+                        {isClaudeCodeDetail ? "Claude Code" : "OpenCode"}
+                      </span>
+                    );
+                  })()}
+                </div>
                 <div className={cn("flex items-center gap-3 mt-0.5 text-xs", t.textDim)}>
                   {selectedSession.session.model && <span>{selectedSession.session.model}</span>}
                   <span>{formatNumber(selectedSession.session.totalTokens)} tokens</span>
@@ -1616,6 +1633,10 @@ function SessionRow({ session, isSelected, onClick, theme }: { session: any; isS
 
 function SessionTableRow({ session, isSelected, onClick, theme }: { session: any; isSelected: boolean; onClick: () => void; theme: "dark" | "tan" }) {
   const t = getThemeClasses(theme);
+  // Determine source badge styling
+  const source = session.source || "opencode";
+  const isClaudeCode = source === "claude-code";
+  
   return (
     <button
       onClick={onClick}
@@ -1628,7 +1649,18 @@ function SessionTableRow({ session, isSelected, onClick, theme }: { session: any
       <div className="col-span-5 flex items-center gap-2 min-w-0">
         <MessageSquare className={cn("h-3.5 w-3.5 shrink-0", t.iconMuted)} />
         <div className="min-w-0">
-          <p className={cn("text-sm truncate", t.textSecondary)}>{session.title || "Untitled"}</p>
+          <div className="flex items-center gap-1.5">
+            <p className={cn("text-sm truncate", t.textSecondary)}>{session.title || "Untitled"}</p>
+            {/* Source badge - shows CC for Claude Code, OC for OpenCode */}
+            <span className={cn(
+              "shrink-0 px-1 py-0.5 rounded text-[9px] font-medium uppercase tracking-wide",
+              isClaudeCode
+                ? "bg-amber-500/15 text-amber-500"
+                : "bg-blue-500/15 text-blue-400"
+            )}>
+              {isClaudeCode ? "CC" : "OC"}
+            </span>
+          </div>
           <p className={cn("text-[10px] truncate", t.textDim)}>
             {session.model || "unknown"} · {getTimeAgo(session.updatedAt)}
           </p>
@@ -1775,26 +1807,22 @@ function SourceDropdown({
   ];
 
   return (
-    <div className="relative">
+    <div className={cn("relative flex items-center rounded-md p-0.5 border", t.bgToggle, t.border)}>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value as SourceFilter)}
         className={cn(
-          "h-8 pl-3 pr-8 rounded-md border text-xs appearance-none cursor-pointer focus:outline-none transition-colors",
-          t.bgInput,
-          t.border,
-          t.textSecondary,
-          // Highlight when filtering is active
-          value !== "all" && (theme === "dark" ? "border-blue-500/50" : "border-[#EB5601]/50")
+          "px-3 py-1 text-xs rounded appearance-none cursor-pointer focus:outline-none transition-colors bg-transparent",
+          t.textSecondary
         )}
       >
         {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
+          <option key={opt.value} value={opt.value} className={t.bgToggle}>
             {opt.label}
           </option>
         ))}
       </select>
-      <ChevronDown className={cn("absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 pointer-events-none", t.iconMuted)} />
+      <ChevronDown className={cn("absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 pointer-events-none", t.iconMuted)} />
     </div>
   );
 }
