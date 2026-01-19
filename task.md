@@ -93,6 +93,17 @@ None currently.
 
 ## Recently Completed
 
+- [x] Dashboard UX improvement: removed search bar, added search icon to Context link
+  - Search functionality consolidated into dedicated Context page
+  - Cleaner header with Context link as search entry point
+  - Removed unused searchQuery state, keyboard handler, and searchResults query
+
+- [x] Login page tan mode theme support with footer theme switcher
+  - Added ThemeSwitcher component to bottom right footer
+  - Full theme-aware styling for all Login page elements
+  - Logo inversion for tan mode (Convex, WorkOS, Netlify)
+  - Theme persists via localStorage
+
 - [x] Delete user data and account options
   - Added deleteAllData mutation (removes sessions, messages, parts, embeddings, apiLogs)
   - Added deleteAccount action (calls WorkOS API DELETE /user_management/users/:id)

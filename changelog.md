@@ -6,7 +6,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- Removed search bar from Dashboard header, added search icon to Context link for cleaner UX
+- Search functionality consolidated into dedicated Context page (/context)
+- Login page now supports tan mode theme with icon-only theme switcher in bottom right footer
+
 ### Added
+
+- Theme switcher on Login page footer (Sun/Moon icon, no text labels)
 
 - Delete synced data option in Settings (removes all sessions, messages, embeddings while keeping account)
 - Delete account option in Settings (calls WorkOS API to delete user, removes all Convex data)

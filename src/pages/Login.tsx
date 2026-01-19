@@ -1,7 +1,8 @@
 import { useAuth } from "../lib/auth";
 import { useAuth as useAuthKit } from "@workos-inc/authkit-react";
 import { Navigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { Loader2, Sun, Moon } from "lucide-react";
+import { useTheme } from "../lib/theme";
 
 const ASCII_LOGO = `
  ██████╗ ██████╗ ███████╗███╗   ██╗███████╗██╗   ██╗███╗   ██╗ ██████╗
@@ -19,18 +20,44 @@ const MOCK_SESSIONS = [
   { id: "04", title: "db-migration", time: "3h ago", tokens: "2.1k" },
 ];
 
+// Small theme switcher component for footer
+function ThemeSwitcher() {
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === "dark";
+
+  return (
+    <button
+      onClick={toggleTheme}
+      className={`p-1.5 rounded-md transition-colors ${
+        isDark
+          ? "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50"
+          : "text-[#6b6b6b] hover:text-[#1a1a1a] hover:bg-[#ebe9e6]"
+      }`}
+      title={isDark ? "Switch to tan mode" : "Switch to dark mode"}
+    >
+      {isDark ? (
+        <Sun className="h-4 w-4" />
+      ) : (
+        <Moon className="h-4 w-4" />
+      )}
+    </button>
+  );
+}
+
 export function LoginPage() {
   const { isAuthenticated, isLoading, signIn, signOut } = useAuth();
   // Get WorkOS user state directly to detect auth sync issues
   const { user: workosUser, isLoading: workosLoading } = useAuthKit();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   // Show loading state while processing callback or checking auth
   if (isLoading || workosLoading) {
     return (
-      <div className="min-h-screen bg-[#0E0E0E] flex items-center justify-center">
+      <div className={`min-h-screen flex items-center justify-center ${isDark ? "bg-[#0E0E0E]" : "bg-[#faf8f5]"}`}>
         <div className="text-center">
-          <Loader2 className="h-6 w-6 animate-spin text-zinc-500 mx-auto" />
-          <p className="mt-3 text-sm text-zinc-500">Signing in...</p>
+          <Loader2 className={`h-6 w-6 animate-spin mx-auto ${isDark ? "text-zinc-500" : "text-[#8b7355]"}`} />
+          <p className={`mt-3 text-sm ${isDark ? "text-zinc-500" : "text-[#6b6b6b]"}`}>Signing in...</p>
         </div>
       </div>
     );
@@ -46,9 +73,13 @@ export function LoginPage() {
   const authSyncIssue = hasWorkosUser && !isAuthenticated;
 
   return (
-    <div className="min-h-screen bg-[#0E0E0E] text-zinc-100">
+    <div className={`min-h-screen ${isDark ? "bg-[#0E0E0E] text-zinc-100" : "bg-[#faf8f5] text-[#1a1a1a]"}`}>
       {/* Subtle gradient overlay */}
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(255,255,255,0.02),_transparent_50%)]" />
+      <div className={`pointer-events-none fixed inset-0 ${
+        isDark 
+          ? "bg-[radial-gradient(ellipse_at_top,_rgba(255,255,255,0.02),_transparent_50%)]"
+          : "bg-[radial-gradient(ellipse_at_top,_rgba(139,115,85,0.03),_transparent_50%)]"
+      }`} />
 
       <div className="relative mx-auto flex min-h-screen max-w-6xl flex-col px-6 py-8">
         {/* Main content */}
@@ -57,62 +88,74 @@ export function LoginPage() {
             {/* Left side: ASCII logo and text */}
             <div className="flex flex-col justify-center">
               {/* ASCII Logo */}
-              <pre className="overflow-x-auto text-[7px] leading-tight text-zinc-500 md:text-[9px]">
+              <pre className={`overflow-x-auto text-[7px] leading-tight md:text-[9px] ${isDark ? "text-zinc-500" : "text-[#8b7355]"}`}>
                 {ASCII_LOGO}
               </pre>
 
               {/* Tagline */}
-              <h2 className="mt-6 text-lg font-medium text-zinc-200 sm:text-xl">
+              <h2 className={`mt-6 text-lg font-medium sm:text-xl ${isDark ? "text-zinc-200" : "text-[#1a1a1a]"}`}>
                 Dashboards for OpenCode and Claude coding sessions
               </h2>
-              <p className="mt-2 text-sm text-zinc-300 sm:text-base">
+              <p className={`mt-2 text-sm sm:text-base ${isDark ? "text-zinc-300" : "text-[#1a1a1a]"}`}>
                 Cloud-synced dashboards that track session activity, tool usage, and token spend across projects.
               </p>
 
               {/* Feature list - colors from VSCode TypeScript theme */}
-              <div className="mt-6 space-y-2 text-sm text-zinc-500">
+              <div className={`mt-6 space-y-2 text-sm ${isDark ? "text-zinc-500" : "text-[#6b6b6b]"}`}>
                 <p>
-                  <span className="text-[#c586c0] font-mono">Sync</span> sessions from CLI
+                  <span className={`font-mono ${isDark ? "text-[#c586c0]" : "text-[#9b4d96]"}`}>Sync</span> sessions from CLI
                   to cloud
                 </p>
                 <p>
-                  <span className="text-[#dcdcaa] font-mono">Search</span> with full text
+                  <span className={`font-mono ${isDark ? "text-[#dcdcaa]" : "text-[#8b7355]"}`}>Search</span> with full text
                   and semantic lookup
                 </p>
                 <p>
-                  <span className="text-[#ce9178] font-mono">Private</span> your data stays
+                  <span className={`font-mono ${isDark ? "text-[#ce9178]" : "text-[#a05d3b]"}`}>Private</span> your data stays
                   in your account. 
                 </p>
                 <p>
-                  <span className="text-[#9cdcfe] font-mono">Export</span> sessions for
+                  <span className={`font-mono ${isDark ? "text-[#9cdcfe]" : "text-[#3d7ea6]"}`}>Export</span> sessions for
                   evals in DeepEval, OpenAI, or plain text
                 </p>
                 <p>
-                  <span className="text-[#FF6541] font-mono">Delete</span> your data, your control, delete your sessions anytime.
+                  <span className="text-[#EB5601] font-mono">Delete</span> your data, your control, delete your sessions anytime.
                 </p>
               </div>
 
               {/* CTA */}
               {authSyncIssue ? (
                 <div className="mt-8 space-y-3">
-                  <div className="rounded-md border border-amber-800/50 bg-amber-900/20 px-4 py-3">
-                    <p className="text-sm text-amber-200">
+                  <div className={`rounded-md border px-4 py-3 ${
+                    isDark 
+                      ? "border-amber-800/50 bg-amber-900/20" 
+                      : "border-amber-600/30 bg-amber-50"
+                  }`}>
+                    <p className={`text-sm ${isDark ? "text-amber-200" : "text-amber-800"}`}>
                       Signed in as {workosUser?.email}
                     </p>
-                    <p className="mt-1 text-xs text-amber-400/70">
+                    <p className={`mt-1 text-xs ${isDark ? "text-amber-400/70" : "text-amber-600"}`}>
                       Backend sync pending. Try signing out and back in.
                     </p>
                   </div>
                   <div className="flex gap-3">
                     <button
                       onClick={signOut}
-                      className="w-fit rounded-md border border-zinc-700 bg-[#0E0E0E] px-6 py-2.5 text-sm font-medium text-zinc-100 transition-colors hover:border-zinc-600 hover:bg-zinc-900"
+                      className={`w-fit rounded-md border px-6 py-2.5 text-sm font-medium transition-colors ${
+                        isDark
+                          ? "border-zinc-700 bg-[#0E0E0E] text-zinc-100 hover:border-zinc-600 hover:bg-zinc-900"
+                          : "border-[#e6e4e1] bg-[#faf8f5] text-[#1a1a1a] hover:border-[#8b7355] hover:bg-[#f5f3f0]"
+                      }`}
                     >
                       Sign out
                     </button>
                     <button
                       onClick={signIn}
-                      className="w-fit rounded-md border border-zinc-600 bg-zinc-800 px-6 py-2.5 text-sm font-medium text-zinc-100 transition-colors hover:bg-zinc-700"
+                      className={`w-fit rounded-md border px-6 py-2.5 text-sm font-medium transition-colors ${
+                        isDark
+                          ? "border-zinc-600 bg-zinc-800 text-zinc-100 hover:bg-zinc-700"
+                          : "border-[#8b7355] bg-[#ebe9e6] text-[#1a1a1a] hover:bg-[#e6e4e1]"
+                      }`}
                     >
                       Try again
                     </button>
@@ -122,13 +165,21 @@ export function LoginPage() {
                 <div className="mt-8 flex gap-3">
                   <button
                     onClick={signIn}
-                    className="w-fit rounded-md border border-zinc-700 bg-[#0E0E0E] px-6 py-2.5 text-sm font-medium text-zinc-100 transition-colors hover:border-zinc-600 hover:bg-zinc-900"
+                    className={`w-fit rounded-md border px-6 py-2.5 text-sm font-medium transition-colors ${
+                      isDark
+                        ? "border-zinc-700 bg-[#0E0E0E] text-zinc-100 hover:border-zinc-600 hover:bg-zinc-900"
+                        : "border-[#e6e4e1] bg-[#faf8f5] text-[#1a1a1a] hover:border-[#8b7355] hover:bg-[#f5f3f0]"
+                    }`}
                   >
                     Sign in
                   </button>
                   <a
                     href="/docs"
-                    className="w-fit rounded-md border border-zinc-700 bg-[#0E0E0E] px-6 py-2.5 text-sm font-medium text-zinc-100 transition-colors hover:border-zinc-600 hover:bg-zinc-900"
+                    className={`w-fit rounded-md border px-6 py-2.5 text-sm font-medium transition-colors ${
+                      isDark
+                        ? "border-zinc-700 bg-[#0E0E0E] text-zinc-100 hover:border-zinc-600 hover:bg-zinc-900"
+                        : "border-[#e6e4e1] bg-[#faf8f5] text-[#1a1a1a] hover:border-[#8b7355] hover:bg-[#f5f3f0]"
+                    }`}
                   >
                     Docs
                   </a>
@@ -136,7 +187,7 @@ export function LoginPage() {
               )}
 
               {/* Export formats */}
-              <div className="mt-6 flex flex-wrap gap-4 text-xs text-zinc-600">
+              <div className={`mt-6 flex flex-wrap gap-4 text-xs ${isDark ? "text-zinc-600" : "text-[#8b7355]"}`}>
                 <span>JSON</span>
                 <span>JSONL</span>
                 <span>Markdown</span>
@@ -144,8 +195,12 @@ export function LoginPage() {
               </div>
 
               {/* Trust message */}
-              <div className="mt-6 rounded-md border border-zinc-800 bg-zinc-900/50 px-4 py-3">
-                <p className="text-xs text-zinc-400">
+              <div className={`mt-6 rounded-md border px-4 py-3 ${
+                isDark 
+                  ? "border-zinc-800 bg-zinc-900/50" 
+                  : "border-[#e6e4e1] bg-[#f5f3f0]"
+              }`}>
+                <p className={`text-xs ${isDark ? "text-zinc-400" : "text-[#6b6b6b]"}`}>
                   Your sessions stay private. Unsync or delete your data from the database anytime.
                 </p>
               </div>
@@ -154,15 +209,19 @@ export function LoginPage() {
             {/* Right side: Mini dashboard mock + Getting started */}
             <div className="hidden lg:flex lg:flex-col lg:gap-6">
               {/* Dashboard preview */}
-              <div className="overflow-hidden rounded-lg border border-zinc-800 bg-[#161616]">
+              <div className={`overflow-hidden rounded-lg border ${
+                isDark ? "border-zinc-800 bg-[#161616]" : "border-[#e6e4e1] bg-[#f5f3f0]"
+              }`}>
                 {/* Window chrome */}
-                <div className="flex items-center gap-2 border-b border-zinc-800 px-4 py-3">
+                <div className={`flex items-center gap-2 border-b px-4 py-3 ${
+                  isDark ? "border-zinc-800" : "border-[#e6e4e1]"
+                }`}>
                   <div className="flex gap-1.5">
-                    <div className="h-3 w-3 rounded-full bg-zinc-700" />
-                    <div className="h-3 w-3 rounded-full bg-zinc-700" />
-                    <div className="h-3 w-3 rounded-full bg-zinc-700" />
+                    <div className={`h-3 w-3 rounded-full ${isDark ? "bg-zinc-700" : "bg-[#e6e4e1]"}`} />
+                    <div className={`h-3 w-3 rounded-full ${isDark ? "bg-zinc-700" : "bg-[#e6e4e1]"}`} />
+                    <div className={`h-3 w-3 rounded-full ${isDark ? "bg-zinc-700" : "bg-[#e6e4e1]"}`} />
                   </div>
-                  <span className="ml-2 text-xs text-zinc-500">
+                  <span className={`ml-2 text-xs ${isDark ? "text-zinc-500" : "text-[#8b7355]"}`}>
                     opensync dashboard
                   </span>
                 </div>
@@ -170,8 +229,10 @@ export function LoginPage() {
                 {/* Dashboard content */}
                 <div className="flex">
                   {/* Sidebar */}
-                  <div className="w-48 border-r border-zinc-800 p-3">
-                    <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-zinc-600">
+                  <div className={`w-48 border-r p-3 ${isDark ? "border-zinc-800" : "border-[#e6e4e1]"}`}>
+                    <p className={`mb-2 text-[10px] font-medium uppercase tracking-wider ${
+                      isDark ? "text-zinc-600" : "text-[#8b7355]"
+                    }`}>
                       Sessions
                     </p>
                     <div className="space-y-1">
@@ -180,12 +241,16 @@ export function LoginPage() {
                           key={session.id}
                           className={`cursor-pointer rounded px-2 py-1.5 text-xs ${
                             i === 0
-                              ? "bg-zinc-800 text-zinc-200"
-                              : "text-zinc-500 hover:bg-zinc-800/50"
+                              ? isDark 
+                                ? "bg-zinc-800 text-zinc-200" 
+                                : "bg-[#ebe9e6] text-[#1a1a1a]"
+                              : isDark 
+                                ? "text-zinc-500 hover:bg-zinc-800/50" 
+                                : "text-[#6b6b6b] hover:bg-[#ebe9e6]"
                           }`}
                         >
                           <div className="flex items-center gap-2">
-                            <span className="text-zinc-600">{session.id}</span>
+                            <span className={isDark ? "text-zinc-600" : "text-[#8b7355]"}>{session.id}</span>
                             <span className="truncate">{session.title}</span>
                           </div>
                         </div>
@@ -197,32 +262,38 @@ export function LoginPage() {
                   <div className="flex-1 p-4">
                     <div className="mb-4 flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-zinc-300">
+                        <p className={`text-sm font-medium ${isDark ? "text-zinc-300" : "text-[#1a1a1a]"}`}>
                           auth-flow-setup
                         </p>
-                        <p className="text-xs text-zinc-600">2 minutes ago</p>
+                        <p className={`text-xs ${isDark ? "text-zinc-600" : "text-[#8b7355]"}`}>2 minutes ago</p>
                       </div>
                       <div className="flex gap-2">
-                        <span className="rounded bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">
+                        <span className={`rounded px-2 py-0.5 text-[10px] ${
+                          isDark ? "bg-zinc-800 text-zinc-400" : "bg-[#ebe9e6] text-[#6b6b6b]"
+                        }`}>
                           1.2k tokens
                         </span>
-                        <span className="rounded bg-emerald-900/30 px-2 py-0.5 text-[10px] text-emerald-400">
+                        <span className={`rounded px-2 py-0.5 text-[10px] ${
+                          isDark ? "bg-emerald-900/30 text-emerald-400" : "bg-emerald-100 text-emerald-700"
+                        }`}>
                           synced
                         </span>
                       </div>
                     </div>
 
                     {/* Mock message preview */}
-                    <div className="space-y-3 rounded border border-zinc-800 bg-[#0E0E0E] p-3">
+                    <div className={`space-y-3 rounded border p-3 ${
+                      isDark ? "border-zinc-800 bg-[#0E0E0E]" : "border-[#e6e4e1] bg-[#faf8f5]"
+                    }`}>
                       <div className="text-xs">
-                        <p className="mb-1 text-zinc-600">user</p>
-                        <p className="text-zinc-400">
+                        <p className={`mb-1 ${isDark ? "text-zinc-600" : "text-[#8b7355]"}`}>user</p>
+                        <p className={isDark ? "text-zinc-400" : "text-[#6b6b6b]"}>
                           Add authentication to the API routes
                         </p>
                       </div>
                       <div className="text-xs">
-                        <p className="mb-1 text-zinc-600">assistant</p>
-                        <p className="text-zinc-400">
+                        <p className={`mb-1 ${isDark ? "text-zinc-600" : "text-[#8b7355]"}`}>assistant</p>
+                        <p className={isDark ? "text-zinc-400" : "text-[#6b6b6b]"}>
                           I'll add JWT validation middleware...
                         </p>
                       </div>
@@ -230,19 +301,19 @@ export function LoginPage() {
 
                     {/* Stats row */}
                     <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                      <div className="rounded bg-zinc-800/50 p-2">
-                        <p className="text-lg font-medium text-zinc-300">24</p>
-                        <p className="text-[10px] text-zinc-600">sessions</p>
+                      <div className={`rounded p-2 ${isDark ? "bg-zinc-800/50" : "bg-[#ebe9e6]"}`}>
+                        <p className={`text-lg font-medium ${isDark ? "text-zinc-300" : "text-[#1a1a1a]"}`}>24</p>
+                        <p className={`text-[10px] ${isDark ? "text-zinc-600" : "text-[#8b7355]"}`}>sessions</p>
                       </div>
-                      <div className="rounded bg-zinc-800/50 p-2">
-                        <p className="text-lg font-medium text-zinc-300">
+                      <div className={`rounded p-2 ${isDark ? "bg-zinc-800/50" : "bg-[#ebe9e6]"}`}>
+                        <p className={`text-lg font-medium ${isDark ? "text-zinc-300" : "text-[#1a1a1a]"}`}>
                           42.1k
                         </p>
-                        <p className="text-[10px] text-zinc-600">tokens</p>
+                        <p className={`text-[10px] ${isDark ? "text-zinc-600" : "text-[#8b7355]"}`}>tokens</p>
                       </div>
-                      <div className="rounded bg-zinc-800/50 p-2">
-                        <p className="text-lg font-medium text-zinc-300">3</p>
-                        <p className="text-[10px] text-zinc-600">shared</p>
+                      <div className={`rounded p-2 ${isDark ? "bg-zinc-800/50" : "bg-[#ebe9e6]"}`}>
+                        <p className={`text-lg font-medium ${isDark ? "text-zinc-300" : "text-[#1a1a1a]"}`}>3</p>
+                        <p className={`text-[10px] ${isDark ? "text-zinc-600" : "text-[#8b7355]"}`}>shared</p>
                       </div>
                     </div>
                   </div>
@@ -250,11 +321,13 @@ export function LoginPage() {
               </div>
 
               {/* Getting started section */}
-              <div className="rounded-lg border border-zinc-800 bg-[#161616] p-4">
-                <h3 className="text-sm font-medium text-zinc-300">
+              <div className={`rounded-lg border p-4 ${
+                isDark ? "border-zinc-800 bg-[#161616]" : "border-[#e6e4e1] bg-[#f5f3f0]"
+              }`}>
+                <h3 className={`text-sm font-medium ${isDark ? "text-zinc-300" : "text-[#1a1a1a]"}`}>
                   Getting started
                 </h3>
-                <p className="mt-2 text-[11px] text-zinc-500">
+                <p className={`mt-2 text-[11px] ${isDark ? "text-zinc-500" : "text-[#6b6b6b]"}`}>
                   Install one of the sync plugins to send session data to your dashboard.
                 </p>
 
@@ -264,12 +337,22 @@ export function LoginPage() {
                     href="https://www.npmjs.com/package/claude-code-sync"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-center justify-between rounded-md border border-zinc-800 bg-[#0E0E0E] px-3 py-2 transition-colors hover:border-zinc-700"
+                    className={`group flex items-center justify-between rounded-md border px-3 py-2 transition-colors ${
+                      isDark 
+                        ? "border-zinc-800 bg-[#0E0E0E] hover:border-zinc-700" 
+                        : "border-[#e6e4e1] bg-[#faf8f5] hover:border-[#8b7355]"
+                    }`}
                   >
-                    <span className="font-mono text-xs text-zinc-400 group-hover:text-zinc-300">
+                    <span className={`font-mono text-xs ${
+                      isDark 
+                        ? "text-zinc-400 group-hover:text-zinc-300" 
+                        : "text-[#6b6b6b] group-hover:text-[#1a1a1a]"
+                    }`}>
                       claude-code-sync
                     </span>
-                    <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-600">
+                    <span className={`rounded px-1.5 py-0.5 text-[10px] ${
+                      isDark ? "bg-zinc-800 text-zinc-600" : "bg-[#ebe9e6] text-[#8b7355]"
+                    }`}>
                       npm
                     </span>
                   </a>
@@ -279,12 +362,22 @@ export function LoginPage() {
                     href="https://www.npmjs.com/package/opencode-sync-plugin"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-center justify-between rounded-md border border-zinc-800 bg-[#0E0E0E] px-3 py-2 transition-colors hover:border-zinc-700"
+                    className={`group flex items-center justify-between rounded-md border px-3 py-2 transition-colors ${
+                      isDark 
+                        ? "border-zinc-800 bg-[#0E0E0E] hover:border-zinc-700" 
+                        : "border-[#e6e4e1] bg-[#faf8f5] hover:border-[#8b7355]"
+                    }`}
                   >
-                    <span className="font-mono text-xs text-zinc-400 group-hover:text-zinc-300">
+                    <span className={`font-mono text-xs ${
+                      isDark 
+                        ? "text-zinc-400 group-hover:text-zinc-300" 
+                        : "text-[#6b6b6b] group-hover:text-[#1a1a1a]"
+                    }`}>
                       opencode-sync-plugin
                     </span>
-                    <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-600">
+                    <span className={`rounded px-1.5 py-0.5 text-[10px] ${
+                      isDark ? "bg-zinc-800 text-zinc-600" : "bg-[#ebe9e6] text-[#8b7355]"
+                    }`}>
                       npm
                     </span>
                   </a>
@@ -295,12 +388,12 @@ export function LoginPage() {
         </main>
 
         {/* Footer */}
-        <footer className="mt-8 flex flex-col items-center gap-3 text-xs text-zinc-600">
+        <footer className={`mt-8 flex flex-col items-center gap-3 text-xs ${isDark ? "text-zinc-600" : "text-[#8b7355]"}`}>
           <a
             href="https://github.com/waynesutton/opensync"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-zinc-500 hover:text-zinc-300 transition-colors"
+            className={`transition-colors ${isDark ? "text-zinc-500 hover:text-zinc-300" : "text-[#6b6b6b] hover:text-[#1a1a1a]"}`}
           >
             Open Source project
           </a>
@@ -317,10 +410,10 @@ export function LoginPage() {
                 <img
                   src="/convex.svg"
                   alt="Convex"
-                  className="h-4 w-auto invert"
+                  className={`h-4 w-auto ${isDark ? "invert" : ""}`}
                 />
               </a>
-              <span className="text-zinc-500">+</span>
+              <span className={isDark ? "text-zinc-500" : "text-[#8b7355]"}>+</span>
               <a
                 href="https://workos.com/docs"
                 target="_blank"
@@ -331,10 +424,10 @@ export function LoginPage() {
                 <img
                   src="/workos.svg"
                   alt="WorkOS"
-                  className="h-5 w-auto invert"
+                  className={`h-5 w-auto ${isDark ? "invert" : ""}`}
                 />
               </a>
-              <span className="text-zinc-500">+</span>
+              <span className={isDark ? "text-zinc-500" : "text-[#8b7355]"}>+</span>
               <a
                 href="https://netlify.com"
                 target="_blank"
@@ -345,10 +438,15 @@ export function LoginPage() {
                 <img
                   src="/netlify-logo.svg"
                   alt="Netlify"
-                  className="h-6 w-auto"
+                  className={`h-6 w-auto ${isDark ? "" : "invert"}`}
                 />
               </a>
             </div>
+          </div>
+
+          {/* Theme switcher - positioned in bottom right */}
+          <div className="fixed bottom-4 right-4">
+            <ThemeSwitcher />
           </div>
         </footer>
       </div>

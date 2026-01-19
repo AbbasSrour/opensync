@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Link } from "react-router-dom";
@@ -14,7 +14,6 @@ import {
   FileText,
   User,
   LogOut,
-  Command,
   ChevronDown,
   Folder,
   MessageSquare,
@@ -59,7 +58,6 @@ export function DashboardPage() {
   const { theme, toggleTheme } = useTheme();
   const t = getThemeClasses(theme);
   const [viewMode, setViewMode] = useState<ViewMode>("overview");
-  const [searchQuery, setSearchQuery] = useState("");
   const [selectedSessionId, setSelectedSessionId] = useState<Id<"sessions"> | null>(null);
   const [sortField, setSortField] = useState<SortField>("updatedAt");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
@@ -69,20 +67,6 @@ export function DashboardPage() {
   const [showFilters, setShowFilters] = useState(false);
   // Source filter for OpenCode vs Claude Code sessions
   const [sourceFilter, setSourceFilter] = useState<SourceFilter>("all");
-  const searchInputRef = useRef<HTMLInputElement>(null);
-
-  // Keyboard shortcuts
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-      e.preventDefault();
-      searchInputRef.current?.focus();
-    }
-  }, []);
-
-  useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [handleKeyDown]);
 
   // Ensure user exists
   const getOrCreate = useMutation(api.users.getOrCreate);
@@ -108,12 +92,6 @@ export function DashboardPage() {
     filterProvider,
     source: sourceArg,
   });
-
-  // Search results
-  const searchResults = useQuery(
-    api.search.searchSessions,
-    searchQuery.trim() ? { query: searchQuery, limit: 20 } : "skip"
-  );
 
   // Selected session details
   const selectedSession = useQuery(
@@ -141,9 +119,7 @@ export function DashboardPage() {
     };
   }, [sessionsData]);
 
-  const displaySessions = searchQuery.trim()
-    ? searchResults || []
-    : sessionsData?.sessions || [];
+  const displaySessions = sessionsData?.sessions || [];
 
   const hasActiveFilters = !!(filterModel || filterProject || filterProvider);
 
@@ -189,33 +165,14 @@ export function DashboardPage() {
         {/* Spacer */}
         <div className="flex-1" />
 
-        {/* Search */}
+        {/* Navigation links */}
         <div className="flex items-center gap-3">
-          <div className="w-64">
-            <div className="relative">
-              <Search className={cn("absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5", t.iconMuted)} />
-              <input
-                ref={searchInputRef}
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search sessions..."
-                className={cn(
-                  "w-full h-8 pl-9 pr-16 rounded-md border text-sm focus:outline-none transition-colors",
-                  t.bgInput, t.borderInput, t.textSecondary, t.textPlaceholder, t.borderFocus
-                )}
-              />
-              <div className={cn("absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5 pointer-events-none", t.iconMuted)}>
-                <Command className="h-3 w-3" />
-                <span className="text-[10px]">K</span>
-              </div>
-            </div>
-          </div>
           <Link
             to="/context"
-            className={cn("text-xs transition-colors", t.textSubtle, "hover:opacity-80")}
-            title="Advanced context search"
+            className={cn("flex items-center gap-1.5 text-xs transition-colors", t.textSubtle, "hover:opacity-80")}
+            title="Search and context"
           >
+            <Search className="h-3.5 w-3.5" />
             Context
           </Link>
           <Link
