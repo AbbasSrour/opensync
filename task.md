@@ -8,6 +8,16 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 
 - [ ] (add next task here)
 
+## Recently Completed (Claude Code Output Display Fix)
+
+- [x] Fixed Claude Code assistant output not displaying in Dashboard (GitHub #7)
+  - MessageBubble component was rendering object content directly instead of extracting text
+  - Added getPartTextContent helper to extract text from string, `{ text: "..." }`, or `{ content: "..." }` formats
+  - Added getToolName helper to extract tool names from `name` or `toolName` properties
+  - Added hasDisplayableParts check to detect if parts have actual content
+  - Added textContent fallback when parts are empty
+  - Added tool-result part type rendering (was missing from MessageBubble)
+
 ## Recently Completed (Factory Droid Full Integration)
 
 - [x] Full Factory Droid support as third sync source

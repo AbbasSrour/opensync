@@ -2432,9 +2432,36 @@ function SessionTableRow({ session, isSelected, onClick, theme }: { session: any
   );
 }
 
+// Helper to extract text content from various plugin formats
+// Claude Code stores content as { text: "..." }, OpenCode may use strings or { content: "..." }
+function getPartTextContent(content: any): string {
+  if (!content) return "";
+  if (typeof content === "string") return content;
+  return content.text || content.content || "";
+}
+
+// Helper to extract tool name from various plugin formats
+function getToolName(content: any): string {
+  if (!content) return "Unknown Tool";
+  return content.name || content.toolName || "Unknown Tool";
+}
+
 function MessageBubble({ message, theme }: { message: any; theme: "dark" | "tan" }) {
   const t = getThemeClasses(theme);
   const isUser = message.role === "user";
+
+  // Check if parts have any displayable text content
+  const hasDisplayableParts = message.parts?.some((part: any) => {
+    if (part.type === "text") {
+      const text = getPartTextContent(part.content);
+      return text && text.trim().length > 0;
+    }
+    return part.type === "tool-call" || part.type === "tool-result";
+  });
+
+  // Use textContent fallback if no parts have displayable content
+  const showFallback = !hasDisplayableParts && message.textContent;
+
   return (
     <div className={cn("flex gap-2", isUser && "flex-row-reverse")}>
       <div className={cn(
@@ -2450,18 +2477,33 @@ function MessageBubble({ message, theme }: { message: any; theme: "dark" | "tan"
             ? cn(t.bgUserBubble, t.textPrimary) 
             : cn(t.bgAssistantBubble, t.textSecondary, "border", t.border)
         )}>
-          {message.parts?.map((part: any, i: number) => (
-            <div key={i}>
-              {part.type === "text" && <p className="whitespace-pre-wrap">{part.content}</p>}
-              {part.type === "tool-call" && (
-                <div className={cn("mt-2 p-2 rounded text-xs font-mono", t.bgCode)}>
-                  <span className={t.textSubtle}>tool:</span> {part.content.name}
-                </div>
-              )}
-            </div>
-          ))}
-          {!message.parts?.length && message.textContent && (
+          {showFallback ? (
             <p className="whitespace-pre-wrap">{message.textContent}</p>
+          ) : (
+            message.parts?.map((part: any, i: number) => {
+              if (part.type === "text") {
+                const textContent = getPartTextContent(part.content);
+                if (!textContent) return null;
+                return <p key={i} className="whitespace-pre-wrap">{textContent}</p>;
+              }
+              if (part.type === "tool-call") {
+                return (
+                  <div key={i} className={cn("mt-2 p-2 rounded text-xs font-mono", t.bgCode)}>
+                    <span className={t.textSubtle}>tool:</span> {getToolName(part.content)}
+                  </div>
+                );
+              }
+              if (part.type === "tool-result") {
+                const result = part.content?.result || part.content?.output || part.content;
+                const resultStr = typeof result === "string" ? result : JSON.stringify(result, null, 2);
+                return (
+                  <div key={i} className={cn("mt-2 p-2 rounded text-xs font-mono", t.bgCode, "text-green-400")}>
+                    <pre className="whitespace-pre-wrap overflow-x-auto">{resultStr}</pre>
+                  </div>
+                );
+              }
+              return null;
+            })
           )}
         </div>
         <span className={cn("text-[10px] mt-1", t.textDim)}>
