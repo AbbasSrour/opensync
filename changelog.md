@@ -16,6 +16,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- Fixed session panel flashing when switching between sessions in Dashboard
+  - Added smooth transition with loading overlay instead of unmounting/remounting the panel
+  - Previous session content stays visible during transition with subtle blur overlay
+  - Dual query approach keeps previous data while new session loads
 - Fixed wrapped image export capturing extra space by using hidden off-screen container (no CSS transforms)
 - Fixed Template 5 (vinyl): removed center hole, enlarged circle to 420px, increased all text sizes
 - Fixed Template 6 (orange gradient): enlarged all text to 6xl for stats, 3xl for labels

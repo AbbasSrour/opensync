@@ -8,6 +8,15 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 
 - [ ] (add next task here)
 
+## Recently Completed (Session Transition Fix)
+
+- [x] Fixed session panel flashing when switching between sessions in Dashboard
+  - Added displaySessionId and isSessionLoading state to track transitions
+  - Added dual query approach: query both current and previous session during transition
+  - Created activeSession fallback that shows previous session while new one loads
+  - Added loading overlay with spinner in messages area (bg-background/60 backdrop-blur)
+  - Session panel no longer unmounts/remounts on selection change
+
 ## Recently Completed (Wrapped Image Fixes)
 
 - [x] Fixed Daily Sync Wrapped image dimensions for social media

@@ -82,6 +82,9 @@ export function DashboardPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [viewMode, setViewMode] = useState<ViewMode>("overview");
   const [selectedSessionId, setSelectedSessionId] = useState<Id<"sessions"> | null>(null);
+  // Track previous session ID to prevent flash during transitions
+  const [displaySessionId, setDisplaySessionId] = useState<Id<"sessions"> | null>(null);
+  const [isSessionLoading, setIsSessionLoading] = useState(false);
   const [sortField, setSortField] = useState<SortField>("updatedAt");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [filterModel, setFilterModel] = useState<string | undefined>();
@@ -143,11 +146,42 @@ export function DashboardPage() {
     source: sourceArg,
   });
 
-  // Selected session details
+  // Selected session details - query both current and display session for smooth transitions
   const selectedSession = useQuery(
     api.sessions.get,
     selectedSessionId ? { sessionId: selectedSessionId } : "skip"
   );
+  
+  // Also fetch the display session (previous) to show during loading
+  const displaySession = useQuery(
+    api.sessions.get,
+    displaySessionId && displaySessionId !== selectedSessionId
+      ? { sessionId: displaySessionId }
+      : "skip"
+  );
+
+  // Handle session transition - update display ID when new session loads
+  useEffect(() => {
+    if (selectedSessionId === null) {
+      // Closing session panel
+      setDisplaySessionId(null);
+      setIsSessionLoading(false);
+    } else if (selectedSessionId !== displaySessionId) {
+      // Switching to a new session
+      setIsSessionLoading(true);
+    }
+  }, [selectedSessionId, displaySessionId]);
+
+  // When new session data arrives, update display ID and clear loading
+  useEffect(() => {
+    if (selectedSession && selectedSessionId) {
+      setDisplaySessionId(selectedSessionId);
+      setIsSessionLoading(false);
+    }
+  }, [selectedSession, selectedSessionId]);
+
+  // Use the loaded session data, falling back to display session during loading
+  const activeSession = selectedSession || (isSessionLoading ? displaySession : null);
 
   // Get unique values for filters
   const filterOptions = useMemo(() => {
@@ -323,7 +357,8 @@ export function DashboardPage() {
             sessions={displaySessions}
             total={sessionsData?.total || 0}
             onSelectSession={setSelectedSessionId}
-            selectedSession={selectedSession}
+            selectedSession={activeSession}
+            isSessionLoading={isSessionLoading}
             sortField={sortField}
             sortOrder={sortOrder}
             onSortChange={(field) => {
@@ -823,6 +858,7 @@ function SessionsView({
   total,
   onSelectSession,
   selectedSession,
+  isSessionLoading,
   sortField,
   sortOrder,
   onSortChange,
@@ -843,6 +879,7 @@ function SessionsView({
   total: number;
   onSelectSession: (id: Id<"sessions"> | null) => void;
   selectedSession: any;
+  isSessionLoading?: boolean;
   sortField: SortField;
   sortOrder: SortOrder;
   onSortChange: (field: SortField) => void;
@@ -1250,7 +1287,13 @@ function SessionsView({
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 relative">
+            {/* Loading overlay during session transition */}
+            {isSessionLoading && (
+              <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px] flex items-center justify-center z-10 transition-opacity duration-150">
+                <Loader2 className={cn("h-6 w-6 animate-spin", t.textMuted)} />
+              </div>
+            )}
             {selectedSession.messages.map((msg: any) => (
               <MessageBubble key={msg._id} message={msg} theme={theme} />
             ))}
