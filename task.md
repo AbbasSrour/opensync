@@ -8,6 +8,29 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 
 - [ ] (add next task here)
 
+## Recently Completed (Codex CLI Plugin Integration)
+
+- [x] codex-sync plugin integration for syncing OpenAI Codex CLI sessions
+  - Added codex-sync to README Ecosystem table and Quick Start section
+  - Updated Codex CLI in AI_AGENTS to status: supported with npm URL
+  - Added codex-sync to Plugin Setup section with npm/GitHub links
+  - Added codex-sync to Quick Setup install commands
+  - Added Codex CLI icon (OpenAI logo) to homepage "Syncs with" section
+  - Added codex-sync package link to homepage "Getting started" section
+  - Added codex-cli to getSourceDisplayName helper
+  - Added codex-cli to SourceType union in source.ts
+  - Added CX short label and Codex CLI full label to getSourceLabel
+  - Added purple theme colors to getSourceColorClass for codex-cli
+  - Added Codex CLI Plugin search index entries to Docs.tsx
+  - Added Codex CLI Plugin navigation entry to Docs sidebar
+  - Added full Codex CLI Plugin documentation section
+  - Added codex-sync to Resources markdown export
+  - Updated inferProvider to recognize Codex models as openai
+- [x] Created docs/ADD-NEW-PLUGIN-TEMPLATE.md for adding future plugins
+  - Comprehensive checklist with 10 file locations
+  - Testing checklist for verification
+  - Color and status options reference
+
 ## Recently Completed (Delete All Data Fix - Issue #17)
 
 - [x] Fixed deleteAllData mutation failing with Server Error (GitHub #17)
@@ -20,11 +43,11 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 ## Recently Completed (Session Transition Fix)
 
 - [x] Fixed session panel flashing when switching between sessions in Dashboard
-  - Added displaySessionId and isSessionLoading state to track transitions
-  - Added dual query approach: query both current and previous session during transition
-  - Created activeSession fallback that shows previous session while new one loads
-  - Added loading overlay with spinner in messages area (bg-background/60 backdrop-blur)
-  - Session panel no longer unmounts/remounts on selection change
+  - Added lastValidSessionRef to cache last valid session data
+  - Updated activeSession logic: selectedSession || displaySession || lastValidSessionRef.current
+  - Replaced full-screen loading overlay with subtle corner spinner (no content blocking)
+  - Added optional chaining for safer property access during transitions
+  - Content stays visible during transitions (Convex real-time without flash)
 
 ## Recently Completed (Wrapped Image Fixes)
 
@@ -500,6 +523,7 @@ Deferred. See [PRD-FEATURES.md](docs/PRD-FEATURES.md).
 |------|---------|----------|------|--------|
 | [opencode-sync-plugin](https://www.npmjs.com/package/opencode-sync-plugin) | npm package for OpenCode CLI | TypeScript | API Key (osk_*) | Published |
 | [claude-code-sync](https://www.npmjs.com/package/claude-code-sync) | npm package for Claude Code | TypeScript | API Key (osk_*) | Published |
+| [codex-sync](https://www.npmjs.com/package/codex-sync) | npm package for Codex CLI | TypeScript | API Key (osk_*) | Published |
 
 ## Notes
 

@@ -28,13 +28,28 @@ function inferProvider(session: { model?: string; provider?: string }): string {
   const model = (session.model || "").toLowerCase();
 
   // Anthropic/Claude models
-  if (model.includes("claude") || model.includes("anthropic")) return "anthropic";
+  if (model.includes("claude") || model.includes("anthropic"))
+    return "anthropic";
 
-  // OpenAI models
-  if (model.includes("gpt") || model.includes("o1") || model.includes("o3") || model.includes("davinci") || model.includes("curie") || model.includes("text-embedding")) return "openai";
+  // OpenAI models (including Codex)
+  if (
+    model.includes("gpt") ||
+    model.includes("o1") ||
+    model.includes("o3") ||
+    model.includes("davinci") ||
+    model.includes("curie") ||
+    model.includes("text-embedding") ||
+    model.includes("codex")
+  )
+    return "openai";
 
   // Google models
-  if (model.includes("gemini") || model.includes("palm") || model.includes("bard")) return "google";
+  if (
+    model.includes("gemini") ||
+    model.includes("palm") ||
+    model.includes("bard")
+  )
+    return "google";
 
   // Mistral models
   if (model.includes("mistral") || model.includes("mixtral")) return "mistral";
@@ -69,7 +84,7 @@ export const dailyStats = query({
       totalTokens: v.number(),
       cost: v.number(),
       durationMs: v.number(),
-    })
+    }),
   ),
   handler: async (ctx, { days = 30, source }) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -91,20 +106,23 @@ export const dailyStats = query({
     sessions = filterBySource(sessions, source);
 
     // Group by date
-    const byDate: Record<string, {
-      sessions: number;
-      promptTokens: number;
-      completionTokens: number;
-      totalTokens: number;
-      cost: number;
-      durationMs: number;
-    }> = {};
+    const byDate: Record<
+      string,
+      {
+        sessions: number;
+        promptTokens: number;
+        completionTokens: number;
+        totalTokens: number;
+        cost: number;
+        durationMs: number;
+      }
+    > = {};
 
     const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
 
     for (const session of sessions) {
       if (session.createdAt < cutoff) continue;
-      
+
       const date = new Date(session.createdAt).toISOString().split("T")[0];
       if (!byDate[date]) {
         byDate[date] = {
@@ -145,7 +163,7 @@ export const modelStats = query({
       totalTokens: v.number(),
       cost: v.number(),
       avgDurationMs: v.number(),
-    })
+    }),
   ),
   handler: async (ctx, { source }) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -167,14 +185,17 @@ export const modelStats = query({
     sessions = filterBySource(sessions, source);
 
     // Group by model
-    const byModel: Record<string, {
-      sessions: number;
-      promptTokens: number;
-      completionTokens: number;
-      totalTokens: number;
-      cost: number;
-      totalDurationMs: number;
-    }> = {};
+    const byModel: Record<
+      string,
+      {
+        sessions: number;
+        promptTokens: number;
+        completionTokens: number;
+        totalTokens: number;
+        cost: number;
+        totalDurationMs: number;
+      }
+    > = {};
 
     for (const session of sessions) {
       const model = session.model || "unknown";
@@ -204,7 +225,10 @@ export const modelStats = query({
         completionTokens: stats.completionTokens,
         totalTokens: stats.totalTokens,
         cost: stats.cost,
-        avgDurationMs: stats.sessions > 0 ? Math.round(stats.totalDurationMs / stats.sessions) : 0,
+        avgDurationMs:
+          stats.sessions > 0
+            ? Math.round(stats.totalDurationMs / stats.sessions)
+            : 0,
       }))
       .sort((a, b) => b.totalTokens - a.totalTokens);
   },
@@ -226,7 +250,7 @@ export const projectStats = query({
       totalDurationMs: v.number(),
       cost: v.number(),
       lastActive: v.number(),
-    })
+    }),
   ),
   handler: async (ctx, { source }) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -248,16 +272,19 @@ export const projectStats = query({
     sessions = filterBySource(sessions, source);
 
     // Group by project with extended metrics
-    const byProject: Record<string, {
-      sessions: number;
-      messageCount: number;
-      totalTokens: number;
-      promptTokens: number;
-      completionTokens: number;
-      totalDurationMs: number;
-      cost: number;
-      lastActive: number;
-    }> = {};
+    const byProject: Record<
+      string,
+      {
+        sessions: number;
+        messageCount: number;
+        totalTokens: number;
+        promptTokens: number;
+        completionTokens: number;
+        totalDurationMs: number;
+        cost: number;
+        lastActive: number;
+      }
+    > = {};
 
     for (const session of sessions) {
       const project = session.projectName || session.projectPath || "Other";
@@ -280,7 +307,10 @@ export const projectStats = query({
       byProject[project].completionTokens += session.completionTokens;
       byProject[project].totalDurationMs += session.durationMs || 0;
       byProject[project].cost += session.cost;
-      byProject[project].lastActive = Math.max(byProject[project].lastActive, session.updatedAt);
+      byProject[project].lastActive = Math.max(
+        byProject[project].lastActive,
+        session.updatedAt,
+      );
     }
 
     return Object.entries(byProject)
@@ -300,7 +330,7 @@ export const providerStats = query({
       sessions: v.number(),
       totalTokens: v.number(),
       cost: v.number(),
-    })
+    }),
   ),
   handler: async (ctx, { source }) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -322,11 +352,14 @@ export const providerStats = query({
     sessions = filterBySource(sessions, source);
 
     // Group by provider
-    const byProvider: Record<string, {
-      sessions: number;
-      totalTokens: number;
-      cost: number;
-    }> = {};
+    const byProvider: Record<
+      string,
+      {
+        sessions: number;
+        totalTokens: number;
+        cost: number;
+      }
+    > = {};
 
     for (const session of sessions) {
       // Use inferred provider for consistent display (fixes GitHub issue #2)
@@ -353,13 +386,15 @@ export const providerStats = query({
 export const sessionsWithDetails = query({
   args: {
     limit: v.optional(v.number()),
-    sortBy: v.optional(v.union(
-      v.literal("updatedAt"),
-      v.literal("createdAt"),
-      v.literal("totalTokens"),
-      v.literal("cost"),
-      v.literal("durationMs")
-    )),
+    sortBy: v.optional(
+      v.union(
+        v.literal("updatedAt"),
+        v.literal("createdAt"),
+        v.literal("totalTokens"),
+        v.literal("cost"),
+        v.literal("durationMs"),
+      ),
+    ),
     sortOrder: v.optional(v.union(v.literal("asc"), v.literal("desc"))),
     filterModel: v.optional(v.string()),
     filterProject: v.optional(v.string()),
@@ -391,12 +426,16 @@ export const sessionsWithDetails = query({
     }
     if (args.filterProject) {
       sessions = sessions.filter(
-        (s) => s.projectName === args.filterProject || s.projectPath === args.filterProject
+        (s) =>
+          s.projectName === args.filterProject ||
+          s.projectPath === args.filterProject,
       );
     }
     if (args.filterProvider) {
       // Use inferred provider for consistent filtering (fixes GitHub issue #2)
-      sessions = sessions.filter((s) => inferProvider(s) === args.filterProvider);
+      sessions = sessions.filter(
+        (s) => inferProvider(s) === args.filterProvider,
+      );
     }
 
     const total = sessions.length;
@@ -407,7 +446,9 @@ export const sessionsWithDetails = query({
     sessions.sort((a, b) => {
       const aVal = a[sortBy] ?? 0;
       const bVal = b[sortBy] ?? 0;
-      return sortOrder === "desc" ? (bVal as number) - (aVal as number) : (aVal as number) - (bVal as number);
+      return sortOrder === "desc"
+        ? (bVal as number) - (aVal as number)
+        : (aVal as number) - (bVal as number);
     });
 
     // Limit
@@ -451,7 +492,7 @@ export const sourceStats = query({
       sessions: v.number(),
       totalTokens: v.number(),
       cost: v.number(),
-    })
+    }),
   ),
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -470,11 +511,14 @@ export const sourceStats = query({
       .collect();
 
     // Group by source
-    const bySource: Record<string, {
-      sessions: number;
-      totalTokens: number;
-      cost: number;
-    }> = {};
+    const bySource: Record<
+      string,
+      {
+        sessions: number;
+        totalTokens: number;
+        cost: number;
+      }
+    > = {};
 
     for (const session of sessions) {
       // Treat null/undefined source as "opencode" for backward compatibility
@@ -516,7 +560,7 @@ export const summaryStats = query({
       avgTokensPerSession: v.number(),
       avgCostPerSession: v.number(),
     }),
-    v.null()
+    v.null(),
   ),
   handler: async (ctx, { source }) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -600,14 +644,14 @@ export const publicPlatformStats = query({
         model: v.string(),
         totalTokens: v.number(),
         sessions: v.number(),
-      })
+      }),
     ),
     topSources: v.array(
       v.object({
         source: v.string(),
         sessions: v.number(),
         totalTokens: v.number(),
-      })
+      }),
     ),
   }),
   handler: async (ctx) => {
@@ -622,9 +666,11 @@ export const publicPlatformStats = query({
     }
 
     // Aggregate by model
-    const modelMap: Record<string, { totalTokens: number; sessions: number }> = {};
+    const modelMap: Record<string, { totalTokens: number; sessions: number }> =
+      {};
     // Aggregate by source (CLI tool)
-    const sourceMap: Record<string, { sessions: number; totalTokens: number }> = {};
+    const sourceMap: Record<string, { sessions: number; totalTokens: number }> =
+      {};
 
     for (const s of sessions) {
       // Model aggregation

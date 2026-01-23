@@ -6,6 +6,19 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- codex-sync plugin integration: sync OpenAI Codex CLI sessions to OpenSync
+  - Added codex-sync to README Ecosystem table and Quick Start section
+  - Added Codex CLI to AI Coding Agents in Settings (status: supported)
+  - Added codex-sync to Plugin Setup and Quick Setup sections
+  - Added Codex CLI icon to homepage "Syncs with" section
+  - Added codex-sync to homepage "Getting started" package links
+  - Added CX source badge with purple theme color
+  - Added Codex CLI Plugin documentation section with installation, configuration, and commands
+  - Updated analytics provider inference to recognize Codex models
+- Created docs/ADD-NEW-PLUGIN-TEMPLATE.md: reusable prompt template for adding future plugins
+
 ### Fixed
 
 - Fixed deleteAllData mutation failing with Server Error (GitHub #17)
@@ -25,9 +38,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 
 - Fixed session panel flashing when switching between sessions in Dashboard
-  - Added smooth transition with loading overlay instead of unmounting/remounting the panel
-  - Previous session content stays visible during transition with subtle blur overlay
-  - Dual query approach keeps previous data while new session loads
+  - Added lastValidSessionRef to cache session data during transitions
+  - Changed activeSession fallback to use cached ref when queries are loading
+  - Replaced full-screen loading overlay with subtle corner spinner
+  - Content stays visible until new session data loads (no flash)
 - Fixed wrapped image export capturing extra space by using hidden off-screen container (no CSS transforms)
 - Fixed Template 5 (vinyl): removed center hole, enlarged circle to 420px, increased all text sizes
 - Fixed Template 6 (orange gradient): enlarged all text to 6xl for stats, 3xl for labels

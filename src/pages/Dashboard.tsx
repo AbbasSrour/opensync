@@ -85,6 +85,8 @@ export function DashboardPage() {
   // Track previous session ID to prevent flash during transitions
   const [displaySessionId, setDisplaySessionId] = useState<Id<"sessions"> | null>(null);
   const [isSessionLoading, setIsSessionLoading] = useState(false);
+  // Cache last valid session to prevent flash during transitions
+  const lastValidSessionRef = useRef<any>(null);
   const [sortField, setSortField] = useState<SortField>("updatedAt");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [filterModel, setFilterModel] = useState<string | undefined>();
@@ -172,16 +174,29 @@ export function DashboardPage() {
     }
   }, [selectedSessionId, displaySessionId]);
 
-  // When new session data arrives, update display ID and clear loading
+  // When new session data arrives, update display ID, clear loading, and cache the session
   useEffect(() => {
     if (selectedSession && selectedSessionId) {
       setDisplaySessionId(selectedSessionId);
       setIsSessionLoading(false);
+      // Cache the valid session to prevent flash during future transitions
+      lastValidSessionRef.current = selectedSession;
     }
   }, [selectedSession, selectedSessionId]);
 
-  // Use the loaded session data, falling back to display session during loading
-  const activeSession = selectedSession || (isSessionLoading ? displaySession : null);
+  // Clear cached session when closing the panel
+  useEffect(() => {
+    if (selectedSessionId === null) {
+      lastValidSessionRef.current = null;
+    }
+  }, [selectedSessionId]);
+
+  // Use the loaded session data, falling back to cached session during loading to prevent flash
+  // Priority: selectedSession (current) > displaySession (previous query) > lastValidSessionRef (cached)
+  // If selectedSessionId exists, always try to show content (prevents flash)
+  const activeSession = selectedSessionId 
+    ? (selectedSession || displaySession || lastValidSessionRef.current)
+    : null;
 
   // Get unique values for filters
   const filterOptions = useMemo(() => {
@@ -1288,13 +1303,13 @@ function SessionsView({
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 relative">
-            {/* Loading overlay during session transition */}
+            {/* Subtle loading indicator in corner during session transition - no overlay to prevent flash */}
             {isSessionLoading && (
-              <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px] flex items-center justify-center z-10 transition-opacity duration-150">
-                <Loader2 className={cn("h-6 w-6 animate-spin", t.textMuted)} />
+              <div className="absolute top-2 right-2 z-10">
+                <Loader2 className={cn("h-4 w-4 animate-spin", t.textMuted)} />
               </div>
             )}
-            {selectedSession.messages.map((msg: any) => (
+            {selectedSession?.messages?.map((msg: any) => (
               <MessageBubble key={msg._id} message={msg} theme={theme} />
             ))}
           </div>

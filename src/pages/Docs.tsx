@@ -40,77 +40,580 @@ interface SearchEntry {
 // Build searchable index from doc content
 const searchIndex: SearchEntry[] = [
   // Hosted Version
-  { id: "hosted", title: "Use the Hosted Version", section: "Getting Started", keywords: ["hosted", "quick", "start", "sign in", "opensync.dev", "2 minutes"], snippet: "Start syncing sessions in under 2 minutes with opensync.dev" },
-  { id: "hosted-features", title: "Features", section: "Hosted Version", keywords: ["sync", "search", "private", "export", "delete", "api", "rag", "workos"], snippet: "Sync, search, export, and API access features" },
-  { id: "hosted-install", title: "Install Plugins Locally", section: "Hosted Version", keywords: ["install", "npm", "opencode-sync-plugin", "claude-code-sync", "plugin", "global"], snippet: "npm install -g opencode-sync-plugin" },
-  { id: "hosted-login", title: "Login and Sync", section: "Hosted Version", keywords: ["login", "sync", "api key", "convex url", "authenticate"], snippet: "Run opencode-sync login or claude-code-sync login" },
-  
+  {
+    id: "hosted",
+    title: "Use the Hosted Version",
+    section: "Getting Started",
+    keywords: [
+      "hosted",
+      "quick",
+      "start",
+      "sign in",
+      "opensync.dev",
+      "2 minutes",
+    ],
+    snippet: "Start syncing sessions in under 2 minutes with opensync.dev",
+  },
+  {
+    id: "hosted-features",
+    title: "Features",
+    section: "Hosted Version",
+    keywords: [
+      "sync",
+      "search",
+      "private",
+      "export",
+      "delete",
+      "api",
+      "rag",
+      "workos",
+    ],
+    snippet: "Sync, search, export, and API access features",
+  },
+  {
+    id: "hosted-install",
+    title: "Install Plugins Locally",
+    section: "Hosted Version",
+    keywords: [
+      "install",
+      "npm",
+      "opencode-sync-plugin",
+      "claude-code-sync",
+      "plugin",
+      "global",
+    ],
+    snippet: "npm install -g opencode-sync-plugin",
+  },
+  {
+    id: "hosted-login",
+    title: "Login and Sync",
+    section: "Hosted Version",
+    keywords: ["login", "sync", "api key", "convex url", "authenticate"],
+    snippet: "Run opencode-sync login or claude-code-sync login",
+  },
+
   // Requirements
-  { id: "requirements", title: "Self-Hosting Requirements", section: "Setup", keywords: ["requirements", "self-host", "deploy", "cloud", "local"], snippet: "Requirements for self-hosting your own instance" },
-  { id: "requirements-cloud", title: "Cloud Deployment", section: "Requirements", keywords: ["cloud", "convex", "workos", "node", "openai", "api key", "scaling"], snippet: "Use Convex Cloud for managed backend" },
-  { id: "requirements-local", title: "100% Local Deployment", section: "Requirements", keywords: ["local", "docker", "self-host", "127.0.0.1", "private", "no cloud"], snippet: "Run entirely on your machine with Docker" },
-  
+  {
+    id: "requirements",
+    title: "Self-Hosting Requirements",
+    section: "Setup",
+    keywords: ["requirements", "self-host", "deploy", "cloud", "local"],
+    snippet: "Requirements for self-hosting your own instance",
+  },
+  {
+    id: "requirements-cloud",
+    title: "Cloud Deployment",
+    section: "Requirements",
+    keywords: [
+      "cloud",
+      "convex",
+      "workos",
+      "node",
+      "openai",
+      "api key",
+      "scaling",
+    ],
+    snippet: "Use Convex Cloud for managed backend",
+  },
+  {
+    id: "requirements-local",
+    title: "100% Local Deployment",
+    section: "Requirements",
+    keywords: [
+      "local",
+      "docker",
+      "self-host",
+      "127.0.0.1",
+      "private",
+      "no cloud",
+    ],
+    snippet: "Run entirely on your machine with Docker",
+  },
+
   // Quick Start
-  { id: "quickstart", title: "Quick Start", section: "Setup", keywords: ["quickstart", "quick start", "getting started", "setup", "begin"], snippet: "Get started with OpenSync" },
-  { id: "quickstart-deploy", title: "Deploy Backend", section: "Quick Start", keywords: ["deploy", "backend", "convex", "npx convex dev", "clone", "git"], snippet: "Clone repo and deploy to Convex" },
-  { id: "quickstart-api-key", title: "Get API Key", section: "Quick Start", keywords: ["api key", "generate", "settings", "osk_", "token"], snippet: "Generate API key from Settings" },
-  { id: "quickstart-plugin", title: "Install Plugin", section: "Quick Start", keywords: ["install", "plugin", "npm", "opencode", "claude code"], snippet: "Install opencode-sync-plugin or claude-code-sync" },
-  
+  {
+    id: "quickstart",
+    title: "Quick Start",
+    section: "Setup",
+    keywords: [
+      "quickstart",
+      "quick start",
+      "getting started",
+      "setup",
+      "begin",
+    ],
+    snippet: "Get started with OpenSync",
+  },
+  {
+    id: "quickstart-deploy",
+    title: "Deploy Backend",
+    section: "Quick Start",
+    keywords: ["deploy", "backend", "convex", "npx convex dev", "clone", "git"],
+    snippet: "Clone repo and deploy to Convex",
+  },
+  {
+    id: "quickstart-api-key",
+    title: "Get API Key",
+    section: "Quick Start",
+    keywords: ["api key", "generate", "settings", "osk_", "token"],
+    snippet: "Generate API key from Settings",
+  },
+  {
+    id: "quickstart-plugin",
+    title: "Install Plugin",
+    section: "Quick Start",
+    keywords: ["install", "plugin", "npm", "opencode", "claude code"],
+    snippet: "Install opencode-sync-plugin or claude-code-sync",
+  },
+
   // Dashboard
-  { id: "dashboard", title: "Dashboard Features", section: "Features", keywords: ["dashboard", "overview", "metrics", "analytics", "ui"], snippet: "Dashboard overview and features" },
-  { id: "dashboard-overview", title: "Overview Tab", section: "Dashboard", keywords: ["overview", "metrics", "total sessions", "tokens", "cost", "charts", "30 days"], snippet: "Key metrics and usage trends over 30 days" },
-  { id: "dashboard-sessions", title: "Sessions View", section: "Dashboard", keywords: ["sessions", "browse", "filter", "sort", "source badges", "OC", "CC", "conversation"], snippet: "Browse and filter all synced sessions" },
-  { id: "dashboard-evals", title: "Evals Export", section: "Dashboard", keywords: ["evals", "export", "eval-ready", "deepeval", "openai", "jsonl", "training", "dataset"], snippet: "Export sessions for training and evaluation" },
-  { id: "dashboard-analytics", title: "Analytics", section: "Dashboard", keywords: ["analytics", "model", "provider", "project", "breakdown", "cost per session", "efficiency"], snippet: "Detailed breakdowns by model, provider, project" },
-  { id: "dashboard-context", title: "Context Search", section: "Dashboard", keywords: ["context", "search", "rag", "full-text", "semantic", "pipeline"], snippet: "Full-text search for RAG pipelines" },
-  
+  {
+    id: "dashboard",
+    title: "Dashboard Features",
+    section: "Features",
+    keywords: ["dashboard", "overview", "metrics", "analytics", "ui"],
+    snippet: "Dashboard overview and features",
+  },
+  {
+    id: "dashboard-overview",
+    title: "Overview Tab",
+    section: "Dashboard",
+    keywords: [
+      "overview",
+      "metrics",
+      "total sessions",
+      "tokens",
+      "cost",
+      "charts",
+      "30 days",
+    ],
+    snippet: "Key metrics and usage trends over 30 days",
+  },
+  {
+    id: "dashboard-sessions",
+    title: "Sessions View",
+    section: "Dashboard",
+    keywords: [
+      "sessions",
+      "browse",
+      "filter",
+      "sort",
+      "source badges",
+      "OC",
+      "CC",
+      "conversation",
+    ],
+    snippet: "Browse and filter all synced sessions",
+  },
+  {
+    id: "dashboard-evals",
+    title: "Evals Export",
+    section: "Dashboard",
+    keywords: [
+      "evals",
+      "export",
+      "eval-ready",
+      "deepeval",
+      "openai",
+      "jsonl",
+      "training",
+      "dataset",
+    ],
+    snippet: "Export sessions for training and evaluation",
+  },
+  {
+    id: "dashboard-analytics",
+    title: "Analytics",
+    section: "Dashboard",
+    keywords: [
+      "analytics",
+      "model",
+      "provider",
+      "project",
+      "breakdown",
+      "cost per session",
+      "efficiency",
+    ],
+    snippet: "Detailed breakdowns by model, provider, project",
+  },
+  {
+    id: "dashboard-context",
+    title: "Context Search",
+    section: "Dashboard",
+    keywords: ["context", "search", "rag", "full-text", "semantic", "pipeline"],
+    snippet: "Full-text search for RAG pipelines",
+  },
+
   // OpenCode Plugin
-  { id: "opencode-plugin", title: "OpenCode Plugin", section: "Plugins", keywords: ["opencode", "plugin", "opencode-sync-plugin", "npm"], snippet: "OpenCode sync plugin documentation" },
-  { id: "opencode-install", title: "Installation", section: "OpenCode Plugin", keywords: ["install", "npm install", "opencode-sync-plugin", "global", "-g"], snippet: "npm install -g opencode-sync-plugin" },
-  { id: "opencode-config", title: "Configuration", section: "OpenCode Plugin", keywords: ["config", "configuration", "opencode.json", "plugin array", "login"], snippet: "Configure opencode.json with plugin array" },
-  { id: "opencode-commands", title: "Commands", section: "OpenCode Plugin", keywords: ["commands", "login", "status", "sync", "opencode-sync"], snippet: "login, status, sync commands" },
-  
+  {
+    id: "opencode-plugin",
+    title: "OpenCode Plugin",
+    section: "Plugins",
+    keywords: ["opencode", "plugin", "opencode-sync-plugin", "npm"],
+    snippet: "OpenCode sync plugin documentation",
+  },
+  {
+    id: "opencode-install",
+    title: "Installation",
+    section: "OpenCode Plugin",
+    keywords: [
+      "install",
+      "npm install",
+      "opencode-sync-plugin",
+      "global",
+      "-g",
+    ],
+    snippet: "npm install -g opencode-sync-plugin",
+  },
+  {
+    id: "opencode-config",
+    title: "Configuration",
+    section: "OpenCode Plugin",
+    keywords: [
+      "config",
+      "configuration",
+      "opencode.json",
+      "plugin array",
+      "login",
+    ],
+    snippet: "Configure opencode.json with plugin array",
+  },
+  {
+    id: "opencode-commands",
+    title: "Commands",
+    section: "OpenCode Plugin",
+    keywords: ["commands", "login", "status", "sync", "opencode-sync"],
+    snippet: "login, status, sync commands",
+  },
+
   // Claude Plugin
-  { id: "claude-plugin", title: "Claude Code Plugin", section: "Plugins", keywords: ["claude", "claude code", "claude-code-sync", "anthropic"], snippet: "Claude Code sync plugin documentation" },
-  { id: "claude-install", title: "Installation", section: "Claude Code Plugin", keywords: ["install", "npm install", "claude-code-sync", "global", "-g"], snippet: "npm install -g claude-code-sync" },
-  { id: "claude-config", title: "Configuration", section: "Claude Code Plugin", keywords: ["config", "configuration", "config.json", ".config", "convexUrl", "apiKey"], snippet: "Create ~/.config/claude-code-sync/config.json" },
-  { id: "claude-commands", title: "Commands", section: "Claude Code Plugin", keywords: ["commands", "login", "status", "sync", "claude-code-sync"], snippet: "login, status, sync commands" },
-  
+  {
+    id: "claude-plugin",
+    title: "Claude Code Plugin",
+    section: "Plugins",
+    keywords: ["claude", "claude code", "claude-code-sync", "anthropic"],
+    snippet: "Claude Code sync plugin documentation",
+  },
+  {
+    id: "claude-install",
+    title: "Installation",
+    section: "Claude Code Plugin",
+    keywords: ["install", "npm install", "claude-code-sync", "global", "-g"],
+    snippet: "npm install -g claude-code-sync",
+  },
+  {
+    id: "claude-config",
+    title: "Configuration",
+    section: "Claude Code Plugin",
+    keywords: [
+      "config",
+      "configuration",
+      "config.json",
+      ".config",
+      "convexUrl",
+      "apiKey",
+    ],
+    snippet: "Create ~/.config/claude-code-sync/config.json",
+  },
+  {
+    id: "claude-commands",
+    title: "Commands",
+    section: "Claude Code Plugin",
+    keywords: ["commands", "login", "status", "sync", "claude-code-sync"],
+    snippet: "login, status, sync commands",
+  },
+
+  // Codex CLI Plugin
+  {
+    id: "codex-plugin",
+    title: "Codex CLI Plugin",
+    section: "Plugins",
+    keywords: ["codex", "codex-sync", "openai", "codex cli", "codex-cli"],
+    snippet: "Codex CLI sync plugin documentation",
+  },
+  {
+    id: "codex-install",
+    title: "Installation",
+    section: "Codex CLI Plugin",
+    keywords: ["install", "npm install", "codex-sync", "global", "-g"],
+    snippet: "npm install -g codex-sync",
+  },
+  {
+    id: "codex-config",
+    title: "Configuration",
+    section: "Codex CLI Plugin",
+    keywords: [
+      "config",
+      "codex",
+      "toml",
+      "notify",
+      "hook",
+      "agent-turn-complete",
+    ],
+    snippet: "Configure codex notify hook",
+  },
+  {
+    id: "codex-commands",
+    title: "Commands",
+    section: "Codex CLI Plugin",
+    keywords: ["commands", "login", "setup", "verify", "sync", "codex-sync"],
+    snippet: "login, setup, verify, sync commands",
+  },
+
   // API Reference
-  { id: "api", title: "API Reference", section: "API", keywords: ["api", "rest", "http", "endpoint", "curl", "bearer token"], snippet: "REST API reference and endpoints" },
-  { id: "api-auth", title: "Authentication", section: "API", keywords: ["authentication", "auth", "bearer", "token", "api key", "jwt", "authorization header"], snippet: "Bearer token authentication" },
-  { id: "api-sessions", title: "Sessions Endpoint", section: "API", keywords: ["sessions", "endpoint", "/api/sessions", "list", "get"], snippet: "GET /api/sessions" },
-  { id: "api-search", title: "Search Endpoint", section: "API", keywords: ["search", "endpoint", "/api/search", "query", "type", "fulltext", "semantic"], snippet: "GET /api/search?q=query&type=semantic" },
-  { id: "api-context", title: "Context Endpoint", section: "API", keywords: ["context", "endpoint", "/api/context", "rag", "format", "text", "limit"], snippet: "GET /api/context for RAG pipelines" },
-  { id: "api-export", title: "Export Endpoint", section: "API", keywords: ["export", "endpoint", "/api/export", "markdown", "format", "download"], snippet: "GET /api/export?format=markdown" },
-  { id: "api-stats", title: "Stats Endpoint", section: "API", keywords: ["stats", "statistics", "endpoint", "/api/stats", "metrics"], snippet: "GET /api/stats" },
-  
+  {
+    id: "api",
+    title: "API Reference",
+    section: "API",
+    keywords: ["api", "rest", "http", "endpoint", "curl", "bearer token"],
+    snippet: "REST API reference and endpoints",
+  },
+  {
+    id: "api-auth",
+    title: "Authentication",
+    section: "API",
+    keywords: [
+      "authentication",
+      "auth",
+      "bearer",
+      "token",
+      "api key",
+      "jwt",
+      "authorization header",
+    ],
+    snippet: "Bearer token authentication",
+  },
+  {
+    id: "api-sessions",
+    title: "Sessions Endpoint",
+    section: "API",
+    keywords: ["sessions", "endpoint", "/api/sessions", "list", "get"],
+    snippet: "GET /api/sessions",
+  },
+  {
+    id: "api-search",
+    title: "Search Endpoint",
+    section: "API",
+    keywords: [
+      "search",
+      "endpoint",
+      "/api/search",
+      "query",
+      "type",
+      "fulltext",
+      "semantic",
+    ],
+    snippet: "GET /api/search?q=query&type=semantic",
+  },
+  {
+    id: "api-context",
+    title: "Context Endpoint",
+    section: "API",
+    keywords: [
+      "context",
+      "endpoint",
+      "/api/context",
+      "rag",
+      "format",
+      "text",
+      "limit",
+    ],
+    snippet: "GET /api/context for RAG pipelines",
+  },
+  {
+    id: "api-export",
+    title: "Export Endpoint",
+    section: "API",
+    keywords: [
+      "export",
+      "endpoint",
+      "/api/export",
+      "markdown",
+      "format",
+      "download",
+    ],
+    snippet: "GET /api/export?format=markdown",
+  },
+  {
+    id: "api-stats",
+    title: "Stats Endpoint",
+    section: "API",
+    keywords: ["stats", "statistics", "endpoint", "/api/stats", "metrics"],
+    snippet: "GET /api/stats",
+  },
+
   // Search Types
-  { id: "search", title: "Search", section: "Features", keywords: ["search", "full-text", "semantic", "hybrid", "embeddings"], snippet: "Search types and functionality" },
-  { id: "search-fulltext", title: "Full-Text Search", section: "Search", keywords: ["full-text", "fulltext", "keyword", "exact", "fast", "?type=fulltext"], snippet: "Keyword matching, fast and exact" },
-  { id: "search-semantic", title: "Semantic Search", section: "Search", keywords: ["semantic", "meaning", "embeddings", "openai", "vector", "?type=semantic"], snippet: "Meaning-based search using embeddings" },
-  { id: "search-hybrid", title: "Hybrid Search", section: "Search", keywords: ["hybrid", "rrf", "combined", "both", "?type=hybrid"], snippet: "Combines full-text and semantic search" },
-  
+  {
+    id: "search",
+    title: "Search",
+    section: "Features",
+    keywords: ["search", "full-text", "semantic", "hybrid", "embeddings"],
+    snippet: "Search types and functionality",
+  },
+  {
+    id: "search-fulltext",
+    title: "Full-Text Search",
+    section: "Search",
+    keywords: [
+      "full-text",
+      "fulltext",
+      "keyword",
+      "exact",
+      "fast",
+      "?type=fulltext",
+    ],
+    snippet: "Keyword matching, fast and exact",
+  },
+  {
+    id: "search-semantic",
+    title: "Semantic Search",
+    section: "Search",
+    keywords: [
+      "semantic",
+      "meaning",
+      "embeddings",
+      "openai",
+      "vector",
+      "?type=semantic",
+    ],
+    snippet: "Meaning-based search using embeddings",
+  },
+  {
+    id: "search-hybrid",
+    title: "Hybrid Search",
+    section: "Search",
+    keywords: ["hybrid", "rrf", "combined", "both", "?type=hybrid"],
+    snippet: "Combines full-text and semantic search",
+  },
+
   // Authentication
-  { id: "auth", title: "Authentication", section: "Security", keywords: ["authentication", "auth", "security", "workos", "api key"], snippet: "Authentication methods" },
-  { id: "auth-workos", title: "WorkOS AuthKit", section: "Authentication", keywords: ["workos", "authkit", "sso", "enterprise", "oauth", "google", "github"], snippet: "Enterprise authentication with SSO support" },
-  { id: "auth-api-keys", title: "API Keys", section: "Authentication", keywords: ["api key", "osk_", "generate", "settings", "plugins", "bearer"], snippet: "Generate API keys for plugins" },
-  
+  {
+    id: "auth",
+    title: "Authentication",
+    section: "Security",
+    keywords: ["authentication", "auth", "security", "workos", "api key"],
+    snippet: "Authentication methods",
+  },
+  {
+    id: "auth-workos",
+    title: "WorkOS AuthKit",
+    section: "Authentication",
+    keywords: [
+      "workos",
+      "authkit",
+      "sso",
+      "enterprise",
+      "oauth",
+      "google",
+      "github",
+    ],
+    snippet: "Enterprise authentication with SSO support",
+  },
+  {
+    id: "auth-api-keys",
+    title: "API Keys",
+    section: "Authentication",
+    keywords: ["api key", "osk_", "generate", "settings", "plugins", "bearer"],
+    snippet: "Generate API keys for plugins",
+  },
+
   // Hosting
-  { id: "hosting", title: "Hosting & Deploy", section: "Deployment", keywords: ["hosting", "deploy", "deployment", "production"], snippet: "Hosting and deployment options" },
-  { id: "hosting-convex", title: "Convex Backend", section: "Hosting", keywords: ["convex", "backend", "deploy", "npx convex deploy", "real-time", "database"], snippet: "Deploy backend to Convex" },
-  { id: "hosting-netlify", title: "Netlify Frontend", section: "Hosting", keywords: ["netlify", "frontend", "deploy", "vercel", "react", "vite"], snippet: "Deploy frontend to Netlify" },
-  { id: "hosting-env", title: "Environment Variables", section: "Hosting", keywords: ["env", "environment", "variables", "VITE_CONVEX_URL", "VITE_WORKOS_CLIENT_ID", ".env"], snippet: "Required environment variables" },
-  
+  {
+    id: "hosting",
+    title: "Hosting & Deploy",
+    section: "Deployment",
+    keywords: ["hosting", "deploy", "deployment", "production"],
+    snippet: "Hosting and deployment options",
+  },
+  {
+    id: "hosting-convex",
+    title: "Convex Backend",
+    section: "Hosting",
+    keywords: [
+      "convex",
+      "backend",
+      "deploy",
+      "npx convex deploy",
+      "real-time",
+      "database",
+    ],
+    snippet: "Deploy backend to Convex",
+  },
+  {
+    id: "hosting-netlify",
+    title: "Netlify Frontend",
+    section: "Hosting",
+    keywords: ["netlify", "frontend", "deploy", "vercel", "react", "vite"],
+    snippet: "Deploy frontend to Netlify",
+  },
+  {
+    id: "hosting-env",
+    title: "Environment Variables",
+    section: "Hosting",
+    keywords: [
+      "env",
+      "environment",
+      "variables",
+      "VITE_CONVEX_URL",
+      "VITE_WORKOS_CLIENT_ID",
+      ".env",
+    ],
+    snippet: "Required environment variables",
+  },
+
   // Fork & Self-Host
-  { id: "fork", title: "Fork & Self-Host", section: "Advanced", keywords: ["fork", "self-host", "clone", "github", "customize"], snippet: "Fork and customize OpenSync" },
-  { id: "fork-repo", title: "Clone Repository", section: "Fork", keywords: ["clone", "git clone", "github", "repository", "repo"], snippet: "git clone https://github.com/waynesutton/opensync.git" },
-  { id: "fork-setup", title: "Setup Steps", section: "Fork", keywords: ["setup", "steps", "convex", "workos", "env", "deploy"], snippet: "Step-by-step setup guide" },
-  { id: "fork-customize", title: "Customization", section: "Fork", keywords: ["customize", "customization", "modify", "theme", "branding"], snippet: "Customize your instance" },
-  
+  {
+    id: "fork",
+    title: "Fork & Self-Host",
+    section: "Advanced",
+    keywords: ["fork", "self-host", "clone", "github", "customize"],
+    snippet: "Fork and customize OpenSync",
+  },
+  {
+    id: "fork-repo",
+    title: "Clone Repository",
+    section: "Fork",
+    keywords: ["clone", "git clone", "github", "repository", "repo"],
+    snippet: "git clone https://github.com/waynesutton/opensync.git",
+  },
+  {
+    id: "fork-setup",
+    title: "Setup Steps",
+    section: "Fork",
+    keywords: ["setup", "steps", "convex", "workos", "env", "deploy"],
+    snippet: "Step-by-step setup guide",
+  },
+  {
+    id: "fork-customize",
+    title: "Customization",
+    section: "Fork",
+    keywords: ["customize", "customization", "modify", "theme", "branding"],
+    snippet: "Customize your instance",
+  },
+
   // Troubleshooting & FAQ
-  { id: "troubleshooting", title: "Troubleshooting", section: "Help", keywords: ["troubleshooting", "error", "issue", "problem", "fix", "debug", "not working"], snippet: "Common issues and solutions" },
-  { id: "faq", title: "FAQ", section: "Help", keywords: ["faq", "question", "frequently asked", "help", "support"], snippet: "Frequently asked questions" },
+  {
+    id: "troubleshooting",
+    title: "Troubleshooting",
+    section: "Help",
+    keywords: [
+      "troubleshooting",
+      "error",
+      "issue",
+      "problem",
+      "fix",
+      "debug",
+      "not working",
+    ],
+    snippet: "Common issues and solutions",
+  },
+  {
+    id: "faq",
+    title: "FAQ",
+    section: "Help",
+    keywords: ["faq", "question", "frequently asked", "help", "support"],
+    snippet: "Frequently asked questions",
+  },
 ];
 
 // DocSearch component with typeahead
@@ -141,34 +644,40 @@ function DocSearch({ onClose }: { onClose?: () => void }) {
   }, [query]);
 
   // Navigate to section
-  const navigateToSection = useCallback((id: string) => {
-    setIsOpen(false);
-    setQuery("");
-    onClose?.();
-    // Navigate with hash
-    navigate(`/docs#${id}`);
-    // Scroll to element after a brief delay for DOM update
-    setTimeout(() => {
-      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
-  }, [navigate, onClose]);
-
-  // Keyboard navigation
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setSelectedIndex((i) => Math.min(i + 1, results.length - 1));
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setSelectedIndex((i) => Math.max(i - 1, 0));
-    } else if (e.key === "Enter" && results[selectedIndex]) {
-      e.preventDefault();
-      navigateToSection(results[selectedIndex].id);
-    } else if (e.key === "Escape") {
+  const navigateToSection = useCallback(
+    (id: string) => {
       setIsOpen(false);
       setQuery("");
-    }
-  }, [results, selectedIndex, navigateToSection]);
+      onClose?.();
+      // Navigate with hash
+      navigate(`/docs#${id}`);
+      // Scroll to element after a brief delay for DOM update
+      setTimeout(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    },
+    [navigate, onClose],
+  );
+
+  // Keyboard navigation
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setSelectedIndex((i) => Math.min(i + 1, results.length - 1));
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setSelectedIndex((i) => Math.max(i - 1, 0));
+      } else if (e.key === "Enter" && results[selectedIndex]) {
+        e.preventDefault();
+        navigateToSection(results[selectedIndex].id);
+      } else if (e.key === "Escape") {
+        setIsOpen(false);
+        setQuery("");
+      }
+    },
+    [results, selectedIndex, navigateToSection],
+  );
 
   // Reset selected index when results change
   useEffect(() => {
@@ -200,7 +709,12 @@ function DocSearch({ onClose }: { onClose?: () => void }) {
     <div className="relative">
       {/* Search input */}
       <div className="relative">
-        <Search className={cn("absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4", t.textSubtle)} />
+        <Search
+          className={cn(
+            "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4",
+            t.textSubtle,
+          )}
+        />
         <input
           ref={inputRef}
           type="text"
@@ -223,14 +737,33 @@ function DocSearch({ onClose }: { onClose?: () => void }) {
             t.bgCard,
             t.textPrimary,
             "placeholder:text-gray-400 dark:placeholder:text-gray-500",
-            "focus:ring-gray-300 dark:focus:ring-gray-600"
+            "focus:ring-gray-300 dark:focus:ring-gray-600",
           )}
         />
-        <div className={cn("absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[10px]", t.textDim)}>
-          <kbd className={cn("px-1.5 py-0.5 rounded border font-mono", t.border, t.bgCode)}>
+        <div
+          className={cn(
+            "absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[10px]",
+            t.textDim,
+          )}
+        >
+          <kbd
+            className={cn(
+              "px-1.5 py-0.5 rounded border font-mono",
+              t.border,
+              t.bgCode,
+            )}
+          >
             <Command className="h-3 w-3 inline" />
           </kbd>
-          <kbd className={cn("px-1.5 py-0.5 rounded border font-mono", t.border, t.bgCode)}>K</kbd>
+          <kbd
+            className={cn(
+              "px-1.5 py-0.5 rounded border font-mono",
+              t.border,
+              t.bgCode,
+            )}
+          >
+            K
+          </kbd>
         </div>
       </div>
 
@@ -241,7 +774,7 @@ function DocSearch({ onClose }: { onClose?: () => void }) {
           className={cn(
             "absolute top-full left-0 right-0 mt-2 rounded-lg border shadow-xl overflow-hidden z-50 max-h-80 overflow-y-auto",
             t.border,
-            theme === "dark" ? "bg-[#1a1a1a]" : "bg-[#faf8f5]"
+            theme === "dark" ? "bg-[#1a1a1a]" : "bg-[#faf8f5]",
           )}
         >
           {results.map((result, i) => (
@@ -251,16 +784,26 @@ function DocSearch({ onClose }: { onClose?: () => void }) {
               className={cn(
                 "w-full px-4 py-3 text-left flex flex-col gap-1 transition-colors border-b last:border-b-0",
                 t.border,
-                i === selectedIndex 
-                  ? (theme === "dark" ? "bg-[#2a2a2a]" : "bg-[#f0ede8]")
-                  : (theme === "dark" ? "hover:bg-[#252525]" : "hover:bg-[#f5f2ed]")
+                i === selectedIndex
+                  ? theme === "dark"
+                    ? "bg-[#2a2a2a]"
+                    : "bg-[#f0ede8]"
+                  : theme === "dark"
+                    ? "hover:bg-[#252525]"
+                    : "hover:bg-[#f5f2ed]",
               )}
             >
               <div className="flex items-center gap-2">
                 <span className={cn("text-sm font-medium", t.textPrimary)}>
                   {result.title}
                 </span>
-                <span className={cn("text-[10px] px-1.5 py-0.5 rounded", theme === "dark" ? "bg-[#2a2a2a]" : "bg-[#e8e5e0]", t.textDim)}>
+                <span
+                  className={cn(
+                    "text-[10px] px-1.5 py-0.5 rounded",
+                    theme === "dark" ? "bg-[#2a2a2a]" : "bg-[#e8e5e0]",
+                    t.textDim,
+                  )}
+                >
                   {result.section}
                 </span>
               </div>
@@ -274,7 +817,13 @@ function DocSearch({ onClose }: { onClose?: () => void }) {
 
       {/* No results */}
       {isOpen && query.trim() && results.length === 0 && (
-        <div className={cn("absolute top-full left-0 right-0 mt-2 rounded-lg border shadow-xl p-4 z-50", t.border, theme === "dark" ? "bg-[#1a1a1a]" : "bg-[#faf8f5]")}>
+        <div
+          className={cn(
+            "absolute top-full left-0 right-0 mt-2 rounded-lg border shadow-xl p-4 z-50",
+            t.border,
+            theme === "dark" ? "bg-[#1a1a1a]" : "bg-[#faf8f5]",
+          )}
+        >
           <p className={cn("text-sm text-center", t.textSubtle)}>
             No results for "{query}"
           </p>
@@ -352,6 +901,16 @@ const docSections: DocSection[] = [
       { id: "claude-install", title: "Installation" },
       { id: "claude-config", title: "Configuration" },
       { id: "claude-commands", title: "Commands" },
+    ],
+  },
+  {
+    id: "codex-plugin",
+    title: "Codex CLI Plugin",
+    icon: <Package className="h-4 w-4" />,
+    subsections: [
+      { id: "codex-install", title: "Installation" },
+      { id: "codex-config", title: "Configuration" },
+      { id: "codex-commands", title: "Commands" },
     ],
   },
   {
@@ -437,7 +996,7 @@ function CopyButton({ text, className }: { text: string; className?: string }) {
         "p-1.5 rounded transition-colors",
         t.bgHover,
         t.textSubtle,
-        className
+        className,
       )}
       title="Copy to clipboard"
     >
@@ -451,13 +1010,7 @@ function CopyButton({ text, className }: { text: string; className?: string }) {
 }
 
 // Code block with copy functionality
-function CodeBlock({
-  code,
-  title,
-}: {
-  code: string;
-  title?: string;
-}) {
+function CodeBlock({ code, title }: { code: string; title?: string }) {
   const { theme } = useTheme();
   const t = getThemeClasses(theme);
 
@@ -469,7 +1022,7 @@ function CodeBlock({
             "px-3 py-1.5 border-b text-[10px] font-medium uppercase tracking-wider flex items-center justify-between",
             t.border,
             t.bgCard,
-            t.textDim
+            t.textDim,
           )}
         >
           <span>{title}</span>
@@ -481,7 +1034,7 @@ function CodeBlock({
           className={cn(
             "overflow-x-auto p-3 text-xs font-mono",
             t.bgCode,
-            t.textMuted
+            t.textMuted,
           )}
         >
           <code>{code}</code>
@@ -519,7 +1072,7 @@ function SectionHeader({
           "scroll-mt-20",
           level === 2
             ? cn("text-lg font-semibold", t.textPrimary)
-            : cn("text-sm font-medium", t.textSecondary)
+            : cn("text-sm font-medium", t.textSecondary),
         )}
       >
         <a href={`#${id}`} className="hover:underline">
@@ -532,7 +1085,7 @@ function SectionHeader({
           className={cn(
             "opacity-0 group-hover:opacity-100 p-1 rounded transition-all",
             t.bgHover,
-            t.textSubtle
+            t.textSubtle,
           )}
           title="Copy section as Markdown"
         >
@@ -564,7 +1117,7 @@ function DocsSidebar({
     <div
       className={cn(
         "flex flex-col h-full",
-        isMobile ? "w-full" : "w-56 shrink-0"
+        isMobile ? "w-full" : "w-56 shrink-0",
       )}
     >
       {/* Mobile header */}
@@ -572,7 +1125,7 @@ function DocsSidebar({
         <div
           className={cn(
             "flex items-center justify-between px-4 py-3 border-b",
-            t.border
+            t.border,
           )}
         >
           <span className={cn("text-sm font-medium", t.textPrimary)}>
@@ -614,7 +1167,7 @@ function DocsSidebar({
                   "w-full flex items-center gap-2 px-2 py-1.5 rounded text-sm transition-colors",
                   isActive
                     ? cn(t.bgActive, t.textPrimary)
-                    : cn(t.textMuted, t.bgHover)
+                    : cn(t.textMuted, t.bgHover),
                 )}
               >
                 <span className={t.iconSubtle}>{section.icon}</span>
@@ -623,7 +1176,7 @@ function DocsSidebar({
                   <ChevronRight
                     className={cn(
                       "h-3 w-3 transition-transform",
-                      isExpanded && "rotate-90"
+                      isExpanded && "rotate-90",
                     )}
                   />
                 )}
@@ -647,7 +1200,7 @@ function DocsSidebar({
                         "block px-2 py-1 rounded text-xs transition-colors",
                         activeSection === sub.id
                           ? cn(t.textPrimary, t.bgActive)
-                          : cn(t.textSubtle, t.bgHover)
+                          : cn(t.textSubtle, t.bgHover),
                       )}
                     >
                       {sub.title}
@@ -669,7 +1222,7 @@ function DocsSidebar({
           className={cn(
             "flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-colors",
             t.textSubtle,
-            t.bgHover
+            t.bgHover,
           )}
         >
           <Github className="h-3.5 w-3.5" />
@@ -683,7 +1236,7 @@ function DocsSidebar({
           className={cn(
             "flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-colors",
             t.textSubtle,
-            t.bgHover
+            t.bgHover,
           )}
         >
           <Package className="h-3.5 w-3.5" />
@@ -714,7 +1267,7 @@ function TableOfContents({
         <p
           className={cn(
             "text-[10px] font-medium uppercase tracking-wider mb-3",
-            t.textDim
+            t.textDim,
           )}
         >
           On this page
@@ -735,7 +1288,7 @@ function TableOfContents({
                 section.level === 3 && "pl-3",
                 activeSection === section.id
                   ? t.textPrimary
-                  : cn(t.textSubtle, "hover:opacity-80")
+                  : cn(t.textSubtle, "hover:opacity-80"),
               )}
             >
               {section.title}
@@ -748,13 +1301,7 @@ function TableOfContents({
 }
 
 // FAQ item component
-function FaqItem({
-  question,
-  answer,
-}: {
-  question: string;
-  answer: string;
-}) {
+function FaqItem({ question, answer }: { question: string; answer: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const { theme } = useTheme();
   const t = getThemeClasses(theme);
@@ -765,7 +1312,7 @@ function FaqItem({
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "flex w-full items-center justify-between p-4 text-left transition-colors",
-          t.bgHover
+          t.bgHover,
         )}
       >
         <span className={cn("text-sm font-medium", t.textSecondary)}>
@@ -775,7 +1322,7 @@ function FaqItem({
           className={cn(
             "h-4 w-4 transition-transform",
             t.textSubtle,
-            isOpen ? "rotate-180" : ""
+            isOpen ? "rotate-180" : "",
           )}
         />
       </button>
@@ -800,7 +1347,7 @@ export function DocsPage() {
   // State
   const [activeSection, setActiveSection] = useState("hosted");
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(["hosted", "quickstart", "dashboard", "api"])
+    new Set(["hosted", "quickstart", "dashboard", "api"]),
   );
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   const [showMarkdownView, setShowMarkdownView] = useState(false);
@@ -834,7 +1381,7 @@ export function DocsPage() {
           }
         });
       },
-      { rootMargin: "-100px 0px -80% 0px" }
+      { rootMargin: "-100px 0px -80% 0px" },
     );
 
     const sections = document.querySelectorAll("[data-section]");
@@ -1134,6 +1681,7 @@ npm install
 - GitHub: https://github.com/waynesutton/opensync
 - OpenCode Plugin: https://www.npmjs.com/package/opencode-sync-plugin
 - Claude Code Plugin: https://www.npmjs.com/package/claude-code-sync
+- Codex CLI Plugin: https://www.npmjs.com/package/codex-sync
 - Convex Docs: https://docs.convex.dev
 - WorkOS Docs: https://workos.com/docs
 `;
@@ -1173,7 +1721,7 @@ npm install
           className={cn(
             "sticky top-0 z-10 border-b backdrop-blur-sm",
             t.border,
-            theme === "dark" ? "bg-[#0E0E0E]/90" : "bg-[#faf8f5]/90"
+            theme === "dark" ? "bg-[#0E0E0E]/90" : "bg-[#faf8f5]/90",
           )}
         >
           <div className="mx-auto flex h-12 max-w-4xl items-center justify-between px-6">
@@ -1181,7 +1729,7 @@ npm install
               onClick={() => setShowMarkdownView(false)}
               className={cn(
                 "flex items-center gap-2 text-sm transition-colors",
-                t.textSubtle
+                t.textSubtle,
               )}
             >
               <ArrowLeft className="h-4 w-4" />
@@ -1199,7 +1747,7 @@ npm install
               "whitespace-pre-wrap text-xs font-mono p-6 rounded-lg border",
               t.bgCard,
               t.border,
-              t.textMuted
+              t.textMuted,
             )}
           >
             {generateFullMarkdown}
@@ -1221,7 +1769,7 @@ npm install
           <div
             className={cn(
               "absolute left-0 top-0 bottom-0 w-72 shadow-xl",
-              t.bgPrimary
+              t.bgPrimary,
             )}
           >
             <DocsSidebar
@@ -1239,7 +1787,7 @@ npm install
       <div
         className={cn(
           "hidden lg:flex flex-col border-r sticky top-0 h-screen",
-          t.border
+          t.border,
         )}
       >
         <div
@@ -1268,7 +1816,7 @@ npm install
           className={cn(
             "sticky top-0 z-10 border-b backdrop-blur-sm",
             t.border,
-            theme === "dark" ? "bg-[#0E0E0E]/90" : "bg-[#faf8f5]/90"
+            theme === "dark" ? "bg-[#0E0E0E]/90" : "bg-[#faf8f5]/90",
           )}
         >
           <div className="flex h-12 items-center justify-between px-4 lg:px-6 gap-4">
@@ -1284,7 +1832,7 @@ npm install
                 to="/"
                 className={cn(
                   "flex items-center gap-2 text-sm transition-colors lg:hidden",
-                  t.textSubtle
+                  t.textSubtle,
                 )}
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -1301,7 +1849,11 @@ npm install
               {/* Mobile search button - opens sidebar with search */}
               <button
                 onClick={() => setShowMobileSidebar(true)}
-                className={cn("p-1.5 rounded sm:hidden", t.bgHover, t.textSubtle)}
+                className={cn(
+                  "p-1.5 rounded sm:hidden",
+                  t.bgHover,
+                  t.textSubtle,
+                )}
                 title="Search docs"
               >
                 <Search className="h-4 w-4" />
@@ -1313,7 +1865,7 @@ npm install
                 className={cn(
                   "hidden sm:flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors",
                   t.textSubtle,
-                  t.bgHover
+                  t.bgHover,
                 )}
               >
                 <FileText className="h-3.5 w-3.5" />
@@ -1326,7 +1878,7 @@ npm install
                 className={cn(
                   "hidden sm:flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors",
                   t.textSubtle,
-                  t.bgHover
+                  t.bgHover,
                 )}
               >
                 {copiedSection === "full" ? (
@@ -1343,10 +1895,12 @@ npm install
                 className={cn(
                   "p-1.5 rounded transition-colors",
                   t.textSubtle,
-                  t.bgHover
+                  t.bgHover,
                 )}
                 title={
-                  theme === "dark" ? "Switch to tan mode" : "Switch to dark mode"
+                  theme === "dark"
+                    ? "Switch to tan mode"
+                    : "Switch to dark mode"
                 }
               >
                 {theme === "dark" ? (
@@ -1389,8 +1943,8 @@ npm install
                 >
                   Claude Code
                 </a>
-                . Cloud-synced dashboards that track session
-                activity, tool usage, and token spend across projects.
+                . Cloud-synced dashboards that track session activity, tool
+                usage, and token spend across projects.
               </p>
 
               {/* Quick links */}
@@ -1403,7 +1957,7 @@ npm install
                     "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs border transition-colors",
                     t.border,
                     t.textSubtle,
-                    t.bgHover
+                    t.bgHover,
                   )}
                 >
                   <Github className="h-3.5 w-3.5" />
@@ -1417,7 +1971,7 @@ npm install
                     "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs border transition-colors",
                     t.border,
                     t.textSubtle,
-                    t.bgHover
+                    t.bgHover,
                   )}
                 >
                   <Package className="h-3.5 w-3.5" />
@@ -1431,7 +1985,7 @@ npm install
                     "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs border transition-colors",
                     t.border,
                     t.textSubtle,
-                    t.bgHover
+                    t.bgHover,
                   )}
                 >
                   <Package className="h-3.5 w-3.5" />
@@ -1445,7 +1999,7 @@ npm install
                     "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs border transition-colors",
                     t.border,
                     t.textSubtle,
-                    t.bgHover
+                    t.bgHover,
                   )}
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
@@ -1462,7 +2016,7 @@ npm install
                 onCopyMarkdown={() =>
                   copySectionMarkdown(
                     "hosted",
-                    `## Use the Hosted Version\n\nStart syncing sessions in under 2 minutes with https://www.opensync.dev/\n\n### Install Plugins\n\`\`\`bash\nnpm install -g opencode-sync-plugin\nnpm install -g claude-code-sync\n\`\`\`\n\n### Login and Sync\n1. Sign in at opensync.dev\n2. Generate an API key in Settings\n3. Run \`opencode-sync login\` or \`claude-code-sync login\`\n4. Start coding, sessions sync automatically`
+                    `## Use the Hosted Version\n\nStart syncing sessions in under 2 minutes with https://www.opensync.dev/\n\n### Install Plugins\n\`\`\`bash\nnpm install -g opencode-sync-plugin\nnpm install -g claude-code-sync\n\`\`\`\n\n### Login and Sync\n1. Sign in at opensync.dev\n2. Generate an API key in Settings\n3. Run \`opencode-sync login\` or \`claude-code-sync login\`\n4. Start coding, sessions sync automatically`,
                   )
                 }
               />
@@ -1476,7 +2030,8 @@ npm install
                 >
                   opensync.dev
                 </a>
-                , install a plugin locally, and start syncing in under 2 minutes.
+                , install a plugin locally, and start syncing in under 2
+                minutes.
               </p>
 
               <div className="mt-6 space-y-6">
@@ -1487,53 +2042,133 @@ npm install
                     title="Features"
                     level={3}
                   />
-                  <div className={cn("mt-3 grid gap-3 sm:grid-cols-2", t.textMuted)}>
-                    <div className={cn("p-3 rounded-lg border", t.bgCard, t.border)}>
-                      <span className={cn("font-mono text-xs", theme === "dark" ? "text-[#c586c0]" : "text-[#9b4d96]")}>
+                  <div
+                    className={cn(
+                      "mt-3 grid gap-3 sm:grid-cols-2",
+                      t.textMuted,
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "p-3 rounded-lg border",
+                        t.bgCard,
+                        t.border,
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "font-mono text-xs",
+                          theme === "dark"
+                            ? "text-[#c586c0]"
+                            : "text-[#9b4d96]",
+                        )}
+                      >
                         Sync
                       </span>
                       <p className={cn("mt-1 text-xs", t.textSubtle)}>
-                        Sessions sync from CLI to cloud automatically as you work
+                        Sessions sync from CLI to cloud automatically as you
+                        work
                       </p>
                     </div>
-                    <div className={cn("p-3 rounded-lg border", t.bgCard, t.border)}>
-                      <span className={cn("font-mono text-xs", theme === "dark" ? "text-[#dcdcaa]" : "text-[#8b7355]")}>
+                    <div
+                      className={cn(
+                        "p-3 rounded-lg border",
+                        t.bgCard,
+                        t.border,
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "font-mono text-xs",
+                          theme === "dark"
+                            ? "text-[#dcdcaa]"
+                            : "text-[#8b7355]",
+                        )}
+                      >
                         Search
                       </span>
                       <p className={cn("mt-1 text-xs", t.textSubtle)}>
                         Full-text and semantic search across all sessions
                       </p>
                     </div>
-                    <div className={cn("p-3 rounded-lg border", t.bgCard, t.border)}>
-                      <span className={cn("font-mono text-xs", theme === "dark" ? "text-[#ce9178]" : "text-[#a05d3b]")}>
+                    <div
+                      className={cn(
+                        "p-3 rounded-lg border",
+                        t.bgCard,
+                        t.border,
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "font-mono text-xs",
+                          theme === "dark"
+                            ? "text-[#ce9178]"
+                            : "text-[#a05d3b]",
+                        )}
+                      >
                         Private
                       </span>
                       <p className={cn("mt-1 text-xs", t.textSubtle)}>
                         Your data stays in your account, secured by WorkOS
                       </p>
                     </div>
-                    <div className={cn("p-3 rounded-lg border", t.bgCard, t.border)}>
-                      <span className={cn("font-mono text-xs", theme === "dark" ? "text-[#9cdcfe]" : "text-[#3d7ea6]")}>
+                    <div
+                      className={cn(
+                        "p-3 rounded-lg border",
+                        t.bgCard,
+                        t.border,
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "font-mono text-xs",
+                          theme === "dark"
+                            ? "text-[#9cdcfe]"
+                            : "text-[#3d7ea6]",
+                        )}
+                      >
                         Export
                       </span>
                       <p className={cn("mt-1 text-xs", t.textSubtle)}>
-                        Export for evals in DeepEval, OpenAI, or plain text formats
+                        Export for evals in DeepEval, OpenAI, or plain text
+                        formats
                       </p>
                     </div>
-                    <div className={cn("p-3 rounded-lg border", t.bgCard, t.border)}>
+                    <div
+                      className={cn(
+                        "p-3 rounded-lg border",
+                        t.bgCard,
+                        t.border,
+                      )}
+                    >
                       <span className="font-mono text-xs text-[#EB5601]">
                         Delete
                       </span>
                       <p className={cn("mt-1 text-xs", t.textSubtle)}>
-                        Your control. Delete sessions or your entire account anytime.
+                        Your control. Delete sessions or your entire account
+                        anytime.
                       </p>
                     </div>
-                    <div className={cn("p-3 rounded-lg border", t.bgCard, t.border)}>
-                      <span className={cn("font-mono text-xs", theme === "dark" ? "text-emerald-400" : "text-emerald-600")}>
+                    <div
+                      className={cn(
+                        "p-3 rounded-lg border",
+                        t.bgCard,
+                        t.border,
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "font-mono text-xs",
+                          theme === "dark"
+                            ? "text-emerald-400"
+                            : "text-emerald-600",
+                        )}
+                      >
                         API
                       </span>
                       <p className={cn("mt-1 text-xs", t.textSubtle)}>
-                        Use the REST API for RAG, context injection, and integrations
+                        Use the REST API for RAG, context injection, and
+                        integrations
                       </p>
                     </div>
                   </div>
@@ -1547,18 +2182,27 @@ npm install
                     level={3}
                   />
                   <p className={cn("mt-2 text-xs", t.textSubtle)}>
-                    Install one or both plugins globally. They run on your machine and sync to the hosted dashboard.
+                    Install one or both plugins globally. They run on your
+                    machine and sync to the hosted dashboard.
                   </p>
                   <div className="mt-3 grid gap-4 md:grid-cols-2">
                     {/* OpenCode */}
-                    <div className={cn("p-4 rounded-lg border", t.bgCard, t.border)}>
+                    <div
+                      className={cn(
+                        "p-4 rounded-lg border",
+                        t.bgCard,
+                        t.border,
+                      )}
+                    >
                       <div className="flex items-center gap-2 mb-3">
                         <div className="w-6 h-6 rounded bg-blue-500/15 flex items-center justify-center">
                           <span className="text-[10px] font-medium text-blue-400">
                             OC
                           </span>
                         </div>
-                        <span className={cn("text-sm font-medium", t.textSecondary)}>
+                        <span
+                          className={cn("text-sm font-medium", t.textSecondary)}
+                        >
                           OpenCode
                         </span>
                         <a
@@ -1574,14 +2218,22 @@ npm install
                     </div>
 
                     {/* Claude Code */}
-                    <div className={cn("p-4 rounded-lg border", t.bgCard, t.border)}>
+                    <div
+                      className={cn(
+                        "p-4 rounded-lg border",
+                        t.bgCard,
+                        t.border,
+                      )}
+                    >
                       <div className="flex items-center gap-2 mb-3">
                         <div className="w-6 h-6 rounded bg-amber-500/15 flex items-center justify-center">
                           <span className="text-[10px] font-medium text-amber-500">
                             CC
                           </span>
                         </div>
-                        <span className={cn("text-sm font-medium", t.textSecondary)}>
+                        <span
+                          className={cn("text-sm font-medium", t.textSecondary)}
+                        >
                           Claude Code
                         </span>
                         <a
@@ -1605,8 +2257,19 @@ npm install
                     title="Login and Sync"
                     level={3}
                   />
-                  <div className={cn("mt-3 p-4 rounded-lg border", t.bgCard, t.border)}>
-                    <ol className={cn("space-y-3 text-sm list-decimal list-inside", t.textMuted)}>
+                  <div
+                    className={cn(
+                      "mt-3 p-4 rounded-lg border",
+                      t.bgCard,
+                      t.border,
+                    )}
+                  >
+                    <ol
+                      className={cn(
+                        "space-y-3 text-sm list-decimal list-inside",
+                        t.textMuted,
+                      )}
+                    >
                       <li>
                         Sign in at{" "}
                         <a
@@ -1619,27 +2282,37 @@ npm install
                         </a>
                       </li>
                       <li>
-                        Go to <strong>Settings</strong> and click <strong>Generate API Key</strong>
+                        Go to <strong>Settings</strong> and click{" "}
+                        <strong>Generate API Key</strong>
                       </li>
                       <li>
                         Run the login command:
                         <div className="mt-2 space-y-2 pl-4">
                           <CodeBlock code="opencode-sync login" />
-                          <p className={cn("text-xs text-center", t.textDim)}>or</p>
+                          <p className={cn("text-xs text-center", t.textDim)}>
+                            or
+                          </p>
                           <CodeBlock code="claude-code-sync login" />
                         </div>
                       </li>
                       <li>
-                        Enter the <strong>Convex URL</strong> and <strong>API key</strong> when prompted
+                        Enter the <strong>Convex URL</strong> and{" "}
+                        <strong>API key</strong> when prompted
                       </li>
-                      <li>
-                        Start coding. Sessions sync automatically.
-                      </li>
+                      <li>Start coding. Sessions sync automatically.</li>
                     </ol>
                   </div>
-                  <div className={cn("mt-4 p-3 rounded-lg border", t.bgCode, t.border)}>
+                  <div
+                    className={cn(
+                      "mt-4 p-3 rounded-lg border",
+                      t.bgCode,
+                      t.border,
+                    )}
+                  >
                     <p className={cn("text-xs", t.textSubtle)}>
-                      <strong className={t.textMuted}>Hosted Convex URL:</strong>{" "}
+                      <strong className={t.textMuted}>
+                        Hosted Convex URL:
+                      </strong>{" "}
                       <code className={cn("px-1 rounded", t.bgCard)}>
                         https://polished-penguin-622.convex.cloud
                       </code>
@@ -1657,14 +2330,16 @@ npm install
                 onCopyMarkdown={() =>
                   copySectionMarkdown(
                     "requirements",
-                    `## Requirements for Self-Hosting\n\nTwo options: Cloud (Convex Cloud) or 100% Local (Docker-based).\n\n### Cloud Deployment\n- Node.js 18+\n- Convex account (free)\n- WorkOS account (free)\n- Optional: OpenAI API key\n\n### 100% Local Deployment\n- Docker\n- Node.js 18+\n- No cloud accounts needed`
+                    `## Requirements for Self-Hosting\n\nTwo options: Cloud (Convex Cloud) or 100% Local (Docker-based).\n\n### Cloud Deployment\n- Node.js 18+\n- Convex account (free)\n- WorkOS account (free)\n- Optional: OpenAI API key\n\n### 100% Local Deployment\n- Docker\n- Node.js 18+\n- No cloud accounts needed`,
                   )
                 }
               />
-              <div className={cn("mt-3 p-3 rounded-lg border", t.bgCode, t.border)}>
+              <div
+                className={cn("mt-3 p-3 rounded-lg border", t.bgCode, t.border)}
+              >
                 <p className={cn("text-xs", t.textSubtle)}>
-                  These requirements are only for self-hosting your own OpenSync instance.
-                  To use the hosted version at{" "}
+                  These requirements are only for self-hosting your own OpenSync
+                  instance. To use the hosted version at{" "}
                   <a
                     href="https://www.opensync.dev"
                     target="_blank"
@@ -1686,9 +2361,16 @@ npm install
                     level={3}
                   />
                   <p className={cn("mt-2 text-sm", t.textMuted)}>
-                    Use Convex Cloud for a managed backend with automatic scaling and zero infrastructure management.
+                    Use Convex Cloud for a managed backend with automatic
+                    scaling and zero infrastructure management.
                   </p>
-                  <div className={cn("mt-3 p-4 rounded-lg border", t.bgCard, t.border)}>
+                  <div
+                    className={cn(
+                      "mt-3 p-4 rounded-lg border",
+                      t.bgCard,
+                      t.border,
+                    )}
+                  >
                     <ul className={cn("space-y-2 text-sm", t.textMuted)}>
                       <li className="flex items-center gap-2">
                         <Check className="h-4 w-4 text-emerald-500" />
@@ -1723,7 +2405,13 @@ npm install
                         (free tier available)
                       </li>
                       <li className="flex items-center gap-2">
-                        <span className={cn("text-xs px-1.5 rounded", t.bgCode, t.textDim)}>
+                        <span
+                          className={cn(
+                            "text-xs px-1.5 rounded",
+                            t.bgCode,
+                            t.textDim,
+                          )}
+                        >
                           optional
                         </span>
                         OpenAI API key for semantic search
@@ -1740,9 +2428,16 @@ npm install
                     level={3}
                   />
                   <p className={cn("mt-2 text-sm", t.textMuted)}>
-                    Run OpenSync entirely on your machine. No cloud services required. Your data never leaves your computer.
+                    Run OpenSync entirely on your machine. No cloud services
+                    required. Your data never leaves your computer.
                   </p>
-                  <div className={cn("mt-3 p-4 rounded-lg border", t.bgCard, t.border)}>
+                  <div
+                    className={cn(
+                      "mt-3 p-4 rounded-lg border",
+                      t.bgCard,
+                      t.border,
+                    )}
+                  >
                     <ul className={cn("space-y-2 text-sm", t.textMuted)}>
                       <li className="flex items-center gap-2">
                         <Check className="h-4 w-4 text-emerald-500" />
@@ -1765,7 +2460,13 @@ npm install
                         npm or bun package manager
                       </li>
                       <li className="flex items-center gap-2">
-                        <span className={cn("text-xs px-1.5 rounded", t.bgCode, t.textDim)}>
+                        <span
+                          className={cn(
+                            "text-xs px-1.5 rounded",
+                            t.bgCode,
+                            t.textDim,
+                          )}
+                        >
                           optional
                         </span>
                         OpenAI API key for semantic search (can run without it)
@@ -1773,21 +2474,47 @@ npm install
                     </ul>
                   </div>
 
-                  <div className={cn("mt-4 p-4 rounded-lg border", t.bgCode, t.border)}>
-                    <p className={cn("text-xs font-medium mb-3", t.textSecondary)}>
+                  <div
+                    className={cn(
+                      "mt-4 p-4 rounded-lg border",
+                      t.bgCode,
+                      t.border,
+                    )}
+                  >
+                    <p
+                      className={cn(
+                        "text-xs font-medium mb-3",
+                        t.textSecondary,
+                      )}
+                    >
                       Step 1: Start Local Convex Backend
                     </p>
-                    <CodeBlock code={`# Start the local Convex backend (requires Docker)
-npx convex dev --local`} />
+                    <CodeBlock
+                      code={`# Start the local Convex backend (requires Docker)
+npx convex dev --local`}
+                    />
                     <p className={cn("mt-3 text-xs", t.textSubtle)}>
                       This starts a local Convex instance at{" "}
-                      <code className={cn("px-1 rounded", t.bgCard)}>http://127.0.0.1:3210</code>.
-                      No Convex Cloud account needed.
+                      <code className={cn("px-1 rounded", t.bgCard)}>
+                        http://127.0.0.1:3210
+                      </code>
+                      . No Convex Cloud account needed.
                     </p>
                   </div>
 
-                  <div className={cn("mt-4 p-4 rounded-lg border", t.bgCode, t.border)}>
-                    <p className={cn("text-xs font-medium mb-3", t.textSecondary)}>
+                  <div
+                    className={cn(
+                      "mt-4 p-4 rounded-lg border",
+                      t.bgCode,
+                      t.border,
+                    )}
+                  >
+                    <p
+                      className={cn(
+                        "text-xs font-medium mb-3",
+                        t.textSecondary,
+                      )}
+                    >
                       Step 2: Configure Local Environment
                     </p>
                     <CodeBlock
@@ -1799,42 +2526,102 @@ VITE_REDIRECT_URI=http://localhost:5173/callback`}
                     />
                   </div>
 
-                  <div className={cn("mt-4 p-4 rounded-lg border", t.bgCode, t.border)}>
-                    <p className={cn("text-xs font-medium mb-3", t.textSecondary)}>
+                  <div
+                    className={cn(
+                      "mt-4 p-4 rounded-lg border",
+                      t.bgCode,
+                      t.border,
+                    )}
+                  >
+                    <p
+                      className={cn(
+                        "text-xs font-medium mb-3",
+                        t.textSecondary,
+                      )}
+                    >
                       Step 3: Deploy Schema and Run
                     </p>
-                    <CodeBlock code={`# Deploy schema to local backend
+                    <CodeBlock
+                      code={`# Deploy schema to local backend
 npx convex deploy --local
 
 # Start the web UI
-npm run dev`} />
+npm run dev`}
+                    />
                   </div>
 
-                  <div className={cn("mt-4 p-4 rounded-lg border", t.bgCode, t.border)}>
-                    <p className={cn("text-xs font-medium mb-3", t.textSecondary)}>
+                  <div
+                    className={cn(
+                      "mt-4 p-4 rounded-lg border",
+                      t.bgCode,
+                      t.border,
+                    )}
+                  >
+                    <p
+                      className={cn(
+                        "text-xs font-medium mb-3",
+                        t.textSecondary,
+                      )}
+                    >
                       Step 4: Configure Plugin for Local Backend
                     </p>
-                    <CodeBlock code={`opencode-sync login
+                    <CodeBlock
+                      code={`opencode-sync login
 # Enter: http://127.0.0.1:3210 as the Convex URL
-# Generate an API key from the local dashboard`} />
+# Generate an API key from the local dashboard`}
+                    />
                   </div>
 
-                  <div className={cn("mt-4 p-4 rounded-lg border border-amber-800/50 bg-amber-900/20", t.border)}>
-                    <p className={cn("text-xs font-medium mb-2", theme === "dark" ? "text-amber-200" : "text-amber-800")}>
+                  <div
+                    className={cn(
+                      "mt-4 p-4 rounded-lg border border-amber-800/50 bg-amber-900/20",
+                      t.border,
+                    )}
+                  >
+                    <p
+                      className={cn(
+                        "text-xs font-medium mb-2",
+                        theme === "dark" ? "text-amber-200" : "text-amber-800",
+                      )}
+                    >
                       Local Deployment Notes
                     </p>
-                    <ul className={cn("space-y-1 text-xs list-disc list-inside", theme === "dark" ? "text-amber-400/70" : "text-amber-600")}>
-                      <li>Authentication: Bypass WorkOS for local dev or use WorkOS staging</li>
-                      <li>Data persistence: Local Convex stores data in Docker volumes</li>
-                      <li>Fully offline: Once set up, the entire stack runs without internet</li>
-                      <li>Disable semantic search by removing OpenAI calls for 100% offline operation</li>
+                    <ul
+                      className={cn(
+                        "space-y-1 text-xs list-disc list-inside",
+                        theme === "dark"
+                          ? "text-amber-400/70"
+                          : "text-amber-600",
+                      )}
+                    >
+                      <li>
+                        Authentication: Bypass WorkOS for local dev or use
+                        WorkOS staging
+                      </li>
+                      <li>
+                        Data persistence: Local Convex stores data in Docker
+                        volumes
+                      </li>
+                      <li>
+                        Fully offline: Once set up, the entire stack runs
+                        without internet
+                      </li>
+                      <li>
+                        Disable semantic search by removing OpenAI calls for
+                        100% offline operation
+                      </li>
                     </ul>
                     <div className="mt-3">
                       <a
                         href="https://docs.convex.dev/cli/local-deployments"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={cn("text-xs flex items-center gap-1", theme === "dark" ? "text-amber-300" : "text-amber-700")}
+                        className={cn(
+                          "text-xs flex items-center gap-1",
+                          theme === "dark"
+                            ? "text-amber-300"
+                            : "text-amber-700",
+                        )}
                       >
                         Convex Local Deployments docs
                         <ExternalLink className="h-3 w-3" />
@@ -1853,7 +2640,7 @@ npm run dev`} />
                 onCopyMarkdown={() =>
                   copySectionMarkdown(
                     "quickstart",
-                    `## Quick Start\n\n### Deploy Backend\n\`\`\`bash\ngit clone https://github.com/waynesutton/opensync.git\ncd opensync\nnpm install\nnpx convex dev\n\`\`\``
+                    `## Quick Start\n\n### Deploy Backend\n\`\`\`bash\ngit clone https://github.com/waynesutton/opensync.git\ncd opensync\nnpm install\nnpx convex dev\n\`\`\``,
                   )
                 }
               />
@@ -1891,8 +2678,19 @@ npx convex dev`}
                     title="2. Get Your API Key"
                     level={3}
                   />
-                  <div className={cn("mt-3 p-4 rounded-lg border", t.bgCard, t.border)}>
-                    <ol className={cn("space-y-2 text-sm list-decimal list-inside", t.textMuted)}>
+                  <div
+                    className={cn(
+                      "mt-3 p-4 rounded-lg border",
+                      t.bgCard,
+                      t.border,
+                    )}
+                  >
+                    <ol
+                      className={cn(
+                        "space-y-2 text-sm list-decimal list-inside",
+                        t.textMuted,
+                      )}
+                    >
                       <li>Log into your OpenSync dashboard via WorkOS</li>
                       <li>
                         Go to <strong>Settings</strong>
@@ -1919,14 +2717,22 @@ npx convex dev`}
                   />
                   <div className="mt-3 grid gap-4 md:grid-cols-2">
                     {/* OpenCode */}
-                    <div className={cn("p-4 rounded-lg border", t.bgCard, t.border)}>
+                    <div
+                      className={cn(
+                        "p-4 rounded-lg border",
+                        t.bgCard,
+                        t.border,
+                      )}
+                    >
                       <div className="flex items-center gap-2 mb-3">
                         <div className="w-6 h-6 rounded bg-blue-500/15 flex items-center justify-center">
                           <span className="text-[10px] font-medium text-blue-400">
                             OC
                           </span>
                         </div>
-                        <span className={cn("text-sm font-medium", t.textSecondary)}>
+                        <span
+                          className={cn("text-sm font-medium", t.textSecondary)}
+                        >
                           OpenCode
                         </span>
                       </div>
@@ -1940,14 +2746,22 @@ npx convex dev`}
                     </div>
 
                     {/* Claude Code */}
-                    <div className={cn("p-4 rounded-lg border", t.bgCard, t.border)}>
+                    <div
+                      className={cn(
+                        "p-4 rounded-lg border",
+                        t.bgCard,
+                        t.border,
+                      )}
+                    >
                       <div className="flex items-center gap-2 mb-3">
                         <div className="w-6 h-6 rounded bg-amber-500/15 flex items-center justify-center">
                           <span className="text-[10px] font-medium text-amber-500">
                             CC
                           </span>
                         </div>
-                        <span className={cn("text-sm font-medium", t.textSecondary)}>
+                        <span
+                          className={cn("text-sm font-medium", t.textSecondary)}
+                        >
                           Claude Code
                         </span>
                       </div>
@@ -1976,10 +2790,10 @@ npx convex dev`}
                     level={3}
                   />
                   <p className={cn("mt-2 text-sm", t.textMuted)}>
-                    The Overview tab shows key metrics at a glance: total sessions,
-                    tokens used, total cost, duration, models, and projects. Interactive
-                    charts display usage trends over the last 30 days with breakdowns
-                    by model and project.
+                    The Overview tab shows key metrics at a glance: total
+                    sessions, tokens used, total cost, duration, models, and
+                    projects. Interactive charts display usage trends over the
+                    last 30 days with breakdowns by model and project.
                   </p>
                 </div>
 
@@ -1990,10 +2804,10 @@ npx convex dev`}
                     level={3}
                   />
                   <p className={cn("mt-2 text-sm", t.textMuted)}>
-                    Browse all synced sessions with sorting and filtering. Source badges
-                    show OC (OpenCode) or CC (Claude Code) origin. List view shows token
-                    count, cost, and duration. Timeline view displays sessions
-                    chronologically grouped by project.
+                    Browse all synced sessions with sorting and filtering.
+                    Source badges show OC (OpenCode) or CC (Claude Code) origin.
+                    List view shows token count, cost, and duration. Timeline
+                    view displays sessions chronologically grouped by project.
                   </p>
                 </div>
 
@@ -2004,18 +2818,25 @@ npx convex dev`}
                     level={3}
                   />
                   <p className={cn("mt-2 text-sm", t.textMuted)}>
-                    Mark sessions as eval-ready to build training datasets. Export in
-                    multiple formats:
+                    Mark sessions as eval-ready to build training datasets.
+                    Export in multiple formats:
                   </p>
-                  <ul className={cn("mt-2 space-y-1 text-sm list-disc list-inside", t.textSubtle)}>
+                  <ul
+                    className={cn(
+                      "mt-2 space-y-1 text-sm list-disc list-inside",
+                      t.textSubtle,
+                    )}
+                  >
                     <li>
                       <strong>DeepEval JSON</strong> - For DeepEval framework
                     </li>
                     <li>
-                      <strong>OpenAI JSONL</strong> - For OpenAI Evals and fine-tuning
+                      <strong>OpenAI JSONL</strong> - For OpenAI Evals and
+                      fine-tuning
                     </li>
                     <li>
-                      <strong>Filesystem</strong> - Plain text files for custom pipelines
+                      <strong>Filesystem</strong> - Plain text files for custom
+                      pipelines
                     </li>
                   </ul>
                 </div>
@@ -2027,9 +2848,10 @@ npx convex dev`}
                     level={3}
                   />
                   <p className={cn("mt-2 text-sm", t.textMuted)}>
-                    Detailed breakdowns by model, provider, and project. View efficiency
-                    metrics like cost per session, tokens per message, and prompt/completion
-                    ratios. Filter and sort the projects table to identify high-usage areas.
+                    Detailed breakdowns by model, provider, and project. View
+                    efficiency metrics like cost per session, tokens per
+                    message, and prompt/completion ratios. Filter and sort the
+                    projects table to identify high-usage areas.
                   </p>
                 </div>
 
@@ -2040,9 +2862,10 @@ npx convex dev`}
                     level={3}
                   />
                   <p className={cn("mt-2 text-sm", t.textMuted)}>
-                    Full-text search across all sessions and messages. Results are paginated
-                    and can be used for RAG pipelines and context engineering. No OpenAI key
-                    required for basic full-text search.
+                    Full-text search across all sessions and messages. Results
+                    are paginated and can be used for RAG pipelines and context
+                    engineering. No OpenAI key required for basic full-text
+                    search.
                   </p>
                 </div>
               </div>
@@ -2081,7 +2904,7 @@ npx convex dev`}
                       rel="noopener noreferrer"
                       className={cn(
                         "flex items-center gap-1 text-xs",
-                        t.interactive
+                        t.interactive,
                       )}
                     >
                       <Github className="h-3 w-3" />
@@ -2093,7 +2916,7 @@ npx convex dev`}
                       rel="noopener noreferrer"
                       className={cn(
                         "flex items-center gap-1 text-xs",
-                        t.interactive
+                        t.interactive,
                       )}
                     >
                       <Package className="h-3 w-3" />
@@ -2109,9 +2932,13 @@ npx convex dev`}
                     level={3}
                   />
                   <div className="mt-3 space-y-3">
-                    <CodeBlock code="opencode-sync login" title="Authenticate" />
+                    <CodeBlock
+                      code="opencode-sync login"
+                      title="Authenticate"
+                    />
                     <p className={cn("text-xs", t.textSubtle)}>
-                      Enter your Convex URL ({convexCloudUrl}) and API key when prompted.
+                      Enter your Convex URL ({convexCloudUrl}) and API key when
+                      prompted.
                     </p>
                     <CodeBlock
                       code={`{
@@ -2128,14 +2955,29 @@ npx convex dev`}
                     title="Commands"
                     level={3}
                   />
-                  <div className={cn("mt-3 rounded-lg border overflow-hidden", t.border)}>
+                  <div
+                    className={cn(
+                      "mt-3 rounded-lg border overflow-hidden",
+                      t.border,
+                    )}
+                  >
                     <table className="w-full text-xs">
                       <thead>
                         <tr className={cn("border-b", t.border, t.bgCard)}>
-                          <th className={cn("px-3 py-2 text-left font-medium", t.textMuted)}>
+                          <th
+                            className={cn(
+                              "px-3 py-2 text-left font-medium",
+                              t.textMuted,
+                            )}
+                          >
                             Command
                           </th>
-                          <th className={cn("px-3 py-2 text-left font-medium", t.textMuted)}>
+                          <th
+                            className={cn(
+                              "px-3 py-2 text-left font-medium",
+                              t.textMuted,
+                            )}
+                          >
                             Description
                           </th>
                         </tr>
@@ -2147,7 +2989,9 @@ npx convex dev`}
                               opencode-sync login
                             </code>
                           </td>
-                          <td className="px-3 py-2">Authenticate with the backend</td>
+                          <td className="px-3 py-2">
+                            Authenticate with the backend
+                          </td>
                         </tr>
                         <tr className={cn("border-b", t.borderLight)}>
                           <td className="px-3 py-2">
@@ -2155,7 +2999,9 @@ npx convex dev`}
                               opencode-sync status
                             </code>
                           </td>
-                          <td className="px-3 py-2">Check sync status and configuration</td>
+                          <td className="px-3 py-2">
+                            Check sync status and configuration
+                          </td>
                         </tr>
                         <tr>
                           <td className="px-3 py-2">
@@ -2163,7 +3009,9 @@ npx convex dev`}
                               opencode-sync sync
                             </code>
                           </td>
-                          <td className="px-3 py-2">Manually sync current session</td>
+                          <td className="px-3 py-2">
+                            Manually sync current session
+                          </td>
                         </tr>
                       </tbody>
                     </table>
@@ -2205,7 +3053,7 @@ npx convex dev`}
                       rel="noopener noreferrer"
                       className={cn(
                         "flex items-center gap-1 text-xs",
-                        t.interactive
+                        t.interactive,
                       )}
                     >
                       <Github className="h-3 w-3" />
@@ -2217,7 +3065,7 @@ npx convex dev`}
                       rel="noopener noreferrer"
                       className={cn(
                         "flex items-center gap-1 text-xs",
-                        t.interactive
+                        t.interactive,
                       )}
                     >
                       <Package className="h-3 w-3" />
@@ -2233,7 +3081,10 @@ npx convex dev`}
                     level={3}
                   />
                   <div className="mt-3 space-y-3">
-                    <CodeBlock code="claude-code-sync login" title="Authenticate" />
+                    <CodeBlock
+                      code="claude-code-sync login"
+                      title="Authenticate"
+                    />
                     <p className={cn("text-xs", t.textSubtle)}>
                       Or create a config file manually:
                     </p>
@@ -2256,14 +3107,29 @@ npx convex dev`}
                     title="Commands"
                     level={3}
                   />
-                  <div className={cn("mt-3 rounded-lg border overflow-hidden", t.border)}>
+                  <div
+                    className={cn(
+                      "mt-3 rounded-lg border overflow-hidden",
+                      t.border,
+                    )}
+                  >
                     <table className="w-full text-xs">
                       <thead>
                         <tr className={cn("border-b", t.border, t.bgCard)}>
-                          <th className={cn("px-3 py-2 text-left font-medium", t.textMuted)}>
+                          <th
+                            className={cn(
+                              "px-3 py-2 text-left font-medium",
+                              t.textMuted,
+                            )}
+                          >
                             Command
                           </th>
-                          <th className={cn("px-3 py-2 text-left font-medium", t.textMuted)}>
+                          <th
+                            className={cn(
+                              "px-3 py-2 text-left font-medium",
+                              t.textMuted,
+                            )}
+                          >
                             Description
                           </th>
                         </tr>
@@ -2275,7 +3141,9 @@ npx convex dev`}
                               claude-code-sync login
                             </code>
                           </td>
-                          <td className="px-3 py-2">Authenticate with the backend</td>
+                          <td className="px-3 py-2">
+                            Authenticate with the backend
+                          </td>
                         </tr>
                         <tr className={cn("border-b", t.borderLight)}>
                           <td className="px-3 py-2">
@@ -2300,12 +3168,193 @@ npx convex dev`}
               </div>
             </section>
 
+            {/* Codex CLI Plugin */}
+            <section id="codex-plugin" data-section className="mb-12">
+              <SectionHeader id="codex-plugin" title="Codex CLI Plugin" />
+              <p className={cn("mt-2 text-sm", t.textMuted)}>
+                Sync your{" "}
+                <a
+                  href="https://openai.com/codex"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn("underline", t.interactive)}
+                >
+                  OpenAI Codex CLI
+                </a>{" "}
+                sessions to the same OpenSync dashboard.
+              </p>
+
+              <div className="mt-6 space-y-6">
+                <div id="codex-install" data-section>
+                  <SectionHeader
+                    id="codex-install"
+                    title="Installation"
+                    level={3}
+                  />
+                  <div className="mt-3">
+                    <CodeBlock code="npm install -g codex-sync" />
+                  </div>
+                  <div className="mt-3 flex gap-2">
+                    <a
+                      href="https://github.com/waynesutton/codex-sync"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={cn(
+                        "flex items-center gap-1 text-xs",
+                        t.interactive,
+                      )}
+                    >
+                      <Github className="h-3 w-3" />
+                      GitHub
+                    </a>
+                    <a
+                      href="https://www.npmjs.com/package/codex-sync"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={cn(
+                        "flex items-center gap-1 text-xs",
+                        t.interactive,
+                      )}
+                    >
+                      <Package className="h-3 w-3" />
+                      npm
+                    </a>
+                  </div>
+                </div>
+
+                <div id="codex-config" data-section>
+                  <SectionHeader
+                    id="codex-config"
+                    title="Configuration"
+                    level={3}
+                  />
+                  <div className="mt-3 space-y-3">
+                    <CodeBlock code="codex-sync login" title="Authenticate" />
+                    <CodeBlock
+                      code="codex-sync setup"
+                      title="Configure Codex notify hook"
+                    />
+                    <CodeBlock
+                      code="codex-sync verify"
+                      title="Verify connection"
+                    />
+                    <p className={cn("text-xs", t.textSubtle)}>
+                      Or create a config file manually:
+                    </p>
+                    <CodeBlock
+                      code={`{
+  "convexUrl": "${convexCloudUrl}",
+  "apiKey": "osk_your_api_key",
+  "autoSync": true,
+  "syncToolCalls": true,
+  "syncThinking": false,
+  "debug": false
+}`}
+                      title="~/.config/codex-sync/config.json"
+                    />
+                    <p className={cn("text-xs", t.textSubtle)}>
+                      The setup command adds a notify hook to your Codex config:
+                    </p>
+                    <CodeBlock
+                      code={`notify = ["codex-sync", "hook", "agent-turn-complete"]`}
+                      title="~/.codex/config.toml"
+                    />
+                  </div>
+                </div>
+
+                <div id="codex-commands" data-section>
+                  <SectionHeader
+                    id="codex-commands"
+                    title="Commands"
+                    level={3}
+                  />
+                  <div
+                    className={cn(
+                      "mt-3 rounded-lg border overflow-hidden",
+                      t.border,
+                    )}
+                  >
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className={cn("border-b", t.border, t.bgCard)}>
+                          <th
+                            className={cn(
+                              "px-3 py-2 text-left font-medium",
+                              t.textMuted,
+                            )}
+                          >
+                            Command
+                          </th>
+                          <th
+                            className={cn(
+                              "px-3 py-2 text-left font-medium",
+                              t.textMuted,
+                            )}
+                          >
+                            Description
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className={t.textSubtle}>
+                        <tr className={cn("border-b", t.borderLight)}>
+                          <td className="px-3 py-2">
+                            <code className={cn("px-1 rounded", t.bgCode)}>
+                              codex-sync login
+                            </code>
+                          </td>
+                          <td className="px-3 py-2">
+                            Authenticate with the backend
+                          </td>
+                        </tr>
+                        <tr className={cn("border-b", t.borderLight)}>
+                          <td className="px-3 py-2">
+                            <code className={cn("px-1 rounded", t.bgCode)}>
+                              codex-sync setup
+                            </code>
+                          </td>
+                          <td className="px-3 py-2">
+                            Configure Codex CLI notify hook
+                          </td>
+                        </tr>
+                        <tr className={cn("border-b", t.borderLight)}>
+                          <td className="px-3 py-2">
+                            <code className={cn("px-1 rounded", t.bgCode)}>
+                              codex-sync verify
+                            </code>
+                          </td>
+                          <td className="px-3 py-2">
+                            Verify connection to backend
+                          </td>
+                        </tr>
+                        <tr className={cn("border-b", t.borderLight)}>
+                          <td className="px-3 py-2">
+                            <code className={cn("px-1 rounded", t.bgCode)}>
+                              codex-sync status
+                            </code>
+                          </td>
+                          <td className="px-3 py-2">Check sync status</td>
+                        </tr>
+                        <tr>
+                          <td className="px-3 py-2">
+                            <code className={cn("px-1 rounded", t.bgCode)}>
+                              codex-sync sync
+                            </code>
+                          </td>
+                          <td className="px-3 py-2">Manual sync</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </section>
+
             {/* API Reference */}
             <section id="api" data-section className="mb-12">
               <SectionHeader id="api" title="API Reference" />
               <p className={cn("mt-2 text-sm", t.textMuted)}>
-                All endpoints require authentication via Bearer token (API key or JWT).
-                Generate an API key in Settings.
+                All endpoints require authentication via Bearer token (API key
+                or JWT). Generate an API key in Settings.
               </p>
 
               <div className="mt-6 space-y-6">
@@ -2329,13 +3378,15 @@ curl "${convexUrl}/api/sessions" \\
                 </div>
 
                 <div id="api-sessions" data-section>
-                  <SectionHeader
-                    id="api-sessions"
-                    title="Sessions"
-                    level={3}
-                  />
+                  <SectionHeader id="api-sessions" title="Sessions" level={3} />
                   <div className="mt-3 space-y-4">
-                    <div className={cn("rounded-lg border p-4", t.border, t.bgCard)}>
+                    <div
+                      className={cn(
+                        "rounded-lg border p-4",
+                        t.border,
+                        t.bgCard,
+                      )}
+                    >
                       <div className="flex items-center gap-2 mb-2">
                         <span className="rounded bg-emerald-900/40 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
                           GET
@@ -2353,7 +3404,13 @@ curl "${convexUrl}/api/sessions" \\
                       />
                     </div>
 
-                    <div className={cn("rounded-lg border p-4", t.border, t.bgCard)}>
+                    <div
+                      className={cn(
+                        "rounded-lg border p-4",
+                        t.border,
+                        t.bgCard,
+                      )}
+                    >
                       <div className="flex items-center gap-2 mb-2">
                         <span className="rounded bg-emerald-900/40 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
                           GET
@@ -2366,7 +3423,8 @@ curl "${convexUrl}/api/sessions" \\
                         Get a single session with all messages and parts.
                       </p>
                       <p className={cn("text-[10px] mb-3", t.textDim)}>
-                        <span className={t.textSubtle}>Parameters:</span> id (required)
+                        <span className={t.textSubtle}>Parameters:</span> id
+                        (required)
                       </p>
                       <CodeBlock
                         code={`curl "${convexUrl}/api/sessions/get?id=<session_id>" \\
@@ -2377,12 +3435,14 @@ curl "${convexUrl}/api/sessions" \\
                 </div>
 
                 <div id="api-search" data-section>
-                  <SectionHeader
-                    id="api-search"
-                    title="Search"
-                    level={3}
-                  />
-                  <div className={cn("mt-3 rounded-lg border p-4", t.border, t.bgCard)}>
+                  <SectionHeader id="api-search" title="Search" level={3} />
+                  <div
+                    className={cn(
+                      "mt-3 rounded-lg border p-4",
+                      t.border,
+                      t.bgCard,
+                    )}
+                  >
                     <div className="flex items-center gap-2 mb-2">
                       <span className="rounded bg-emerald-900/40 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
                         GET
@@ -2392,11 +3452,12 @@ curl "${convexUrl}/api/sessions" \\
                       </code>
                     </div>
                     <p className={cn("text-xs mb-2", t.textSubtle)}>
-                      Search sessions. Supports full-text, semantic, and hybrid search.
+                      Search sessions. Supports full-text, semantic, and hybrid
+                      search.
                     </p>
                     <p className={cn("text-[10px] mb-3", t.textDim)}>
-                      <span className={t.textSubtle}>Parameters:</span> q (required),
-                      limit, type (fulltext|semantic|hybrid)
+                      <span className={t.textSubtle}>Parameters:</span> q
+                      (required), limit, type (fulltext|semantic|hybrid)
                     </p>
                     <CodeBlock
                       code={`curl "${convexUrl}/api/search?q=authentication&type=semantic&limit=20" \\
@@ -2406,12 +3467,14 @@ curl "${convexUrl}/api/sessions" \\
                 </div>
 
                 <div id="api-context" data-section>
-                  <SectionHeader
-                    id="api-context"
-                    title="Context"
-                    level={3}
-                  />
-                  <div className={cn("mt-3 rounded-lg border p-4", t.border, t.bgCard)}>
+                  <SectionHeader id="api-context" title="Context" level={3} />
+                  <div
+                    className={cn(
+                      "mt-3 rounded-lg border p-4",
+                      t.border,
+                      t.bgCard,
+                    )}
+                  >
                     <div className="flex items-center gap-2 mb-2">
                       <span className="rounded bg-emerald-900/40 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
                         GET
@@ -2421,11 +3484,12 @@ curl "${convexUrl}/api/sessions" \\
                       </code>
                     </div>
                     <p className={cn("text-xs mb-2", t.textSubtle)}>
-                      Get relevant session content for LLM context. Perfect for RAG pipelines.
+                      Get relevant session content for LLM context. Perfect for
+                      RAG pipelines.
                     </p>
                     <p className={cn("text-[10px] mb-3", t.textDim)}>
-                      <span className={t.textSubtle}>Parameters:</span> q (required),
-                      limit, format (text|messages)
+                      <span className={t.textSubtle}>Parameters:</span> q
+                      (required), limit, format (text|messages)
                     </p>
                     <CodeBlock
                       code={`curl "${convexUrl}/api/context?q=react+hooks&format=text&limit=5" \\
@@ -2435,12 +3499,14 @@ curl "${convexUrl}/api/sessions" \\
                 </div>
 
                 <div id="api-export" data-section>
-                  <SectionHeader
-                    id="api-export"
-                    title="Export"
-                    level={3}
-                  />
-                  <div className={cn("mt-3 rounded-lg border p-4", t.border, t.bgCard)}>
+                  <SectionHeader id="api-export" title="Export" level={3} />
+                  <div
+                    className={cn(
+                      "mt-3 rounded-lg border p-4",
+                      t.border,
+                      t.bgCard,
+                    )}
+                  >
                     <div className="flex items-center gap-2 mb-2">
                       <span className="rounded bg-emerald-900/40 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
                         GET
@@ -2453,8 +3519,8 @@ curl "${convexUrl}/api/sessions" \\
                       Export a session in various formats.
                     </p>
                     <p className={cn("text-[10px] mb-3", t.textDim)}>
-                      <span className={t.textSubtle}>Parameters:</span> id (required),
-                      format (json|markdown|jsonl)
+                      <span className={t.textSubtle}>Parameters:</span> id
+                      (required), format (json|markdown|jsonl)
                     </p>
                     <CodeBlock
                       code={`curl "${convexUrl}/api/export?id=<session_id>&format=markdown" \\
@@ -2464,12 +3530,14 @@ curl "${convexUrl}/api/sessions" \\
                 </div>
 
                 <div id="api-stats" data-section>
-                  <SectionHeader
-                    id="api-stats"
-                    title="Stats"
-                    level={3}
-                  />
-                  <div className={cn("mt-3 rounded-lg border p-4", t.border, t.bgCard)}>
+                  <SectionHeader id="api-stats" title="Stats" level={3} />
+                  <div
+                    className={cn(
+                      "mt-3 rounded-lg border p-4",
+                      t.border,
+                      t.bgCard,
+                    )}
+                  >
                     <div className="flex items-center gap-2 mb-2">
                       <span className="rounded bg-emerald-900/40 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
                         GET
@@ -2479,7 +3547,8 @@ curl "${convexUrl}/api/sessions" \\
                       </code>
                     </div>
                     <p className={cn("text-xs mb-3", t.textSubtle)}>
-                      Get usage statistics: session count, tokens, cost, model breakdown.
+                      Get usage statistics: session count, tokens, cost, model
+                      breakdown.
                     </p>
                     <CodeBlock
                       code={`curl "${convexUrl}/api/stats" \\
@@ -2494,7 +3563,8 @@ curl "${convexUrl}/api/sessions" \\
             <section id="search" data-section className="mb-12">
               <SectionHeader id="search" title="Search" />
               <p className={cn("mt-2 text-sm", t.textMuted)}>
-                OpenSync supports three search modes to find sessions by content.
+                OpenSync supports three search modes to find sessions by
+                content.
               </p>
 
               <div className="mt-6 grid gap-4 md:grid-cols-3">
@@ -2503,13 +3573,17 @@ curl "${convexUrl}/api/sessions" \\
                   data-section
                   className={cn("p-4 rounded-lg border", t.border, t.bgCard)}
                 >
-                  <h4 className={cn("text-sm font-medium mb-2", t.textSecondary)}>
+                  <h4
+                    className={cn("text-sm font-medium mb-2", t.textSecondary)}
+                  >
                     Full-Text
                   </h4>
                   <p className={cn("text-xs mb-2", t.textSubtle)}>
                     Keyword matching. Fast and exact. Best for specific terms.
                   </p>
-                  <code className={cn("text-[10px] block", t.textDim)}>?type=fulltext</code>
+                  <code className={cn("text-[10px] block", t.textDim)}>
+                    ?type=fulltext
+                  </code>
                 </div>
 
                 <div
@@ -2517,13 +3591,18 @@ curl "${convexUrl}/api/sessions" \\
                   data-section
                   className={cn("p-4 rounded-lg border", t.border, t.bgCard)}
                 >
-                  <h4 className={cn("text-sm font-medium mb-2", t.textSecondary)}>
+                  <h4
+                    className={cn("text-sm font-medium mb-2", t.textSecondary)}
+                  >
                     Semantic
                   </h4>
                   <p className={cn("text-xs mb-2", t.textSubtle)}>
-                    Meaning-based search using embeddings. Finds related concepts.
+                    Meaning-based search using embeddings. Finds related
+                    concepts.
                   </p>
-                  <code className={cn("text-[10px] block", t.textDim)}>?type=semantic</code>
+                  <code className={cn("text-[10px] block", t.textDim)}>
+                    ?type=semantic
+                  </code>
                 </div>
 
                 <div
@@ -2531,13 +3610,17 @@ curl "${convexUrl}/api/sessions" \\
                   data-section
                   className={cn("p-4 rounded-lg border", t.border, t.bgCard)}
                 >
-                  <h4 className={cn("text-sm font-medium mb-2", t.textSecondary)}>
+                  <h4
+                    className={cn("text-sm font-medium mb-2", t.textSecondary)}
+                  >
                     Hybrid
                   </h4>
                   <p className={cn("text-xs mb-2", t.textSubtle)}>
                     Combines both using RRF. Best overall results.
                   </p>
-                  <code className={cn("text-[10px] block", t.textDim)}>?type=hybrid</code>
+                  <code className={cn("text-[10px] block", t.textDim)}>
+                    ?type=hybrid
+                  </code>
                 </div>
               </div>
             </section>
@@ -2553,11 +3636,23 @@ curl "${convexUrl}/api/sessions" \\
                     title="WorkOS AuthKit"
                     level={3}
                   />
-                  <div className={cn("mt-3 p-4 rounded-lg border", t.bgCard, t.border)}>
+                  <div
+                    className={cn(
+                      "mt-3 p-4 rounded-lg border",
+                      t.bgCard,
+                      t.border,
+                    )}
+                  >
                     <p className={cn("text-sm mb-3", t.textMuted)}>
-                      The web dashboard uses WorkOS AuthKit for enterprise authentication:
+                      The web dashboard uses WorkOS AuthKit for enterprise
+                      authentication:
                     </p>
-                    <ul className={cn("space-y-1 text-xs list-disc list-inside", t.textSubtle)}>
+                    <ul
+                      className={cn(
+                        "space-y-1 text-xs list-disc list-inside",
+                        t.textSubtle,
+                      )}
+                    >
                       <li>Single Sign-On (SSO) support</li>
                       <li>Magic link authentication</li>
                       <li>Google, GitHub, Microsoft OAuth</li>
@@ -2568,7 +3663,10 @@ curl "${convexUrl}/api/sessions" \\
                         href="https://docs.convex.dev/auth/authkit"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={cn("text-xs flex items-center gap-1", t.interactive)}
+                        className={cn(
+                          "text-xs flex items-center gap-1",
+                          t.interactive,
+                        )}
                       >
                         Convex + WorkOS AuthKit docs
                         <ExternalLink className="h-3 w-3" />
@@ -2583,14 +3681,27 @@ curl "${convexUrl}/api/sessions" \\
                     title="API Keys"
                     level={3}
                   />
-                  <div className={cn("mt-3 p-4 rounded-lg border", t.bgCard, t.border)}>
+                  <div
+                    className={cn(
+                      "mt-3 p-4 rounded-lg border",
+                      t.bgCard,
+                      t.border,
+                    )}
+                  >
                     <p className={cn("text-sm mb-3", t.textMuted)}>
                       Plugins and API access use API keys for authentication:
                     </p>
-                    <ul className={cn("space-y-1 text-xs list-disc list-inside", t.textSubtle)}>
+                    <ul
+                      className={cn(
+                        "space-y-1 text-xs list-disc list-inside",
+                        t.textSubtle,
+                      )}
+                    >
                       <li>
                         Keys start with{" "}
-                        <code className={cn("px-1 rounded", t.bgCode)}>osk_</code>
+                        <code className={cn("px-1 rounded", t.bgCode)}>
+                          osk_
+                        </code>
                       </li>
                       <li>Generated in Dashboard Settings</li>
                       <li>Stored securely server-side</li>
@@ -2614,8 +3725,8 @@ curl "${convexUrl}/api/sessions" \\
                     level={3}
                   />
                   <p className={cn("mt-2 text-sm", t.textMuted)}>
-                    Convex provides the real-time database, serverless functions, and
-                    built-in search capabilities.
+                    Convex provides the real-time database, serverless
+                    functions, and built-in search capabilities.
                   </p>
                   <div className="mt-3">
                     <CodeBlock
@@ -2635,7 +3746,8 @@ npx convex deploy`}
                     level={3}
                   />
                   <p className={cn("mt-2 text-sm", t.textMuted)}>
-                    Deploy the React frontend to Netlify, Vercel, or any static hosting.
+                    Deploy the React frontend to Netlify, Vercel, or any static
+                    hosting.
                   </p>
                   <div className="mt-3">
                     <CodeBlock
@@ -2653,14 +3765,29 @@ npm run build
                     title="Environment Variables"
                     level={3}
                   />
-                  <div className={cn("mt-3 rounded-lg border overflow-hidden", t.border)}>
+                  <div
+                    className={cn(
+                      "mt-3 rounded-lg border overflow-hidden",
+                      t.border,
+                    )}
+                  >
                     <table className="w-full text-xs">
                       <thead>
                         <tr className={cn("border-b", t.border, t.bgCard)}>
-                          <th className={cn("px-3 py-2 text-left font-medium", t.textMuted)}>
+                          <th
+                            className={cn(
+                              "px-3 py-2 text-left font-medium",
+                              t.textMuted,
+                            )}
+                          >
                             Variable
                           </th>
-                          <th className={cn("px-3 py-2 text-left font-medium", t.textMuted)}>
+                          <th
+                            className={cn(
+                              "px-3 py-2 text-left font-medium",
+                              t.textMuted,
+                            )}
+                          >
                             Description
                           </th>
                         </tr>
@@ -2688,7 +3815,9 @@ npm run build
                               OPENAI_API_KEY
                             </code>
                           </td>
-                          <td className="px-3 py-2">For semantic search (Convex env)</td>
+                          <td className="px-3 py-2">
+                            For semantic search (Convex env)
+                          </td>
                         </tr>
                       </tbody>
                     </table>
@@ -2723,8 +3852,19 @@ npm install`}
                     title="Setup Steps"
                     level={3}
                   />
-                  <div className={cn("mt-3 p-4 rounded-lg border", t.bgCard, t.border)}>
-                    <ol className={cn("space-y-3 text-sm list-decimal list-inside", t.textMuted)}>
+                  <div
+                    className={cn(
+                      "mt-3 p-4 rounded-lg border",
+                      t.bgCard,
+                      t.border,
+                    )}
+                  >
+                    <ol
+                      className={cn(
+                        "space-y-3 text-sm list-decimal list-inside",
+                        t.textMuted,
+                      )}
+                    >
                       <li>
                         Create a Convex project at{" "}
                         <a
@@ -2747,7 +3887,9 @@ npm install`}
                           workos.com
                         </a>
                       </li>
-                      <li>Copy .env.example to .env.local and fill in values</li>
+                      <li>
+                        Copy .env.example to .env.local and fill in values
+                      </li>
                       <li>
                         Run{" "}
                         <code className={cn("px-1 rounded", t.bgCode)}>
@@ -2774,21 +3916,34 @@ npm install`}
                   <p className={cn("mt-2 text-sm", t.textMuted)}>
                     The codebase is designed to be forked and customized:
                   </p>
-                  <ul className={cn("mt-2 space-y-1 text-xs list-disc list-inside", t.textSubtle)}>
+                  <ul
+                    className={cn(
+                      "mt-2 space-y-1 text-xs list-disc list-inside",
+                      t.textSubtle,
+                    )}
+                  >
                     <li>
-                      <code className={cn("px-1 rounded", t.bgCode)}>convex/schema.ts</code>{" "}
+                      <code className={cn("px-1 rounded", t.bgCode)}>
+                        convex/schema.ts
+                      </code>{" "}
                       - Database schema
                     </li>
                     <li>
-                      <code className={cn("px-1 rounded", t.bgCode)}>src/lib/theme.tsx</code>{" "}
+                      <code className={cn("px-1 rounded", t.bgCode)}>
+                        src/lib/theme.tsx
+                      </code>{" "}
                       - Theme colors
                     </li>
                     <li>
-                      <code className={cn("px-1 rounded", t.bgCode)}>src/pages/</code>{" "}
+                      <code className={cn("px-1 rounded", t.bgCode)}>
+                        src/pages/
+                      </code>{" "}
                       - Page components
                     </li>
                     <li>
-                      <code className={cn("px-1 rounded", t.bgCode)}>convex/http.ts</code>{" "}
+                      <code className={cn("px-1 rounded", t.bgCode)}>
+                        convex/http.ts
+                      </code>{" "}
                       - API endpoints
                     </li>
                   </ul>
@@ -2801,11 +3956,20 @@ npm install`}
               <SectionHeader id="troubleshooting" title="Troubleshooting" />
 
               <div className={cn("mt-4 space-y-3")}>
-                <div className={cn("p-4 rounded-lg border", t.bgCard, t.border)}>
-                  <h4 className={cn("text-sm font-medium mb-2", t.textSecondary)}>
+                <div
+                  className={cn("p-4 rounded-lg border", t.bgCard, t.border)}
+                >
+                  <h4
+                    className={cn("text-sm font-medium mb-2", t.textSecondary)}
+                  >
                     Plugin not syncing
                   </h4>
-                  <ul className={cn("space-y-1 text-xs list-disc list-inside", t.textSubtle)}>
+                  <ul
+                    className={cn(
+                      "space-y-1 text-xs list-disc list-inside",
+                      t.textSubtle,
+                    )}
+                  >
                     <li>Check API key is valid and not expired</li>
                     <li>Verify Convex URL is correct</li>
                     <li>
@@ -2819,11 +3983,20 @@ npm install`}
                   </ul>
                 </div>
 
-                <div className={cn("p-4 rounded-lg border", t.bgCard, t.border)}>
-                  <h4 className={cn("text-sm font-medium mb-2", t.textSecondary)}>
+                <div
+                  className={cn("p-4 rounded-lg border", t.bgCard, t.border)}
+                >
+                  <h4
+                    className={cn("text-sm font-medium mb-2", t.textSecondary)}
+                  >
                     Authentication errors
                   </h4>
-                  <ul className={cn("space-y-1 text-xs list-disc list-inside", t.textSubtle)}>
+                  <ul
+                    className={cn(
+                      "space-y-1 text-xs list-disc list-inside",
+                      t.textSubtle,
+                    )}
+                  >
                     <li>Clear browser cookies and try again</li>
                     <li>Verify WorkOS configuration in Convex</li>
                     <li>Check VITE_WORKOS_CLIENT_ID is set correctly</li>
@@ -2831,11 +4004,20 @@ npm install`}
                   </ul>
                 </div>
 
-                <div className={cn("p-4 rounded-lg border", t.bgCard, t.border)}>
-                  <h4 className={cn("text-sm font-medium mb-2", t.textSecondary)}>
+                <div
+                  className={cn("p-4 rounded-lg border", t.bgCard, t.border)}
+                >
+                  <h4
+                    className={cn("text-sm font-medium mb-2", t.textSecondary)}
+                  >
                     Semantic search not working
                   </h4>
-                  <ul className={cn("space-y-1 text-xs list-disc list-inside", t.textSubtle)}>
+                  <ul
+                    className={cn(
+                      "space-y-1 text-xs list-disc list-inside",
+                      t.textSubtle,
+                    )}
+                  >
                     <li>Verify OPENAI_API_KEY is set in Convex environment</li>
                     <li>Check OpenAI API quota and billing</li>
                     <li>Embeddings generate asynchronously after sync</li>
@@ -2905,7 +4087,10 @@ npm install`}
                     href="https://github.com/waynesutton/opensync"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={cn("flex items-center gap-1 text-xs", t.textSubtle)}
+                    className={cn(
+                      "flex items-center gap-1 text-xs",
+                      t.textSubtle,
+                    )}
                   >
                     <Github className="h-3.5 w-3.5" />
                     GitHub
