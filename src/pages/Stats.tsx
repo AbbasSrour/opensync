@@ -8,8 +8,6 @@ import {
   Moon,
   MessagesSquare,
   Zap,
-  Play,
-  RotateCcw,
   ArrowLeft,
   RefreshCw,
 } from "lucide-react";
@@ -23,25 +21,6 @@ function formatNumber(num: number): string {
     return (num / 1_000).toFixed(0) + "k";
   }
   return num.toString();
-}
-
-// TEMP: Calculate next milestone based on current count
-function getNextMilestone(count: number): { target: number; previous: number } {
-  if (count < 500_000) {
-    return { target: 500_000, previous: 0 };
-  }
-  if (count < 1_000_000) {
-    // 100k increments: 500k -> 600k -> 700k -> etc.
-    const next = Math.ceil(count / 100_000) * 100_000;
-    const target = count === next ? next + 100_000 : next;
-    const prev = target - 100_000;
-    return { target, previous: prev };
-  }
-  // 500k increments for 1M+
-  const next = Math.ceil(count / 500_000) * 500_000;
-  const target = count === next ? next + 500_000 : next;
-  const prev = target - 500_000;
-  return { target, previous: prev };
 }
 
 function getPTOffsetMinutes(date: Date): number {
@@ -162,7 +141,7 @@ function useStaticQuery<T>(
   return state;
 }
 
-// Message milestone counter component
+// Message counter component
 function MessageMilestoneCounter({
   isDark,
   refreshToken,
@@ -176,13 +155,7 @@ function MessageMilestoneCounter({
     refreshToken,
   );
 
-  // Calculate milestone targets
   const count = messageCount ?? 0;
-  const { target, previous } = getNextMilestone(count);
-
-  // Calculate progress percentage within current milestone range
-  const range = target - previous;
-  const progress = range > 0 ? ((count - previous) / range) * 100 : 0;
 
   return (
     <div
@@ -201,55 +174,31 @@ function MessageMilestoneCounter({
           className={`h-4 w-4 ${isDark ? "text-zinc-500" : "text-[#8b7355]"}`}
         />
         Messages Synced
-        <span
-          className={`ml-auto text-[10px] font-normal ${isDark ? "text-zinc-600" : "text-[#8b7355]"}`}
-        >
-          {loading ? "loading" : "9am PT snapshot"}
-        </span>
+        {loading && (
+          <span
+            className={`ml-auto text-[10px] font-normal ${isDark ? "text-zinc-600" : "text-[#8b7355]"}`}
+          >
+            loading
+          </span>
+        )}
       </h3>
 
       {/* Count display */}
-      <div className="mb-3">
+      <div>
         <span
-          className={`text-2xl font-bold tabular-nums ${
+          className={`text-3xl font-bold tabular-nums ${
             isDark ? "text-zinc-100" : "text-[#1a1a1a]"
           }`}
         >
           {count.toLocaleString()}
         </span>
-        <span
-          className={`text-sm ml-2 ${isDark ? "text-zinc-500" : "text-[#8b7355]"}`}
-        >
-          / {formatNumber(target)}
-        </span>
       </div>
-
-      {/* Progress bar */}
-      <div
-        className={`h-2 rounded-full overflow-hidden ${
-          isDark ? "bg-zinc-800" : "bg-[#e6e4e1]"
-        }`}
-      >
-        <div
-          className={`h-full rounded-full transition-all duration-500 ${
-            isDark ? "bg-emerald-500" : "bg-emerald-600"
-          }`}
-          style={{ width: `${Math.min(progress, 100)}%` }}
-        />
-      </div>
-
-      {/* Percentage */}
-      <p
-        className={`text-xs mt-2 ${isDark ? "text-zinc-500" : "text-[#8b7355]"}`}
-      >
-        {progress.toFixed(1)}% to {formatNumber(target)}
-      </p>
     </div>
   );
 }
 
-// Animated growth chart component
-function AnimatedGrowthChart({
+// Growth chart component
+function GrowthChart({
   isDark,
   refreshToken,
 }: {
@@ -259,8 +208,6 @@ function AnimatedGrowthChart({
   const { data: growthData } = useStaticQuery<
     Array<{ date: string; count: number; cumulative: number }>
   >(api.analytics.publicMessageGrowth, {}, refreshToken);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [animationKey, setAnimationKey] = useState(0);
 
   // Get data points - limit to last 60 days for readability
   const dataPoints = growthData?.slice(-60) ?? [];
@@ -288,25 +235,6 @@ function AnimatedGrowthChart({
   };
 
   const yAxisMax = getNiceMax(maxCumulative * 1.1);
-
-  const handlePlay = () => {
-    setAnimationKey((prev) => prev + 1);
-    setIsPlaying(true);
-  };
-
-  const handleReset = () => {
-    setIsPlaying(false);
-    setAnimationKey((prev) => prev + 1);
-  };
-
-  // Fallback timeout to stop animation
-  useEffect(() => {
-    if (!isPlaying) return;
-    const timeout = setTimeout(() => {
-      setIsPlaying(false);
-    }, 3500);
-    return () => clearTimeout(timeout);
-  }, [isPlaying, animationKey]);
 
   // Build SVG path
   const chartHeight = 120;
@@ -391,47 +319,16 @@ function AnimatedGrowthChart({
           : "border-[#e6e4e1] bg-[#f5f3f0]"
       }`}
     >
-      <div className="flex items-center justify-between mb-4">
-        <h3
-          className={`text-sm font-medium flex items-center gap-2 ${
-            isDark ? "text-zinc-300" : "text-[#1a1a1a]"
-          }`}
-        >
-          <Zap
-            className={`h-4 w-4 ${isDark ? "text-zinc-500" : "text-[#8b7355]"}`}
-          />
-          Message Growth
-        </h3>
-
-        <div className="flex items-center gap-2">
-          {!isPlaying ? (
-            <button
-              onClick={handlePlay}
-              disabled={dataPoints.length === 0}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                isDark
-                  ? "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 disabled:opacity-50"
-                  : "bg-[#ebe9e6] text-[#1a1a1a] hover:bg-[#e6e4e1] disabled:opacity-50"
-              }`}
-            >
-              <Play className="h-3 w-3" />
-              Play
-            </button>
-          ) : (
-            <button
-              onClick={handleReset}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                isDark
-                  ? "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
-                  : "bg-[#ebe9e6] text-[#1a1a1a] hover:bg-[#e6e4e1]"
-              }`}
-            >
-              <RotateCcw className="h-3 w-3" />
-              Reset
-            </button>
-          )}
-        </div>
-      </div>
+      <h3
+        className={`text-sm font-medium mb-4 flex items-center gap-2 ${
+          isDark ? "text-zinc-300" : "text-[#1a1a1a]"
+        }`}
+      >
+        <Zap
+          className={`h-4 w-4 ${isDark ? "text-zinc-500" : "text-[#8b7355]"}`}
+        />
+        Message Growth
+      </h3>
 
       <div className="relative" style={{ height: chartHeight + 20 }}>
         {chartPoints.length === 0 ? (
@@ -466,7 +363,6 @@ function AnimatedGrowthChart({
             </div>
 
             <svg
-              key={animationKey}
               viewBox={`0 0 ${chartWidth} ${chartHeight}`}
               preserveAspectRatio="none"
               className="w-full ml-6"
@@ -485,19 +381,6 @@ function AnimatedGrowthChart({
                     stopOpacity="0"
                   />
                 </linearGradient>
-                <clipPath id={`clipPath-${animationKey}`}>
-                  <rect x="0" y="0" width={chartWidth} height={chartHeight}>
-                    {isPlaying && (
-                      <animate
-                        attributeName="width"
-                        from="0"
-                        to={chartWidth}
-                        dur="3s"
-                        fill="freeze"
-                      />
-                    )}
-                  </rect>
-                </clipPath>
               </defs>
 
               <line
@@ -510,13 +393,7 @@ function AnimatedGrowthChart({
                 strokeDasharray="2,2"
               />
 
-              <path
-                d={areaPath}
-                fill="url(#growthGradient)"
-                clipPath={
-                  isPlaying ? `url(#clipPath-${animationKey})` : undefined
-                }
-              />
+              <path d={areaPath} fill="url(#growthGradient)" />
 
               <path
                 d={pathData}
@@ -524,12 +401,9 @@ function AnimatedGrowthChart({
                 stroke={isDark ? "#10b981" : "#059669"}
                 strokeWidth="1.5"
                 vectorEffect="non-scaling-stroke"
-                clipPath={
-                  isPlaying ? `url(#clipPath-${animationKey})` : undefined
-                }
               />
 
-              {chartPoints.length > 0 && !isPlaying && (
+              {chartPoints.length > 0 && (
                 <circle
                   cx={padding.left + innerWidth}
                   cy={
@@ -561,7 +435,7 @@ function AnimatedGrowthChart({
 
       {chartPoints.length > 0 && (
         <div
-          className={`mt-3 pt-3 border-t flex justify-between text-xs ${
+          className={`mt-3 pt-3 border-t text-xs ${
             isDark
               ? "border-zinc-800 text-zinc-500"
               : "border-[#e6e4e1] text-[#8b7355]"
@@ -571,12 +445,6 @@ function AnimatedGrowthChart({
             Total:{" "}
             <span className={isDark ? "text-zinc-300" : "text-[#1a1a1a]"}>
               {chartPoints[chartPoints.length - 1].cumulative.toLocaleString()}
-            </span>
-          </span>
-          <span>
-            Target:{" "}
-            <span className={isDark ? "text-zinc-300" : "text-[#1a1a1a]"}>
-              500k
             </span>
           </span>
         </div>
@@ -747,7 +615,7 @@ function StatsPageContent({ theme, setTheme }: StatsPageContentProps) {
           <MessageMilestoneCounter isDark={isDark} refreshToken={refreshToken} />
 
           {/* Growth chart */}
-          <AnimatedGrowthChart isDark={isDark} refreshToken={refreshToken} />
+          <GrowthChart isDark={isDark} refreshToken={refreshToken} />
         </div>
 
         {/* Info text */}
@@ -756,7 +624,7 @@ function StatsPageContent({ theme, setTheme }: StatsPageContentProps) {
             isDark ? "text-zinc-600" : "text-[#8b7355]"
           }`}
         >
-          Stats snapshot from the OpenSync platform. Updates daily at 9am PT.
+          Stats snapshot from the OpenSync platform.
         </p>
       </main>
     </div>

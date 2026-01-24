@@ -6,6 +6,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- Simplified stats page UI
+  - Removed Play/Reset animation controls from growth chart (static display only)
+  - Removed milestone progress bar and "% to target" from message counter
+  - Removed "Target: 500k" from growth chart footer
+  - Removed "9am PT snapshot" label (refresh button available for manual updates)
+  - Stats can be refreshed on demand (no rate limit on read-only queries)
+
 ### Fixed
 
 - Fixed mobile scrolling issues across Dashboard

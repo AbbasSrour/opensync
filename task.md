@@ -24,10 +24,10 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 ## Recently Completed (Stats Page)
 
 - [x] Created new public /stats page with platform statistics
-  - Moved MessageMilestoneCounter and AnimatedGrowthChart from Login page
+  - Moved MessageMilestoneCounter and GrowthChart from Login page
   - Isolated stats components to prevent homepage rendering issues
-  - Real-time message document count with dynamic milestone targets
-  - Animated SVG growth chart with play/reset controls
+  - Total message count display (clean, no milestones)
+  - Static SVG growth chart showing cumulative growth over 60 days
   - Dynamic Y-axis scaling based on actual data
   - X-axis date labels (first, middle, last dates)
   - Dark/tan theme support with toggle
@@ -36,16 +36,19 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 - [x] Stabilized public stats page rendering
   - Added local error boundary to prevent full app blanking
   - Guarded growth chart against invalid data points
-- [x] Switched stats to daily snapshots at 9am PT
-  - Loads once from the database (no realtime updates)
-  - Shows daily update status in the UI
 - [x] Fixed 16MB Convex read limit error on stats page
-  - Changed publicMessageCount to use async iteration instead of collect
-  - Changed publicMessageGrowth to use async iteration instead of collect
+  - Rewrote publicMessageCount to sum session.messageCount instead of counting messages
+  - Rewrote publicMessageGrowth to aggregate from sessions table
   - Added temporary refresh button to stats header (to remove later)
+- [x] Simplified stats page UI
+  - Removed Play/Reset animation controls (static chart only)
+  - Removed milestone progress bar and percentage
+  - Removed "Target: 500k" from growth chart
+  - Removed "9am PT snapshot" label
+  - Stats can be refreshed on demand (read-only queries have no rate limit)
 - [x] Added new Convex queries in analytics.ts
-  - publicMessageCount: returns total message documents (no auth)
-  - publicMessageGrowth: returns daily counts with cumulative totals (no auth)
+  - publicMessageCount: sums session messageCount fields (no auth)
+  - publicMessageGrowth: aggregates daily counts from sessions (no auth)
   - Added safety checks for invalid dates in publicMessageGrowth
 
 ## Recently Completed (Docs Page codex-sync Updates)
