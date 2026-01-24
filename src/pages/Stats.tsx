@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Component, type ReactNode } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Link } from "react-router-dom";
-import { useTheme } from "../lib/theme";
+import { useTheme, type Theme } from "../lib/theme";
 import {
   Sun,
   Moon,
@@ -127,9 +127,15 @@ function AnimatedGrowthChart({ isDark }: { isDark: boolean }) {
 
   // Get data points - limit to last 60 days for readability
   const dataPoints = growthData?.slice(-60) ?? [];
-  const maxCumulative = dataPoints.length > 0
-    ? Math.max(...dataPoints.map(d => d.cumulative))
-    : 100;
+  // Guard against invalid data so the chart never crashes
+  const safePoints = dataPoints.filter((point) =>
+    Number.isFinite(point.cumulative),
+  );
+  const chartPoints = safePoints.length > 0 ? safePoints : [];
+  const maxCumulative =
+    chartPoints.length > 0
+      ? Math.max(...chartPoints.map((point) => point.cumulative))
+      : 100;
 
   // Calculate Y-axis scale
   const getNiceMax = (value: number): number => {
@@ -172,23 +178,45 @@ function AnimatedGrowthChart({ isDark }: { isDark: boolean }) {
   const innerWidth = chartWidth - padding.left - padding.right;
   const innerHeight = chartHeight - padding.top - padding.bottom;
 
-  const pathData = dataPoints.length >= 1
-    ? dataPoints.map((d, i) => {
-        const x = padding.left + (dataPoints.length === 1 ? innerWidth : (i / (dataPoints.length - 1)) * innerWidth);
-        const y = padding.top + innerHeight - (d.cumulative / yAxisMax) * innerHeight;
-        return i === 0 ? `M ${padding.left} ${padding.top + innerHeight} L ${x} ${y}` : `L ${x} ${y}`;
-      }).join(' ')
-    : '';
+  const pathData =
+    chartPoints.length >= 1
+      ? chartPoints
+          .map((point, i) => {
+            const x =
+              padding.left +
+              (chartPoints.length === 1
+                ? innerWidth
+                : (i / (chartPoints.length - 1)) * innerWidth);
+            const y =
+              padding.top +
+              innerHeight -
+              (point.cumulative / yAxisMax) * innerHeight;
+            return i === 0
+              ? `M ${padding.left} ${padding.top + innerHeight} L ${x} ${y}`
+              : `L ${x} ${y}`;
+          })
+          .join(" ")
+      : "";
 
-  const areaPath = pathData && dataPoints.length >= 1
-    ? `M ${padding.left} ${padding.top + innerHeight} ` +
-      dataPoints.map((d, i) => {
-        const x = padding.left + (dataPoints.length === 1 ? innerWidth : (i / (dataPoints.length - 1)) * innerWidth);
-        const y = padding.top + innerHeight - (d.cumulative / yAxisMax) * innerHeight;
-        return `L ${x} ${y}`;
-      }).join(' ') +
-      ` L ${padding.left + (dataPoints.length === 1 ? innerWidth : innerWidth)} ${padding.top + innerHeight} Z`
-    : '';
+  const areaPath =
+    pathData && chartPoints.length >= 1
+      ? `M ${padding.left} ${padding.top + innerHeight} ` +
+        chartPoints
+          .map((point, i) => {
+            const x =
+              padding.left +
+              (chartPoints.length === 1
+                ? innerWidth
+                : (i / (chartPoints.length - 1)) * innerWidth);
+            const y =
+              padding.top +
+              innerHeight -
+              (point.cumulative / yAxisMax) * innerHeight;
+            return `L ${x} ${y}`;
+          })
+          .join(" ") +
+        ` L ${padding.left + innerWidth} ${padding.top + innerHeight} Z`
+      : "";
 
   const formatDateLabel = (dateStr: string) => {
     try {
@@ -200,17 +228,23 @@ function AnimatedGrowthChart({ isDark }: { isDark: boolean }) {
     }
   };
 
-  const xLabels = dataPoints.length >= 1
-    ? dataPoints.length === 1
-      ? [formatDateLabel(dataPoints[0].date)]
-      : dataPoints.length === 2
-        ? [formatDateLabel(dataPoints[0].date), formatDateLabel(dataPoints[1].date)]
-        : [
-            formatDateLabel(dataPoints[0].date),
-            formatDateLabel(dataPoints[Math.floor(dataPoints.length / 2)].date),
-            formatDateLabel(dataPoints[dataPoints.length - 1].date),
-          ]
-    : [];
+  const xLabels =
+    chartPoints.length >= 1
+      ? chartPoints.length === 1
+        ? [formatDateLabel(chartPoints[0].date)]
+        : chartPoints.length === 2
+          ? [
+              formatDateLabel(chartPoints[0].date),
+              formatDateLabel(chartPoints[1].date),
+            ]
+          : [
+              formatDateLabel(chartPoints[0].date),
+              formatDateLabel(
+                chartPoints[Math.floor(chartPoints.length / 2)].date,
+              ),
+              formatDateLabel(chartPoints[chartPoints.length - 1].date),
+            ]
+      : [];
 
   return (
     <div
@@ -263,7 +297,7 @@ function AnimatedGrowthChart({ isDark }: { isDark: boolean }) {
       </div>
 
       <div className="relative" style={{ height: chartHeight + 20 }}>
-        {dataPoints.length === 0 ? (
+        {chartPoints.length === 0 ? (
           <div
             className={`flex items-center justify-center h-full text-sm ${
               isDark ? "text-zinc-600" : "text-[#8b7355]"
@@ -345,10 +379,15 @@ function AnimatedGrowthChart({ isDark }: { isDark: boolean }) {
                 clipPath={isPlaying ? `url(#clipPath-${animationKey})` : undefined}
               />
 
-              {dataPoints.length > 0 && !isPlaying && (
+              {chartPoints.length > 0 && !isPlaying && (
                 <circle
                   cx={padding.left + innerWidth}
-                  cy={padding.top + innerHeight - (dataPoints[dataPoints.length - 1].cumulative / yAxisMax) * innerHeight}
+                  cy={
+                    padding.top +
+                    innerHeight -
+                    (chartPoints[chartPoints.length - 1].cumulative / yAxisMax) *
+                      innerHeight
+                  }
                   r="3"
                   fill={isDark ? "#10b981" : "#059669"}
                 />
@@ -369,7 +408,7 @@ function AnimatedGrowthChart({ isDark }: { isDark: boolean }) {
         )}
       </div>
 
-      {dataPoints.length > 0 && (
+      {chartPoints.length > 0 && (
         <div
           className={`mt-3 pt-3 border-t flex justify-between text-xs ${
             isDark ? "border-zinc-800 text-zinc-500" : "border-[#e6e4e1] text-[#8b7355]"
@@ -377,7 +416,7 @@ function AnimatedGrowthChart({ isDark }: { isDark: boolean }) {
         >
           <span>
             Total: <span className={isDark ? "text-zinc-300" : "text-[#1a1a1a]"}>
-              {dataPoints[dataPoints.length - 1].cumulative.toLocaleString()}
+              {chartPoints[chartPoints.length - 1].cumulative.toLocaleString()}
             </span>
           </span>
           <span>
@@ -390,8 +429,81 @@ function AnimatedGrowthChart({ isDark }: { isDark: boolean }) {
 }
 
 // Main Stats page component
-export function StatsPage() {
-  const { theme, setTheme } = useTheme();
+class StatsErrorBoundary extends Component<
+  { children: ReactNode; isDark: boolean },
+  { hasError: boolean }
+> {
+  state = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: unknown) {
+    console.error("Stats page crashed", error);
+  }
+
+  render() {
+    if (!this.state.hasError) {
+      return this.props.children;
+    }
+
+    const { isDark } = this.props;
+    return (
+      <div
+        className={`min-h-screen ${
+          isDark ? "bg-[#0a0a0a] text-zinc-100" : "bg-[#f8f6f3] text-[#1a1a1a]"
+        }`}
+      >
+        <div className="max-w-4xl mx-auto px-4 py-16 text-center">
+          <h1
+            className={`text-lg font-semibold ${
+              isDark ? "text-zinc-100" : "text-[#1a1a1a]"
+            }`}
+          >
+            Stats failed to load
+          </h1>
+          <p
+            className={`mt-2 text-sm ${
+              isDark ? "text-zinc-500" : "text-[#8b7355]"
+            }`}
+          >
+            We hit an error while loading metrics. Refresh to try again.
+          </p>
+          <div className="mt-6 flex items-center justify-center gap-3">
+            <Link
+              to="/"
+              className={`text-sm ${
+                isDark
+                  ? "text-zinc-400 hover:text-zinc-200"
+                  : "text-[#8b7355] hover:text-[#1a1a1a]"
+              }`}
+            >
+              Back
+            </Link>
+            <button
+              onClick={() => window.location.reload()}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                isDark
+                  ? "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                  : "bg-[#ebe9e6] text-[#1a1a1a] hover:bg-[#e6e4e1]"
+              }`}
+            >
+              Reload
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+type StatsPageContentProps = {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+};
+
+function StatsPageContent({ theme, setTheme }: StatsPageContentProps) {
   const isDark = theme === "dark";
 
   return (
@@ -462,5 +574,16 @@ export function StatsPage() {
         </p>
       </main>
     </div>
+  );
+}
+
+export function StatsPage() {
+  const { theme, setTheme } = useTheme();
+  const isDark = theme === "dark";
+
+  return (
+    <StatsErrorBoundary isDark={isDark}>
+      <StatsPageContent theme={theme} setTheme={setTheme} />
+    </StatsErrorBoundary>
   );
 }

@@ -33,6 +33,9 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
   - Dark/tan theme support with toggle
   - Back link to homepage
   - No auth required (public page)
+- [x] Stabilized public stats page rendering
+  - Added local error boundary to prevent full app blanking
+  - Guarded growth chart against invalid data points
 - [x] Added new Convex queries in analytics.ts
   - publicMessageCount: returns total message documents (no auth)
   - publicMessageGrowth: returns daily counts with cumulative totals (no auth)

@@ -18,6 +18,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - Added CSS `100dvh` (dynamic viewport height) fallback for mobile browser compatibility
   - Added `-webkit-overflow-scrolling: touch` for smooth iOS scrolling
   - No changes to desktop UI or features
+- Hardened public stats page rendering
+  - Added a local error boundary so stats failures do not blank the app
+  - Guarded growth chart against invalid data points
 
 ### Added
 
