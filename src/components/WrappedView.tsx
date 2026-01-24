@@ -99,7 +99,7 @@ export function WrappedView() {
   // Loading state
   if (stats === undefined) {
     return (
-      <div className="flex items-center justify-center h-96">
+      <div className="h-full flex items-center justify-center">
         <Loader2 className={cn("w-8 h-8 animate-spin", t.textMuted)} />
       </div>
     );
@@ -108,7 +108,7 @@ export function WrappedView() {
   // No data state
   if (!stats || (stats.totalTokens === 0 && stats.totalMessages === 0)) {
     return (
-      <div className="flex flex-col items-center justify-center h-96 text-center px-4">
+      <div className="h-full flex flex-col items-center justify-center text-center px-4">
         <div className={cn("w-16 h-16 rounded-full flex items-center justify-center mb-4", t.bgSecondary)}>
           <Clock className={cn("w-8 h-8", t.textMuted)} />
         </div>
@@ -126,7 +126,7 @@ export function WrappedView() {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 p-4 lg:p-8">
+    <div className="h-full overflow-y-auto flex flex-col lg:flex-row gap-8 p-4 lg:p-8">
       {/* Hidden export container - positioned off-screen, no transforms */}
       <div
         ref={exportRef}
@@ -146,8 +146,8 @@ export function WrappedView() {
         />
       </div>
 
-      {/* Wrapped Preview */}
-      <div className="flex-1 flex flex-col items-center">
+      {/* Wrapped Preview - flex-1 only on lg+ to not push controls off mobile */}
+      <div className="lg:flex-1 flex flex-col items-center">
         {/* Countdown */}
         <div className={cn("flex items-center gap-2 mb-4 text-sm", t.textMuted)}>
           <Clock className="w-4 h-4" />

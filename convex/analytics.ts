@@ -634,6 +634,56 @@ export const summaryStats = query({
   },
 });
 
+// TEMP: Public message count for milestone display on login page
+// TODO: Remove when no longer needed
+export const publicMessageCount = query({
+  args: {},
+  returns: v.number(),
+  handler: async (ctx) => {
+    const messages = await ctx.db.query("messages").collect();
+    return messages.length;
+  },
+});
+
+// TEMP: Public message growth data for animated chart on login page
+// TODO: Remove when no longer needed
+export const publicMessageGrowth = query({
+  args: {},
+  returns: v.array(
+    v.object({
+      date: v.string(),
+      count: v.number(),
+      cumulative: v.number(),
+    })
+  ),
+  handler: async (ctx) => {
+    const messages = await ctx.db.query("messages").collect();
+
+    // Group messages by date
+    const byDate: Record<string, number> = {};
+    for (const msg of messages) {
+      const date = new Date(msg.createdAt).toISOString().split("T")[0];
+      byDate[date] = (byDate[date] || 0) + 1;
+    }
+
+    // Sort dates and calculate cumulative
+    const sortedDates = Object.keys(byDate).sort();
+    let cumulative = 0;
+    const result: Array<{ date: string; count: number; cumulative: number }> = [];
+
+    for (const date of sortedDates) {
+      cumulative += byDate[date];
+      result.push({
+        date,
+        count: byDate[date],
+        cumulative,
+      });
+    }
+
+    return result;
+  },
+});
+
 // Public platform-wide stats for homepage leaderboard (no auth required)
 // Returns top models and top CLI sources sorted by usage
 export const publicPlatformStats = query({

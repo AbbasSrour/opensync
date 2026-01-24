@@ -293,3 +293,29 @@ th {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Mobile touch scrolling improvements */
+@media (max-width: 1023px) {
+  .overflow-y-auto,
+  .overflow-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Ensure touch scrolling works on mobile for flex containers */
+  .flex-1.overflow-y-auto,
+  .h-full.overflow-y-auto {
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Fix h-screen on mobile browsers with dynamic viewport */
+  .h-screen {
+    height: 100vh;
+    height: 100dvh;
+  }
+  
+  /* Ensure touch-action allows vertical scrolling */
+  .touch-pan-y {
+    touch-action: pan-y;
+  }
+}

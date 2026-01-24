@@ -8,6 +8,40 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 
 - [ ] (add next task here)
 
+## Recently Completed (Mobile Scrolling Fixes)
+
+- [x] Fixed mobile scrolling issues across Dashboard
+  - Sessions list now scrolls properly on mobile devices
+  - Session detail panel content scrolls correctly on mobile
+  - Wrapped view download button visible on mobile (page scrolls to show controls)
+  - Added `shrink-0` to header, footer, filters bar, and sort headers
+  - Added `min-h-0` to flex containers (main, sessions list, session detail, messages area)
+  - Added `touch-pan-y` class for touch scrolling
+  - Added CSS `100dvh` fallback for mobile browser viewport
+  - Added `-webkit-overflow-scrolling: touch` for smooth iOS scrolling
+  - No changes to desktop UI or features
+
+## Recently Completed (Temporary Login Page Stats)
+
+- [x] Added temporary message milestone counter on Login page
+  - Real-time message document count from Convex messages table
+  - Dynamic milestone calculation (500k, 600k, 700k, etc.)
+  - Progress bar with percentage towards next milestone
+  - Raw number with commas (e.g., 468,234) and abbreviated target (e.g., 500k)
+  - Matches both dark and tan themes
+  - Marked with TODO comments for future removal
+- [x] Added temporary animated growth chart on Login page
+  - SVG-based cumulative line chart showing message growth over days
+  - Play button to animate line drawing (3s duration)
+  - Reset button to restart animation
+  - Dynamic Y-axis scaling based on actual data (not hardcoded)
+  - X-axis date labels showing first, middle, and last dates
+  - Gradient fill under line for visual appeal
+  - Marked with TODO comments for future removal
+- [x] Added new Convex queries in analytics.ts
+  - publicMessageCount: returns total message documents (no auth)
+  - publicMessageGrowth: returns daily counts with cumulative totals (no auth)
+
 ## Recently Completed (Docs Page codex-sync Updates)
 
 - [x] Updated Docs.tsx with codex-sync plugin documentation

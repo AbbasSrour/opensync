@@ -6,8 +6,37 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed mobile scrolling issues across Dashboard
+  - Sessions list now scrolls properly on mobile devices
+  - Session detail panel content scrolls correctly on mobile
+  - Wrapped view download button visible on mobile (page scrolls to show controls)
+  - Added `shrink-0` to header, footer, filters bar, and sort headers to maintain fixed heights in flex layout
+  - Added `min-h-0` to flex containers to allow proper overflow scrolling
+  - Added `touch-pan-y` class for touch scrolling on mobile
+  - Added CSS `100dvh` (dynamic viewport height) fallback for mobile browser compatibility
+  - Added `-webkit-overflow-scrolling: touch` for smooth iOS scrolling
+  - No changes to desktop UI or features
+
 ### Added
 
+- Temporary message milestone counter on Login page (real-time document count from messages table)
+  - Dynamic milestone targets (500k, 600k, etc.) that auto-update as counts grow
+  - Progress bar showing percentage towards next milestone
+  - Raw number display with comma formatting for exact count
+  - Abbreviated format for milestone target (e.g., 500k)
+  - Marked with TODO comments for future removal
+- Temporary animated growth chart on Login page
+  - SVG-based line chart showing cumulative message growth over days
+  - Play/Reset animation controls (no auto-play)
+  - Dynamic Y-axis scaling based on actual data
+  - X-axis date labels (first, middle, last dates)
+  - Gradient fill under line for visual appeal
+  - Marked with TODO comments for future removal
+- New Convex queries in analytics.ts:
+  - publicMessageCount: total message documents count (no auth required)
+  - publicMessageGrowth: daily message counts with cumulative totals (no auth required)
 - codex-sync plugin integration: sync OpenAI Codex CLI sessions to OpenSync
   - Added codex-sync to README Ecosystem table and Quick Start section
   - Added Codex CLI to AI Coding Agents in Settings (status: supported)

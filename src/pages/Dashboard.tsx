@@ -230,8 +230,8 @@ export function DashboardPage() {
 
   return (
     <div className={cn("h-screen flex flex-col", t.bgPrimary)}>
-      {/* Header */}
-      <header className={cn("h-12 border-b flex items-center px-3 sm:px-4 gap-2 sm:gap-4", t.border, t.bgPrimary)}>
+      {/* Header - shrink-0 to maintain height in flex layout */}
+      <header className={cn("shrink-0 h-12 border-b flex items-center px-3 sm:px-4 gap-2 sm:gap-4", t.border, t.bgPrimary)}>
         <Link to="/" className={cn("font-normal text-sm tracking-tight shrink-0", t.textSecondary)}>
           opensync
         </Link>
@@ -348,8 +348,8 @@ export function DashboardPage() {
         </div>
       </header>
 
-      {/* Main content */}
-      <main className="flex-1 overflow-hidden">
+      {/* Main content - min-h-0 allows flex children to scroll properly */}
+      <main className="flex-1 min-h-0 overflow-hidden">
         {viewMode === "overview" && (
           <OverviewView
             summaryStats={summaryStats}
@@ -418,8 +418,8 @@ export function DashboardPage() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className={cn("h-10 border-t flex items-center justify-between px-3 sm:px-4", t.border, t.bgPrimary)}>
+      {/* Footer - shrink-0 to maintain height in flex layout */}
+      <footer className={cn("shrink-0 h-10 border-t flex items-center justify-between px-3 sm:px-4", t.border, t.bgPrimary)}>
         <a
           href="https://github.com/waynesutton/opensync"
           target="_blank"
@@ -1006,14 +1006,14 @@ function SessionsView({
 
   return (
     <div className="h-full flex flex-col lg:flex-row">
-      {/* Sessions list - hidden on mobile when session selected */}
+      {/* Sessions list - hidden on mobile when session selected, h-full and min-h-0 for scroll */}
       <div className={cn(
-        "flex flex-col border-r",
+        "h-full min-h-0 flex flex-col border-r",
         t.border,
         selectedSession ? "hidden lg:flex lg:w-1/2" : "w-full"
       )}>
-        {/* Filters bar */}
-        <div className={cn("px-3 sm:px-4 py-2 sm:py-3 border-b flex items-center gap-2 sm:gap-3 flex-wrap", t.border)}>
+        {/* Filters bar - shrink-0 to prevent shrinking in flex */}
+        <div className={cn("shrink-0 px-3 sm:px-4 py-2 sm:py-3 border-b flex items-center gap-2 sm:gap-3 flex-wrap", t.border)}>
           <button
             onClick={onToggleFilters}
             className={cn(
@@ -1090,9 +1090,9 @@ function SessionsView({
           <span className={cn("text-xs shrink-0", t.textDim)}>{sessions.length}<span className="hidden sm:inline"> of {total}</span></span>
         </div>
 
-        {/* Filter dropdowns */}
+        {/* Filter dropdowns - shrink-0 to prevent shrinking */}
         {showFilters && (
-          <div className={cn("px-4 py-3 border-b flex items-center gap-4", t.border, t.bgSecondary)}>
+          <div className={cn("shrink-0 px-4 py-3 border-b flex items-center gap-4", t.border, t.bgSecondary)}>
             <FilterDropdown
               label="Model"
               options={filterOptions.models}
@@ -1120,25 +1120,25 @@ function SessionsView({
         {/* List View */}
         {sessionsViewMode === "list" && (
           <>
-            {/* Sort header - simplified on mobile */}
-            <div className={cn("hidden sm:grid grid-cols-12 gap-2 px-4 py-2 border-b text-[10px] uppercase tracking-wider", t.borderLight, t.textDim)}>
+            {/* Sort header - simplified on mobile, shrink-0 */}
+            <div className={cn("shrink-0 hidden sm:grid grid-cols-12 gap-2 px-4 py-2 border-b text-[10px] uppercase tracking-wider", t.borderLight, t.textDim)}>
               <div className="col-span-5">Title</div>
               <SortHeader label="Tokens" field="totalTokens" current={sortField} order={sortOrder} onChange={onSortChange} className="col-span-2" alignRight theme={theme} />
               <SortHeader label="Cost" field="cost" current={sortField} order={sortOrder} onChange={onSortChange} className="col-span-2" alignRight theme={theme} />
               <SortHeader label="Duration" field="durationMs" current={sortField} order={sortOrder} onChange={onSortChange} className="col-span-2" alignRight theme={theme} />
               <div className="col-span-1" />
             </div>
-            {/* Mobile sort header */}
-            <div className={cn("sm:hidden flex items-center justify-between px-3 py-2 border-b text-[10px] uppercase tracking-wider", t.borderLight, t.textDim)}>
+            {/* Mobile sort header - shrink-0 */}
+            <div className={cn("shrink-0 sm:hidden flex items-center justify-between px-3 py-2 border-b text-[10px] uppercase tracking-wider", t.borderLight, t.textDim)}>
               <span>Sessions</span>
               <SortHeader label="Tokens" field="totalTokens" current={sortField} order={sortOrder} onChange={onSortChange} theme={theme} />
             </div>
 
-            {/* Sessions list with drag scroll */}
+            {/* Sessions list with drag scroll - min-h-0 and touch-action for mobile */}
             <div 
               ref={scrollContainerRef}
               className={cn(
-                "flex-1 overflow-y-auto overflow-x-auto scrollbar-hide cursor-grab",
+                "flex-1 min-h-0 overflow-y-auto overflow-x-auto scrollbar-hide cursor-grab touch-pan-y",
                 isDragging && "cursor-grabbing select-none"
               )}
               onMouseDown={handleMouseDown}
@@ -1175,9 +1175,9 @@ function SessionsView({
         )}
       </div>
 
-      {/* Session detail - full width on mobile */}
+      {/* Session detail - full width on mobile, h-full for scroll, min-h-0 for flex */}
       {selectedSession && (
-        <div className="w-full lg:w-1/2 flex flex-col">
+        <div className="h-full min-h-0 w-full lg:w-1/2 flex flex-col overflow-hidden">
           {/* Detail header */}
           <div className={cn("px-4 py-3 border-b flex items-center justify-between", t.border)}>
             <div className="flex items-center gap-3 min-w-0">
@@ -1301,8 +1301,8 @@ function SessionsView({
             </div>
           </div>
 
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 relative">
+          {/* Messages - flex-1 with min-h-0 for proper overflow scroll */}
+          <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4 relative">
             {/* Subtle loading indicator in corner during session transition - no overlay to prevent flash */}
             {isSessionLoading && (
               <div className="absolute top-2 right-2 z-10">
