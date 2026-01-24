@@ -433,9 +433,9 @@ function MessageMilestoneCounter({ isDark }: { isDark: boolean }) {
   );
 }
 
-// TEMP: Animated growth chart for login page
+// TEMP: Animated growth chart for login page - DISABLED FOR DEBUGGING
 // TODO: Remove when no longer needed
-function AnimatedGrowthChart({ isDark }: { isDark: boolean }) {
+export function _AnimatedGrowthChart_DISABLED({ isDark }: { isDark: boolean }) {
   const growthData = useQuery(api.analytics.publicMessageGrowth);
   const [isPlaying, setIsPlaying] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
@@ -1544,7 +1544,7 @@ export function LoginPage() {
 
               {/* TEMP: Animated message growth chart */}
               {/* TODO: Remove when no longer needed */}
-              <AnimatedGrowthChart isDark={isDark} />
+              {/* <AnimatedGrowthChart isDark={isDark} /> */}
             </div>
           </div>
         </main>
