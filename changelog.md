@@ -6,6 +6,16 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- One-click deploy buttons for Vercel and Netlify in README
+  - Deploy buttons deploy frontend only with explicit warning
+  - Created ONE-CLICK-DEPLOY.md post-deploy checklist with step-by-step Convex/WorkOS/OpenAI setup
+  - Created vercel.json with SPA rewrite rules for client-side routing
+  - Created SetupIncompleteBanner component showing when VITE_CONVEX_URL or VITE_WORKOS_CLIENT_ID is missing
+  - Banner links to GitHub checklist for completing setup
+  - Updated install.md with quick link to one-click deploy option
+
 ### Fixed
 
 - Fixed duplicate "cursor" and "Cursor" entries in source filter dropdown

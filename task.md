@@ -8,10 +8,18 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 
 - [ ] (add next task here)
 - [ ] fix write conflicts
-- [ ] add one click deploy
 - [ ] workos domain updates
 - [ ] models untitled
 - [ ] let users change session name
+
+## Recently Completed (One-Click Deploy)
+
+- [x] Added one-click deploy buttons for Vercel and Netlify
+  - Created vercel.json with SPA rewrite rules
+  - Created ONE-CLICK-DEPLOY.md post-deploy checklist
+  - Created SetupIncompleteBanner component for missing env vars
+  - Added deploy buttons to README Self-hosting section
+  - Updated install.md with quick link to one-click deploy
 
 ## Recently Completed (Cursor Source Normalization)
 

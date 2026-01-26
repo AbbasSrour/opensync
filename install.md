@@ -2,6 +2,12 @@
 
 > Cloud-synced dashboards for OpenCode and Claude coding sessions
 
+**Quick option:** Want to deploy first and configure later? Use [one-click deploy](ONE-CLICK-DEPLOY.md) to get the frontend running on Vercel or Netlify, then follow the post-deploy checklist.
+
+**Full local setup:** Follow the steps below to run everything locally.
+
+---
+
 I want you to set up OpenSync for me. Execute all the steps below autonomously.
 
 OBJECTIVE: Deploy a self-hosted OpenSync instance with Convex backend, WorkOS auth, and local development server.

@@ -96,9 +96,18 @@ npm install
 npx convex dev
 ```
 
-Requires Convex, WorkOS, and Netlify accounts.
+Requires Convex, WorkOS, and OpenAI accounts.
 
 [Self hosting guide](https://www.opensync.dev/docs#hosting) | [Fork guide](https://www.opensync.dev/docs#fork) | [install.md](install.md)
+
+### One-click deploy
+
+Deploy the frontend to Vercel or Netlify. **This deploys the web UI only.** You must set up Convex and WorkOS separately.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/waynesutton/opensync&env=VITE_CONVEX_URL,VITE_WORKOS_CLIENT_ID&envDescription=Required%20environment%20variables%20for%20OpenSync&envLink=https://github.com/waynesutton/opensync/blob/main/ONE-CLICK-DEPLOY.md)
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/waynesutton/opensync)
+
+After deploying, follow the [post-deploy checklist](ONE-CLICK-DEPLOY.md) to complete setup.
 
 ## Dashboard
 

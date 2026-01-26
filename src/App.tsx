@@ -14,6 +14,7 @@ import { ContextPage } from "./pages/Context";
 import { StatsPage } from "./pages/Stats";
 import { UpdatesPage } from "./pages/Updates";
 import { Loader2, ArrowLeft } from "lucide-react";
+import { SetupIncompleteBanner } from "./components/SetupIncompleteBanner";
 
 // Storage key for preserving intended route across auth flow
 const RETURN_TO_KEY = "opensync_return_to";
@@ -164,7 +165,8 @@ function NotFoundPage() {
 export default function App() {
   return (
     <ThemeProvider>
-    <Routes>
+      <SetupIncompleteBanner />
+      <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/callback" element={<CallbackHandler />} />
       <Route path="/s/:slug" element={<PublicSessionPage />} />

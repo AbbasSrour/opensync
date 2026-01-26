@@ -14,6 +14,8 @@ Codebase file structure and descriptions.
 | `tailwind.config.js` | Tailwind CSS configuration                                                                     |
 | `postcss.config.js`  | PostCSS configuration                                                                          |
 | `netlify.toml`       | Netlify deployment config with SPA redirect rules                                              |
+| `vercel.json`        | Vercel deployment config with SPA rewrite rules for one-click deploy                           |
+| `ONE-CLICK-DEPLOY.md`| Post-deploy checklist for users who one-click deployed to Vercel or Netlify                    |
 | `README.md`          | Project documentation with Ecosystem table (official + community plugins including codex-sync) |
 | `install.md`         | AI agent installation instructions following install.md spec for self-hosting setup            |
 
@@ -76,8 +78,9 @@ React frontend application.
 | `Charts.tsx`           | Reusable chart components: BarChart, AreaChart, DonutChart, Sparkline, ProgressBar, StatCard, DataTable, FilterPill, StackedBarChart, UsageCreditBar, ConsumptionBreakdown, ChartDropdown (themed dropdown for Usage Overview filters) |
 | `ConfirmModal.tsx`     | Custom confirmation modal with theme support, replaces browser confirm() dialogs                                                                                                                    |
 | `LegalModal.tsx`       | Dark mode modal for displaying Terms of Service and Privacy Policy with markdown rendering, ESC/X to close                                                                                          |
-| `WrappedView.tsx`      | Daily Wrapped component with countdown timer, download PNG (675x1200 9:16 portrait) using hidden off-screen export container for clean captures (rotate design button commented out for production) |
-| `WrappedTemplates.tsx` | 10 CSS template designs for wrapped (9:16 portrait 675x1200px) showing tokens, messages, sessions (not cost), with large readable fonts                                                             |
+| `WrappedView.tsx`           | Daily Wrapped component with countdown timer, download PNG (675x1200 9:16 portrait) using hidden off-screen export container for clean captures (rotate design button commented out for production) |
+| `WrappedTemplates.tsx`      | 10 CSS template designs for wrapped (9:16 portrait 675x1200px) showing tokens, messages, sessions (not cost), with large readable fonts                                                             |
+| `SetupIncompleteBanner.tsx` | Yellow warning banner shown when VITE_CONVEX_URL or VITE_WORKOS_CLIENT_ID env vars are missing, links to ONE-CLICK-DEPLOY.md checklist                                                              |
 
 ### src/lib/
 
