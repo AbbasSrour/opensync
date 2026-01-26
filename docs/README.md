@@ -1,1 +1,0 @@
-# codex-sync-plugin

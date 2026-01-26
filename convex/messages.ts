@@ -60,6 +60,9 @@ export const upsert = internalMutation({
 
     // Auto-create session if it doesn't exist (handles out-of-order sync)
     if (!session) {
+      // Normalize source: "cursor" -> "cursor-sync" for consistency
+      const rawSource = args.source || "opencode";
+      const normalizedSource = rawSource === "cursor" ? "cursor-sync" : rawSource;
       sessionId = await ctx.db.insert("sessions", {
         userId: args.userId,
         externalId: args.sessionExternalId,
@@ -68,7 +71,7 @@ export const upsert = internalMutation({
         projectName: undefined,
         model: args.model,
         provider: undefined,
-        source: args.source || "opencode",
+        source: normalizedSource,
         promptTokens: 0,
         completionTokens: 0,
         totalTokens: 0,
@@ -258,6 +261,9 @@ export const batchUpsert = internalMutation({
       if (!session) {
         // Create session for out-of-order messages
         const firstMsg = messages[0];
+        // Normalize source: "cursor" -> "cursor-sync" for consistency
+        const rawSource = firstMsg.source || "opencode";
+        const normalizedSource = rawSource === "cursor" ? "cursor-sync" : rawSource;
         sessionId = await ctx.db.insert("sessions", {
           userId: args.userId,
           externalId: sessionExternalId,
@@ -266,7 +272,7 @@ export const batchUpsert = internalMutation({
           projectName: undefined,
           model: firstMsg.model,
           provider: undefined,
-          source: firstMsg.source || "opencode",
+          source: normalizedSource,
           promptTokens: 0,
           completionTokens: 0,
           totalTokens: 0,

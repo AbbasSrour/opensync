@@ -29,13 +29,20 @@ export const me = query({
 
     if (!user) return null;
 
+    // Normalize enabledAgents: convert "cursor" -> "cursor-sync" and deduplicate
+    let normalizedAgents = user.enabledAgents;
+    if (normalizedAgents) {
+      normalizedAgents = normalizedAgents.map((a) => (a === "cursor" ? "cursor-sync" : a));
+      normalizedAgents = [...new Set(normalizedAgents)];
+    }
+
     return {
       _id: user._id,
       email: user.email,
       name: user.name,
       avatarUrl: user.avatarUrl,
       hasApiKey: !!user.apiKey,
-      enabledAgents: user.enabledAgents,
+      enabledAgents: normalizedAgents,
       createdAt: user.createdAt,
     };
   },
@@ -146,9 +153,14 @@ export const updateEnabledAgents = mutation({
 
     if (!user) throw new Error("User not found");
 
+    // Normalize: convert "cursor" -> "cursor-sync" and deduplicate
+    const normalizedAgents = [...new Set(
+      enabledAgents.map((a) => (a === "cursor" ? "cursor-sync" : a))
+    )];
+
     // Patch directly for idempotency
     await ctx.db.patch(user._id, {
-      enabledAgents,
+      enabledAgents: normalizedAgents,
       updatedAt: Date.now(),
     });
 

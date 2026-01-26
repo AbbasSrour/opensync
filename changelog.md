@@ -6,6 +6,17 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed duplicate "cursor" and "Cursor" entries in source filter dropdown
+  - Normalized source values: "cursor" is now converted to "cursor-sync" on sync
+  - Updated sessions.upsert and batchUpsert to normalize source on insert/update
+  - Updated messages.upsert and batchUpsert to normalize source for auto-created sessions
+  - Updated users.me query to normalize enabledAgents (converts "cursor" to "cursor-sync", deduplicates)
+  - Updated users.updateEnabledAgents to normalize input before saving
+  - Added "cursor" as alias in source.ts getSourceLabel and getSourceColorClass
+  - Added "cursor" mapping in Dashboard AI_AGENTS_MAP for legacy data display
+
 ### Added
 
 - Sessions pagination: loads 40 sessions initially with "Load more" button for 20 at a time

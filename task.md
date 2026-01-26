@@ -13,6 +13,15 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 - [ ] models untitled
 - [ ] let users change session name
 
+## Recently Completed (Cursor Source Normalization)
+
+- [x] Fixed duplicate "cursor" and "Cursor" entries in source filter dropdown
+  - Normalized source: "cursor" converted to "cursor-sync" on sync
+  - Updated sessions.upsert, batchUpsert, messages.upsert, batchUpsert with source normalization
+  - Updated users.me query to normalize and deduplicate enabledAgents
+  - Updated users.updateEnabledAgents to normalize input
+  - Added "cursor" alias handling in source.ts and Dashboard AI_AGENTS_MAP
+
 ## Recently Completed (Dropdown UI and Sessions Features)
 
 - [x] Fixed all dropdown filters to use custom themed components matching dark/tan modes

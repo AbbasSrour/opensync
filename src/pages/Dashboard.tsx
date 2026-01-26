@@ -64,6 +64,7 @@ const AI_AGENTS_MAP: Record<string, string> = {
   "claude-code": "Claude Code",
   "factory-droid": "Factory Droid",
   "cursor-sync": "Cursor",
+  "cursor": "Cursor", // Alias for legacy data
   "codex-cli": "Codex CLI",
   "continue": "Continue",
   "amp": "Amp",

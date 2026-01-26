@@ -322,7 +322,9 @@ export const upsert = internalMutation({
 
     const promptTokens = args.promptTokens ?? 0;
     const completionTokens = args.completionTokens ?? 0;
-    const source = args.source || "opencode";
+    // Normalize source: "cursor" -> "cursor-sync" for consistency
+    const rawSource = args.source || "opencode";
+    const source = rawSource === "cursor" ? "cursor-sync" : rawSource;
 
     if (existing) {
       // Idempotency check: skip if recently updated with same key values
@@ -593,7 +595,9 @@ export const batchUpsert = internalMutation({
 
         const promptTokens = session.promptTokens ?? 0;
         const completionTokens = session.completionTokens ?? 0;
-        const source = session.source || "opencode";
+        // Normalize source: "cursor" -> "cursor-sync" for consistency
+        const rawSource = session.source || "opencode";
+        const source = rawSource === "cursor" ? "cursor-sync" : rawSource;
 
         if (existing) {
           // Idempotency check
