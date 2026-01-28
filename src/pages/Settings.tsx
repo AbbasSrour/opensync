@@ -588,7 +588,7 @@ export function SettingsPage() {
                     </p>
                     <p>
                       <a
-                        href="https://www.npmjs.com/package/cursor-sync-plugin"
+                        href="https://www.npmjs.com/package/cursor-opensync-plugin"
                         target="_blank"
                         rel="noopener noreferrer"
                         className={cn(

@@ -387,7 +387,15 @@ const searchIndex: SearchEntry[] = [
     id: "cursor-commands",
     title: "Commands",
     section: "Cursor Plugin",
-    keywords: ["commands", "login", "setup", "verify", "synctest", "logout", "status"],
+    keywords: [
+      "commands",
+      "login",
+      "setup",
+      "verify",
+      "synctest",
+      "logout",
+      "status",
+    ],
     snippet: "cursor-sync CLI commands",
   },
 
@@ -1755,7 +1763,7 @@ npm install
 - OpenCode Plugin: https://www.npmjs.com/package/opencode-sync-plugin
 - Claude Code Plugin: https://www.npmjs.com/package/claude-code-sync
 - Codex CLI Plugin: https://www.npmjs.com/package/codex-sync
-- Cursor Plugin: https://www.npmjs.com/package/cursor-sync-plugin
+- Cursor Plugin: https://www.npmjs.com/package/cursor-opensync-plugin
 - Convex Docs: https://docs.convex.dev
 - WorkOS Docs: https://workos.com/docs
 `;
@@ -2094,7 +2102,7 @@ npm install
                   codex-sync
                 </a>
                 <a
-                  href="https://www.npmjs.com/package/cursor-sync-plugin"
+                  href="https://www.npmjs.com/package/cursor-opensync-plugin"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={cn(
@@ -2415,7 +2423,7 @@ npm install
                           Cursor
                         </span>
                         <a
-                          href="https://www.npmjs.com/package/cursor-sync-plugin"
+                          href="https://www.npmjs.com/package/cursor-opensync-plugin"
                           target="_blank"
                           rel="noopener noreferrer"
                           className={cn("ml-auto text-[10px]", t.textDim)}
@@ -3050,9 +3058,9 @@ npx convex dev`}
                   <p className={cn("mt-2 text-sm", t.textMuted)}>
                     Browse all synced sessions with sorting and filtering.
                     Source badges show OC (OpenCode), CC (Claude Code), CX
-                    (Codex CLI), or CR (Cursor) origin. List view shows token count, cost, and
-                    duration. Timeline view displays sessions chronologically
-                    grouped by project.
+                    (Codex CLI), or CR (Cursor) origin. List view shows token
+                    count, cost, and duration. Timeline view displays sessions
+                    chronologically grouped by project.
                   </p>
                 </div>
 
@@ -3634,7 +3642,7 @@ npx convex dev`}
                       GitHub
                     </a>
                     <a
-                      href="https://www.npmjs.com/package/cursor-sync-plugin"
+                      href="https://www.npmjs.com/package/cursor-opensync-plugin"
                       target="_blank"
                       rel="noopener noreferrer"
                       className={cn(
@@ -3747,9 +3755,7 @@ npx convex dev`}
                               cursor-sync setup
                             </code>
                           </td>
-                          <td className="px-3 py-2">
-                            Configure Cursor hooks
-                          </td>
+                          <td className="px-3 py-2">Configure Cursor hooks</td>
                         </tr>
                         <tr className={cn("border-b", t.borderLight)}>
                           <td className="px-3 py-2">
@@ -3785,7 +3791,9 @@ npx convex dev`}
                               cursor-sync logout
                             </code>
                           </td>
-                          <td className="px-3 py-2">Clear stored credentials</td>
+                          <td className="px-3 py-2">
+                            Clear stored credentials
+                          </td>
                         </tr>
                       </tbody>
                     </table>

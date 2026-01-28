@@ -11,6 +11,7 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 - [ ] workos domain updates
 - [ ] models untitled
 - [ ] let users change session name
+- [ ] setup https://github.com/waynesutton/opensync/community
 
 ## Recently Completed (One-Click Deploy)
 
