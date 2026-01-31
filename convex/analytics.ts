@@ -657,7 +657,7 @@ export const publicMessageGrowth = query({
       date: v.string(),
       count: v.number(),
       cumulative: v.number(),
-    })
+    }),
   ),
   handler: async (ctx) => {
     // Group sessions by date and sum their messageCount
@@ -678,7 +678,8 @@ export const publicMessageGrowth = query({
     // Sort dates and calculate cumulative
     const sortedDates = Object.keys(byDate).sort();
     let cumulative = 0;
-    const result: Array<{ date: string; count: number; cumulative: number }> = [];
+    const result: Array<{ date: string; count: number; cumulative: number }> =
+      [];
 
     for (const date of sortedDates) {
       cumulative += byDate[date];
@@ -714,8 +715,8 @@ export const publicPlatformStats = query({
     ),
   }),
   handler: async (ctx) => {
-    // Fetch all sessions for platform-wide stats
-    const sessions = await ctx.db.query("sessions").collect();
+    // Fetch recent sessions for platform-wide stats (limit to 1000 to avoid timeout)
+    const sessions = await ctx.db.query("sessions").order("desc").take(1000);
 
     if (sessions.length === 0) {
       return {
@@ -732,21 +733,24 @@ export const publicPlatformStats = query({
       {};
 
     for (const s of sessions) {
+      // Safe token value (handle null/undefined)
+      const tokens = s.totalTokens ?? 0;
+
       // Model aggregation
       const model = s.model || "unknown";
       if (!modelMap[model]) {
         modelMap[model] = { totalTokens: 0, sessions: 0 };
       }
-      modelMap[model].totalTokens += s.totalTokens;
+      modelMap[model].totalTokens += tokens;
       modelMap[model].sessions += 1;
 
-      // Source/CLI aggregation (supports: opencode, claude-code, cursor, droid, codex, amp, etc.)
+      // Source/CLI aggregation (supports: opencode, claude-code, cursor, droid, codex, amp, pi, etc.)
       const source = s.source || "opencode";
       if (!sourceMap[source]) {
         sourceMap[source] = { sessions: 0, totalTokens: 0 };
       }
       sourceMap[source].sessions += 1;
-      sourceMap[source].totalTokens += s.totalTokens;
+      sourceMap[source].totalTokens += tokens;
     }
 
     // Sort models by total tokens and take top 5

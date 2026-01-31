@@ -8,6 +8,15 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 
 - [ ] (add next task here)
 
+## Recently Completed (publicPlatformStats Query Fix)
+
+- [x] Fixed publicPlatformStats query causing production black screen
+  - Root cause: Query was failing on production with "Server Error"
+  - Added null-safe token handling (s.totalTokens ?? 0) to prevent NaN when adding undefined
+  - Limited query to 1000 most recent sessions using .order("desc").take(1000) to avoid timeout
+  - Deployed fix to production with npx convex deploy
+  - Login page now renders correctly on opensync.dev
+
 ## Recently Completed (Homepage Blank Screen Fix)
 
 - [x] Fixed homepage blank screen in production

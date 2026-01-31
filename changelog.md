@@ -25,6 +25,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- Fixed publicPlatformStats query causing production crash and black screen
+  - Added null-safe token handling (s.totalTokens ?? 0) to prevent NaN values
+  - Limited query to 1000 most recent sessions to avoid timeout on large datasets
+  - Fixed Login page going black after initial render on opensync.dev
 - Fixed homepage blank screen in production caused by auth loading blocking page render
   - Changed loading guard to only block during OAuth callback (when URL contains ?code=)
   - Anonymous visitors now see homepage content immediately without waiting for Convex auth
