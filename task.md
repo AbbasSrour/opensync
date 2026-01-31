@@ -8,15 +8,6 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 
 - [ ] (add next task here)
 
-## Recently Completed (publicPlatformStats All-Time Data Fix)
-
-- [x] Fixed publicPlatformStats showing only recent data instead of all-time
-  - Root cause: Query used .take(1000) which only showed most recent 1000 sessions
-  - Changed to async iteration (for await) to process ALL sessions
-  - Top Models and Top CLI on homepage now show true all-time totals
-  - Pattern matches publicMessageCount and publicMessageGrowth queries
-  - No crash risk: async iteration streams data without memory limits
-
 ## Recently Completed (publicPlatformStats Query Fix)
 
 - [x] Fixed publicPlatformStats query causing production black screen

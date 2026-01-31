@@ -6,13 +6,6 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
-### Fixed
-
-- Fixed publicPlatformStats query showing only recent 1000 sessions instead of all-time data
-  - Changed from .take(1000) to async iteration for true all-time aggregation
-  - Top Models and Top CLI on homepage now show accurate all-time totals
-  - Uses same pattern as publicMessageCount and publicMessageGrowth queries
-
 ### Added
 
 - pi-opensync-plugin community plugin support (syncs Pi coding agent sessions)
