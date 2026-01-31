@@ -29,5 +29,4 @@ dist/
 # Documentation (internal)
 docs/
 
-# Disabled pages
-src/pages/Stats.tsx
+# Disabled pages (kept for reference, no files currently disabled)

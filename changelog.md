@@ -6,6 +6,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed Netlify build error: Stats.tsx was git-ignored causing module not found error
+  - Removed src/pages/Stats.tsx from .gitignore so placeholder page is included in build
+  - Updated Stats.tsx header comment to reflect it's no longer git-ignored
+
 ### Added
 
 - pi-opensync-plugin community plugin support (syncs Pi coding agent sessions)

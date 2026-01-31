@@ -8,6 +8,14 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 
 - [ ] (add next task here)
 
+## Recently Completed (Stats.tsx Build Fix)
+
+- [x] Fixed Netlify build error: Stats.tsx module not found
+  - Root cause: src/pages/Stats.tsx was in .gitignore so file wasn't committed
+  - Fix: Removed Stats.tsx from .gitignore so placeholder page is included
+  - Updated Stats.tsx header comment to remove "git-ignored" reference
+  - Build now passes
+
 ## Recently Completed (publicPlatformStats Query Fix)
 
 - [x] Fixed publicPlatformStats query causing production black screen
