@@ -695,7 +695,8 @@ export const publicMessageGrowth = query({
 });
 
 // Public platform-wide stats for homepage leaderboard (no auth required)
-// Returns top models and top CLI sources sorted by usage
+// Returns top models and top CLI sources sorted by ALL-TIME usage
+// Uses async iteration to process all sessions without hitting read limits
 export const publicPlatformStats = query({
   args: {},
   returns: v.object({
@@ -715,24 +716,15 @@ export const publicPlatformStats = query({
     ),
   }),
   handler: async (ctx) => {
-    // Fetch recent sessions for platform-wide stats (limit to 1000 to avoid timeout)
-    const sessions = await ctx.db.query("sessions").order("desc").take(1000);
-
-    if (sessions.length === 0) {
-      return {
-        topModels: [],
-        topSources: [],
-      };
-    }
-
-    // Aggregate by model
+    // Aggregate by model (all-time)
     const modelMap: Record<string, { totalTokens: number; sessions: number }> =
       {};
-    // Aggregate by source (CLI tool)
+    // Aggregate by source/CLI tool (all-time)
     const sourceMap: Record<string, { sessions: number; totalTokens: number }> =
       {};
 
-    for (const s of sessions) {
+    // Use async iteration to process ALL sessions without memory limits
+    for await (const s of ctx.db.query("sessions")) {
       // Safe token value (handle null/undefined)
       const tokens = s.totalTokens ?? 0;
 
