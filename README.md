@@ -6,7 +6,7 @@ Cloud-synced dashboards that track session activity, tool usage, and token spend
 
 [Website](https://www.opensync.dev/) | [Docs](https://www.opensync.dev/docs) | [Dashboard](https://www.opensync.dev/)
 
-## OpenSync Ecosystem
+## OpenSync Ecosystems
 
 | Project                | Description                                   | Links                                                                                                                         |
 | ---------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |

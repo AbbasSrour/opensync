@@ -32,6 +32,7 @@ npx convex dev
 ```
 
 This will:
+
 - Prompt you to log in to Convex (create account if needed)
 - Create a new Convex project
 - Deploy the schema and functions
@@ -57,9 +58,21 @@ Replace with your actual deployed URL from Vercel or Netlify.
 
 4. Copy your **Client ID** (`client_xxxxx`) from API Keys
 
+5. **Configure CORS (Required for production):**
+   - In the WorkOS Dashboard, go to **Authentication** page
+   - Click **"Configure CORS"** or find **"Allowed web origins"** section
+   - Add your deployed URL:
+   ```
+   https://your-deployed-url.vercel.app
+   https://your-deployed-url.netlify.app
+   ```
+
+   - This prevents CORS errors when the app authenticates users
+
 - [ ] WorkOS project created
 - [ ] Email + Password auth enabled
 - [ ] Redirect URI added for your deployed URL
+- [ ] **CORS origins configured**
 - [ ] Note your Client ID: `client_____________`
 
 ### 3. Set up OpenAI (for semantic search)
@@ -79,10 +92,10 @@ In the [Convex dashboard](https://dashboard.convex.dev):
 2. Go to **Settings** > **Environment Variables**
 3. Add these variables:
 
-| Name | Value |
-|------|-------|
+| Name               | Value                        |
+| ------------------ | ---------------------------- |
 | `WORKOS_CLIENT_ID` | `client_xxxxx` (from step 2) |
-| `OPENAI_API_KEY` | `sk-xxxxx` (from step 3) |
+| `OPENAI_API_KEY`   | `sk-xxxxx` (from step 3)     |
 
 - [ ] WORKOS_CLIENT_ID set in Convex
 - [ ] OPENAI_API_KEY set in Convex
@@ -105,10 +118,10 @@ In your Vercel or Netlify dashboard, update environment variables:
 
 **Netlify:** Site settings > Environment variables
 
-| Variable | Value |
-|----------|-------|
-| `VITE_CONVEX_URL` | `https://your-project.convex.cloud` (from step 1) |
-| `VITE_WORKOS_CLIENT_ID` | `client_xxxxx` (from step 2) |
+| Variable                | Value                                             |
+| ----------------------- | ------------------------------------------------- |
+| `VITE_CONVEX_URL`       | `https://your-project.convex.cloud` (from step 1) |
+| `VITE_WORKOS_CLIENT_ID` | `client_xxxxx` (from step 2)                      |
 
 - [ ] VITE_CONVEX_URL set
 - [ ] VITE_WORKOS_CLIENT_ID set
@@ -140,18 +153,21 @@ Trigger a new deployment in Vercel or Netlify to pick up the new environment var
 Once your instance is working, install a plugin to sync coding sessions:
 
 **For Claude Code:**
+
 ```bash
 npm install -g claude-code-sync
 claude-code-sync login
 ```
 
 **For OpenCode:**
+
 ```bash
 npm install -g opencode-sync-plugin
 opencode-sync login
 ```
 
 **For Codex CLI:**
+
 ```bash
 npm install -g codex-sync
 codex-sync login
@@ -164,15 +180,29 @@ Enter your Convex URL and API key when prompted.
 ### "Setup incomplete" banner showing
 
 The app detected missing environment variables. Check that:
+
 - `VITE_CONVEX_URL` is set in Vercel/Netlify
 - `VITE_WORKOS_CLIENT_ID` is set in Vercel/Netlify
 - You redeployed after setting the variables
+
+### CORS error: "Access-Control-Allow-Origin" header missing
+
+This happens when WorkOS CORS is not configured:
+
+1. Go to WorkOS Dashboard > **Authentication** page
+2. Click **"Configure CORS"** button
+3. Add your deployed URL to allowed origins:
+   ```
+   https://your-deployed-url.vercel.app
+   ```
+4. Save and try logging in again
 
 ### Login redirects but user stays on login page
 
 1. Check WorkOS redirect URI matches your deployed URL exactly
 2. Check `WORKOS_CLIENT_ID` is set in Convex environment variables
-3. Run `npx convex deploy` to sync changes
+3. Verify CORS is configured (see above)
+4. Run `npx convex deploy` to sync changes
 
 ### "Invalid token" errors
 
@@ -201,6 +231,7 @@ The app detected missing environment variables. Check that:
 ## Need help?
 
 Open an issue on [GitHub](https://github.com/waynesutton/opensync/issues) with:
+
 - Your deployment platform (Vercel or Netlify)
 - Which step you're stuck on
 - Any error messages from browser console or Convex logs
