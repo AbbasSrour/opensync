@@ -1,0 +1,14 @@
+{
+  "name": "docs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "mintlify validate",
+    "dev": "mintlify dev",
+    "check": "mintlify broken-links"
+  },
+  "devDependencies": {
+    "mintlify": "latest"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "instructions/about.md",
+    "instructions/changelog.md",
+    "instructions/convex-write-conflicts.md",
+    "instructions/convex2.md",
+    "instructions/dev2.md",
+    "instructions/gitruels.md",
+    "instructions/help.md",
+    "instructions/opensync-ecosystem.md",
+    "instructions/rulesforconvex.md",
+    "instructions/sec-check.md",
+    "instructions/task.md",
+    "instructions/write.md"
+  ],
+  "skills": {
+    "paths": ["skills"]
+  }
+}

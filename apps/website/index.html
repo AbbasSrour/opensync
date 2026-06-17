@@ -2,12 +2,48 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>website</title>
+    <title>OpenSync - Beautiful Dashboards for OpenCode and Claude Code Sessions</title>
+    <meta
+      name="description"
+      content="Sync and share your Claude Code and OpenCode sessions. View, search, and collaborate on AI coding agent workflows in real time."
+    />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- OpenGraph -->
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="OpenSync - Beautiful Dashboards for OpenCode and Claude Code Sessions"
+    />
+    <meta
+      property="og:description"
+      content="Sync and share your Claude Code and OpenCode sessions. View, search, and collaborate on AI coding agent workflows in real time."
+    />
+    <meta property="og:image" content="https://www.opensync.dev/og-image.png" />
+    <!-- setup url -->
+    <meta property="og:url" content="#" />
+    <meta property="og:site_name" content="OpenSync" />
+
+    <!-- Twitter Card (Large Image) -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="OpenSync - Beautiful Dashboards for OpenCode and Claude Code Sessions"
+    />
+    <meta
+      name="twitter:description"
+      content="Sync and share your Claude Code and OpenCode sessions. View, search, and collaborate on AI coding agent workflows in real time."
+    />
+    <meta name="twitter:image" content="https://www.opensync.dev/og-image.png" />
+
+    <!-- Rybbit Analytics -->
+    <script src="https://app.rybbit.io/api/script.js" data-site-id="d66e863b2881" defer></script>
   </head>
   <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

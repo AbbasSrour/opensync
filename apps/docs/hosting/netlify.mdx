@@ -1,0 +1,80 @@
+---
+title: "Netlify Frontend"
+description: "Deploy the frontend to Netlify"
+---
+
+# Netlify Frontend
+
+Deploy the OpenSync frontend to Netlify or Vercel.
+
+## Netlify Deploy
+
+### One-Click
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/waynesutton/opensync)
+
+### Manual Deploy
+
+<Steps>
+  <Step title="Connect Repository">
+    In Netlify, click **New site from Git** and connect your GitHub repository.
+  </Step>
+  <Step title="Configure Build">
+    Set the project/root directory to `apps/website`. The app-local `netlify.toml` uses **Build
+    command:** `tsc && vp build` and **Publish directory:** `dist`.
+  </Step>
+  <Step title="Set Environment Variables">Add required environment variables (see below).</Step>
+  <Step title="Deploy">Click **Deploy site**.</Step>
+</Steps>
+
+## Vercel Deploy
+
+### One-Click
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/waynesutton/opensync)
+
+### Manual Deploy
+
+<Steps>
+  <Step title="Import Project">In Vercel, click **New Project** and import your repository.</Step>
+  <Step title="Configure">Framework preset will be detected automatically (Vite).</Step>
+  <Step title="Environment Variables">Add required environment variables.</Step>
+  <Step title="Deploy">Click **Deploy**.</Step>
+</Steps>
+
+## Environment Variables
+
+Set these in your hosting platform:
+
+```bash
+# Convex (required)
+VITE_CONVEX_URL=https://your-deployment.convex.cloud
+
+# WorkOS (required for auth)
+VITE_WORKOS_CLIENT_ID=client_...
+VITE_REDIRECT_URI=https://your-domain.com/callback
+```
+
+<Warning>Remember to add your production URL to WorkOS CORS settings.</Warning>
+
+## Build Settings
+
+| Setting           | Value             |
+| ----------------- | ----------------- |
+| Project directory | `apps/website`    |
+| Build command     | `tsc && vp build` |
+| Output directory  | `dist`            |
+| Node version      | 22+               |
+
+## Custom Domain
+
+Both Netlify and Vercel support custom domains:
+
+1. Add your domain in the hosting dashboard
+2. Update DNS records as instructed
+3. Enable HTTPS (automatic)
+4. Update WorkOS redirect URIs
+
+## Preview Deployments
+
+Both platforms support preview deployments for pull requests. Ensure preview URLs are added to WorkOS if you need auth to work in previews.

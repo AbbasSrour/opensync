@@ -1,0 +1,122 @@
+---
+title: "Full-Text Search"
+description: "Search sessions using keyword matching with Convex search indexes"
+---
+
+# Full-Text Search
+
+Full-text search finds sessions containing specific words or phrases. It uses Convex's built-in search indexes, so results are fast and ranked by relevance.
+
+## How it works
+
+OpenSync maintains a search index on the `sessions.searchableText` field. This field is built by concatenating the session title with all message text content. When you search, Convex's search engine tokenizes your query and matches against this index.
+
+### What gets indexed
+
+| Source             | Indexed field                        |
+| ------------------ | ------------------------------------ |
+| Session title      | `sessions.searchableText` (prefix)   |
+| User messages      | `sessions.searchableText` (appended) |
+| Assistant messages | `sessions.searchableText` (appended) |
+
+Tool call names and arguments are not included in `searchableText` by default. Only the textual content of messages is indexed.
+
+### Ranking
+
+Results are ranked by Convex's built-in relevance scoring, which factors in:
+
+- Term frequency (how often the term appears in the session)
+- Inverse document frequency (terms that are rare across all sessions score higher)
+- Position (terms appearing earlier in the document score slightly higher)
+
+## Search syntax
+
+### Single term
+
+```
+authentication
+```
+
+Finds sessions containing "authentication" anywhere in the searchable text.
+
+### Multiple terms
+
+```
+react hooks useState
+```
+
+All terms must be present (AND logic). This finds sessions containing "react", "hooks", and "useState".
+
+### Prefix matching
+
+```
+refact
+```
+
+Matches "refactoring", "refactored", "refactor", etc. Convex search supports prefix matching by default.
+
+### Phrase search
+
+Exact phrase matching is not currently supported. Multi-word queries use AND logic across individual terms.
+
+## Using full-text search in the dashboard
+
+The search box at the top of the Sessions, Evals, and Context views all use full-text search by default.
+
+1. Type your query in the search box.
+2. Results update in real time as you type.
+3. Results are sorted by relevance score.
+
+You can combine search with filters (source, date range, eval status) to narrow results further.
+
+## Using full-text search via API
+
+```bash
+curl -X POST "https://polished-penguin-622.convex.site/search" \
+  -H "Authorization: Bearer osk_your_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "authentication middleware express",
+    "type": "fulltext",
+    "limit": 10
+  }'
+```
+
+Response:
+
+```json
+{
+  "results": [
+    {
+      "sessionId": "j57a...",
+      "title": "Express Auth Middleware Setup",
+      "snippet": "...setting up authentication middleware for the Express app...",
+      "score": 0.95
+    },
+    {
+      "sessionId": "k82b...",
+      "title": "Add JWT middleware",
+      "snippet": "...authentication layer using JSON web tokens...",
+      "score": 0.78
+    }
+  ]
+}
+```
+
+## Tips for better results
+
+- **Use specific terms.** "convex mutation upsert" will return more targeted results than "database update".
+- **Include technical identifiers.** Function names, library names, error codes, and file paths make great search terms.
+- **Combine with source filters.** If you know which tool you used, filter by source to narrow the results.
+- **Use fewer terms for broader results.** Start with one or two key terms and add more if you get too many results.
+
+## When to use full-text vs semantic
+
+| Use full-text when                    | Use semantic when                    |
+| ------------------------------------- | ------------------------------------ |
+| You know the exact terms used         | You want to describe the concept     |
+| Searching for function/variable names | Searching for solutions to a problem |
+| Looking for specific error messages   | Looking for similar approaches       |
+| Need fast, precise matching           | Need meaning-based matching          |
+
+For more on semantic search, see [Semantic Search](/search/semantic). For combining both, see [Hybrid Search](/search/hybrid).

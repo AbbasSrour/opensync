@@ -1,0 +1,93 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "OpenSync",
+  "description": "Sync and analyze your AI coding sessions across tools",
+  "logo": {
+    "light": "/logo-light.svg",
+    "dark": "/logo-dark.svg",
+    "href": "https://opensync.dev"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#EB5601",
+    "light": "#faf8f5",
+    "dark": "#0E0E0E"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Dashboard",
+        "href": "https://opensync.dev"
+      },
+      {
+        "type": "github",
+        "href": "https://github.com/waynesutton/opensync"
+      }
+    ]
+  },
+  "navigation": {
+    "groups": [
+      {
+        "group": "Getting Started",
+        "pages": [
+          "index",
+          "getting-started/hosted",
+          "getting-started/requirements",
+          "getting-started/quick-start"
+        ]
+      },
+      {
+        "group": "Dashboard",
+        "pages": [
+          "dashboard/overview",
+          "dashboard/sessions",
+          "dashboard/evals",
+          "dashboard/analytics",
+          "dashboard/context"
+        ]
+      },
+      {
+        "group": "Plugins",
+        "pages": [
+          "plugins/opencode-sync",
+          "plugins/claude-code-sync",
+          "plugins/codex-sync",
+          "plugins/cursor-sync"
+        ]
+      },
+      {
+        "group": "API Reference",
+        "pages": ["api/authentication", "api/endpoints", "api/errors"]
+      },
+      {
+        "group": "Search",
+        "pages": ["search/fulltext", "search/semantic", "search/hybrid"]
+      },
+      {
+        "group": "Authentication",
+        "pages": ["auth/workos", "auth/api-keys"]
+      },
+      {
+        "group": "Hosting & Deploy",
+        "pages": ["hosting/convex", "hosting/netlify", "hosting/env"]
+      },
+      {
+        "group": "Fork & Self-Host",
+        "pages": ["fork/guide", "fork/customize", "fork/contribute"]
+      },
+      {
+        "group": "Troubleshooting",
+        "pages": ["troubleshooting/common-issues", "troubleshooting/faq"]
+      }
+    ]
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/waynesutton/opensync"
+    }
+  },
+  "appearance": {
+    "default": "system"
+  }
+}

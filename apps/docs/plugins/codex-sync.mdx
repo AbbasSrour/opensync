@@ -1,0 +1,170 @@
+---
+title: "Codex CLI Plugin"
+description: "Sync sessions from OpenAI Codex CLI to OpenSync"
+---
+
+# Codex CLI Plugin
+
+The `codex-sync` plugin syncs your [OpenAI Codex CLI](https://github.com/openai/codex) sessions to OpenSync. It reads the JSONL session logs that Codex produces and pushes them to your dashboard.
+
+**Source identifier:** `codex-cli`
+
+## Installation
+
+Install globally with npm:
+
+```bash
+npm install -g codex-sync
+```
+
+Or with yarn:
+
+```bash
+yarn global add codex-sync
+```
+
+Verify the installation:
+
+```bash
+codex-sync --version
+```
+
+## Setup
+
+<Steps>
+  <Step title="Generate an API key">
+    Log in to [opensync.dev](https://www.opensync.dev), go to **Settings**, and click **Generate API Key**. Copy the key (starts with `osk_`).
+  </Step>
+  <Step title="Run login">
+    ```bash
+    codex-sync login
+    ```
+
+    Enter your Convex URL and API key when prompted:
+
+    - **Convex URL**: `https://polished-penguin-622.convex.cloud` (for hosted) or your self-hosted URL
+    - **API Key**: The key you copied from Settings
+
+  </Step>
+  <Step title="Verify the connection">
+    ```bash
+    codex-sync status
+    ```
+  </Step>
+</Steps>
+
+## Config file
+
+Credentials are stored in `~/.codex-sync/config.json`:
+
+```json
+{
+  "convexUrl": "https://polished-penguin-622.convex.cloud",
+  "apiKey": "osk_..."
+}
+```
+
+## Commands
+
+### codex-sync login
+
+Stores your Convex URL and API key.
+
+### codex-sync status
+
+Shows connection info and sync stats:
+
+```
+Connected: true
+Convex URL: https://polished-penguin-622.convex.cloud
+Sessions synced: 15
+Last sync: 1 minute ago
+```
+
+### codex-sync sync
+
+Manually triggers a sync of all sessions from `~/.codex/`.
+
+```bash
+codex-sync sync
+```
+
+### codex-sync logout
+
+Clears stored credentials.
+
+```bash
+codex-sync logout
+```
+
+## How syncing works
+
+1. Codex CLI writes JSONL session logs to `~/.codex/`.
+2. The plugin parses these logs, extracting session metadata, messages, token counts, and model information.
+3. Each session is pushed to `/sync/session` with `source: "codex-cli"`.
+4. Messages are pushed to `/sync/message` with role, content, and per-message token data.
+5. Deduplication is handled via `externalId`, so re-syncing is safe.
+
+### What gets synced
+
+| Data                  | Description                                      |
+| --------------------- | ------------------------------------------------ |
+| Conversation messages | Full history with user and assistant turns       |
+| Model name            | GPT-4o, o3-mini, o1-mini, etc.                   |
+| Token counts          | Prompt and completion tokens from the JSONL logs |
+| Cost                  | Estimated based on OpenAI pricing                |
+| Session metadata      | Timestamps, duration, project context            |
+
+### Supported models
+
+All OpenAI models used through Codex CLI are supported:
+
+| Model       | Input (per 1M) | Output (per 1M) |
+| ----------- | -------------- | --------------- |
+| gpt-4o      | $2.50          | $10.00          |
+| gpt-4o-mini | $0.15          | $0.60           |
+| o3-mini     | $1.10          | $4.40           |
+| o1-mini     | $1.10          | $4.40           |
+| gpt-4-turbo | $10.00         | $30.00          |
+
+Cost calculations use these prices at the time of sync.
+
+## Troubleshooting
+
+### No sessions syncing
+
+1. Check that Codex CLI is installed and has been used: `ls ~/.codex/`
+2. Verify plugin status: `codex-sync status`
+3. Confirm your API key is valid in the dashboard Settings.
+4. Run `codex-sync sync` to force a manual push.
+
+### Token counts missing
+
+Older versions of Codex CLI may not include token counts in their JSONL logs. Update Codex CLI to the latest version:
+
+```bash
+npm update -g @openai/codex
+```
+
+### Permission errors
+
+The plugin needs read access to `~/.codex/`. Check permissions:
+
+```bash
+ls -la ~/.codex/
+```
+
+## Updating
+
+```bash
+npm update -g codex-sync
+```
+
+## Uninstalling
+
+```bash
+codex-sync logout
+npm uninstall -g codex-sync
+```
+
+Synced sessions remain in your dashboard after uninstalling.
