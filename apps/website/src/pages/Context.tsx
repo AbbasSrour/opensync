@@ -292,7 +292,7 @@ export function ContextPage() {
       {/* Header */}
       <header className={cn("h-12 border-b flex items-center px-4 gap-4", t.border, t.bgPrimary)}>
         <Link
-          to="/"
+          to="/dashboard"
           className={cn(
             "flex items-center gap-2 transition-colors",
             t.textSubtle,
