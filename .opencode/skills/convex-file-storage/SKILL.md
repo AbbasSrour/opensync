@@ -52,7 +52,7 @@ export const generateUploadUrl = mutation({
 ```typescript
 // React component
 import { useMutation } from "convex/react";
-import { api } from "@opensync/convex";
+import { api } from "@opensync/api";
 import { useState } from "react";
 
 function FileUploader() {
@@ -176,7 +176,7 @@ export const getFile = query({
 
 ```typescript
 import { useQuery } from "convex/react";
-import { api } from "@opensync/convex";
+import { api } from "@opensync/api";
 
 function FileDisplay({ fileId }: { fileId: Id<"files"> }) {
   const file = useQuery(api.files.getFile, { fileId });
@@ -318,7 +318,7 @@ export const deleteFile = mutation({
 
 ```typescript
 import { useMutation } from "convex/react";
-import { api } from "@opensync/convex";
+import { api } from "@opensync/api";
 import { useState, useRef } from "react";
 
 function ImageUploader({ onUpload }: { onUpload: (id: Id<"files">) => void }) {
@@ -407,7 +407,7 @@ function ImageUploader({ onUpload }: { onUpload: (id: Id<"files">) => void }) {
 ### Schema for File Storage
 
 ```typescript
-// packages/convex/src/schema.ts
+// packages/api/convex/schema.ts
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
@@ -442,7 +442,7 @@ export default defineSchema({
 
 ## Best Practices
 
-- Never run `vp run @opensync/convex#convex:deploy` unless explicitly instructed
+- Never run `vp run @opensync/api#convex:deploy` unless explicitly instructed
 - Never run any git commands unless explicitly instructed
 - Validate file types and sizes on the client before uploading
 - Store file metadata (name, type, size) in your own table

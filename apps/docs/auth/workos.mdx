@@ -85,8 +85,8 @@ From the WorkOS dashboard, copy:
 **On Convex (backend):**
 
 ```bash
-cd packages/convex && vp run convex:env -- set WORKOS_API_KEY sk_your_api_key
-cd packages/convex && vp run convex:env -- set WORKOS_CLIENT_ID client_your_client_id
+cd packages/api && vp run convex:env -- set WORKOS_API_KEY sk_your_api_key
+cd packages/api && vp run convex:env -- set WORKOS_CLIENT_ID client_your_client_id
 ```
 
 **On your frontend hosting (Netlify/Vercel):**
@@ -107,7 +107,7 @@ openssl rand -base64 32
 
 ### 5. Configure Convex auth
 
-OpenSync's Convex backend uses the `@workos-inc/authkit-js` integration. The auth configuration is defined in `packages/convex/src/auth.config.ts`. No changes are needed for standard setups. Convex validates the WorkOS JWT on every function call automatically.
+OpenSync's Convex backend uses the `@workos-inc/authkit-js` integration. The auth configuration is defined in `packages/api/convex/auth.config.ts`. No changes are needed for standard setups. Convex validates the WorkOS JWT on every function call automatically.
 
 ## User management
 
@@ -149,7 +149,7 @@ Your callback URL is not registered in WorkOS. Go to **AuthKit** > **Redirects**
 
 ### "User not created in Convex"
 
-Check that the auto-provision logic in `packages/convex/src/auth.config.ts` is enabled. On first sign-in, the Convex auth middleware should create a user record automatically. If the `users` table is empty after a successful login, check the Convex function logs for errors.
+Check that the auto-provision logic in `packages/api/convex/auth.config.ts` is enabled. On first sign-in, the Convex auth middleware should create a user record automatically. If the `users` table is empty after a successful login, check the Convex function logs for errors.
 
 ### Sign-in works locally but not in production
 

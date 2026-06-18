@@ -409,7 +409,7 @@ export default crons;
 ### Schema for Cron Job Logging
 
 ```typescript
-// packages/convex/src/schema.ts
+// packages/api/convex/schema.ts
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
@@ -486,7 +486,7 @@ export default crons;
 
 ## Best Practices
 
-- Never run `vp run @opensync/convex#convex:deploy` unless explicitly instructed
+- Never run `vp run @opensync/api#convex:deploy` unless explicitly instructed
 - Never run any git commands unless explicitly instructed
 - Only use `crons.interval` or `crons.cron` methods, not deprecated helpers
 - Always call internal functions from cron jobs for security

@@ -315,7 +315,7 @@ export const remove = mutation({
 
 ## Best Practices
 
-- Never run `vp run @opensync/convex#convex:deploy` unless explicitly instructed
+- Never run `vp run @opensync/api#convex:deploy` unless explicitly instructed
 - Never run any git commands unless explicitly instructed
 - Always define return validators for functions
 - Use indexes for all queries that filter data

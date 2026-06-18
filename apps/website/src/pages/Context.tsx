@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery } from "convex/react";
-import { api } from "@opensync/convex";
+import { api } from "@opensync/api";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../lib/auth.tsx";
 import { cn } from "../lib/utils.ts";
 import { getSourceLabel, getSourceColorClass } from "../lib/source.ts";
 import { useTheme, getThemeClasses } from "../lib/theme.tsx";
-import type { Id } from "@opensync/convex";
+import type { Id } from "@opensync/api";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";

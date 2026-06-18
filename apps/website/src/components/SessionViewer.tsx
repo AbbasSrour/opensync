@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
-import { api } from "@opensync/convex";
+import { api } from "@opensync/api";
 import { cn } from "../lib/utils.ts";
 import { ConfirmModal } from "./ConfirmModal.tsx";
 import ReactMarkdown from "react-markdown";
@@ -21,7 +21,7 @@ import {
   Clock,
   Coins,
 } from "lucide-react";
-import type { Id } from "@opensync/convex";
+import type { Id } from "@opensync/api";
 
 interface SessionViewerProps {
   session: {

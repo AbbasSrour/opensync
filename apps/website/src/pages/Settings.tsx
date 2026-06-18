@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useAction } from "convex/react";
-import { api } from "@opensync/convex";
+import { api } from "@opensync/api";
 import { useAuth } from "../lib/auth.tsx";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "../lib/utils.ts";

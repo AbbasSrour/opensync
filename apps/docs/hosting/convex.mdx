@@ -37,7 +37,7 @@ npm install -g convex
 git clone https://github.com/waynesutton/opensync
 cd opensync
 vp install
-vp run @opensync/convex#convex
+vp run @opensync/api#convex
 ```
 
 On first run, the CLI prompts you to:
@@ -46,20 +46,20 @@ On first run, the CLI prompts you to:
 2. Create a new project.
 3. Push the schema, functions, and indexes.
 
-`vp run @opensync/convex#convex` runs in watch mode. It pushes changes to your development deployment every time you save a file in the `packages/convex/src/` directory.
+`vp run @opensync/api#convex` runs in watch mode. It pushes changes to your development deployment every time you save a file in the `packages/api/convex/` directory.
 
 ### 3. Set environment variables
 
 ```bash
-cd packages/convex && vp run convex:env -- set WORKOS_API_KEY sk_your_key
-cd packages/convex && vp run convex:env -- set WORKOS_CLIENT_ID client_your_id
-cd packages/convex && vp run convex:env -- set OPENAI_API_KEY sk-your-key  # Optional, for semantic search
+cd packages/api && vp run convex:env -- set WORKOS_API_KEY sk_your_key
+cd packages/api && vp run convex:env -- set WORKOS_CLIENT_ID client_your_id
+cd packages/api && vp run convex:env -- set OPENAI_API_KEY sk-your-key  # Optional, for semantic search
 ```
 
 ### 4. Deploy to production
 
 ```bash
-vp run @opensync/convex#convex:deploy
+vp run @opensync/api#convex:deploy
 ```
 
 This pushes your functions and schema to the production deployment. Production deployments have a separate URL from development.
@@ -97,7 +97,7 @@ Search indexes enable full-text search on `sessions.searchableText`. Vector inde
 
 ## HTTP endpoints
 
-The sync API is defined in `packages/convex/src/http.ts`. These are the endpoints that plugins call:
+The sync API is defined in `packages/api/convex/http.ts`. These are the endpoints that plugins call:
 
 | Endpoint            | Method | Purpose                               |
 | ------------------- | ------ | ------------------------------------- |

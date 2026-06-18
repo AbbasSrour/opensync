@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "convex/react";
-import { api } from "@opensync/convex";
+import { api } from "@opensync/api";
 import { ArrowLeft, Loader2, User, Bot, Wrench, Sun, Moon } from "lucide-react";
 import { cn } from "../lib/utils.ts";
 import { useTheme, getThemeClasses } from "../lib/theme.tsx";

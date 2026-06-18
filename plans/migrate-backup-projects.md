@@ -13,11 +13,11 @@ repo conventions (`vp` toolchain, workspaces, catalog deps):
 | Decision         | Choice                                                                                      |
 | ---------------- | ------------------------------------------------------------------------------------------- |
 | Website build    | **Adopt vite-plus** (`vp dev` / `vp build`) with `@vitejs/plugin-react` in `vite.config.ts` |
-| Convex backend   | **Dedicated package** `packages/convex` (exports generated API/types)                       |
+| Convex backend   | **Dedicated package** `packages/api` (exports generated API/types)                          |
 | Plugin build     | **Convert to `vp pack`** (tsdown-based, multi-entry + CLI bin)                              |
 | Plugin placement | **`plugins/opencode-sync-plugin`** (top-level plugins workspace folder)                     |
 | Docs placement   | **`apps/docs`** (Mintlify site; deploys separately)                                         |
-| Sync scripts     | **With Convex package** (`packages/convex`, since they write Convex tables)                 |
+| Sync scripts     | **With Convex package** (`packages/api`, since they write Convex tables)                    |
 
 ## Grounding notes (verified)
 
@@ -63,7 +63,7 @@ repo conventions (`vp` toolchain, workspaces, catalog deps):
    set in the Convex dashboard. Convex keeps its own deploy lifecycle.
 5. **TypeScript** → Resolved: catalog now pins `typescript: ^5`, matching both backups
    (5.3). No version drift; use `catalog:` for TS in each package.
-6. **Convex package name** → `@opensync/convex` (scoped, internal-only, never published).
+6. **Convex package name** → `@opensync/api` (scoped, internal-only, never published).
 7. **Convex `_generated`** → keep committed (matches backup `.gitignore`, which ignores
    `.convex/`/`dist/` but not `_generated/`). Lets the website typecheck without first
    running Convex codegen.
@@ -75,7 +75,7 @@ apps/
   website/        # React SPA (vp dev/build, vite + react plugin, Tailwind/PostCSS)
   docs/           # Mintlify docs (docs.json, mint.json, *.mdx) — standalone deploy
 packages/
-  convex/         # @opensync/convex — Convex source in src/ (plus convex -> src symlink for CLI)
+  convex/         # @opensync/api — Convex source in src/ (plus convex -> src symlink for CLI)
 plugins/
   opencode-sync-plugin/ # published npm plugin/CLI (vp pack)
 ```
@@ -89,19 +89,19 @@ plugins/
       workos, radix, etc. Add shared/runtime-critical deps to `workspaces.catalog` in root
       `package.json` where it makes sense; keep app-specific deps local.
 
-### Phase 1 — Convex package (`packages/convex`)
+### Phase 1 — Convex package (`packages/api`)
 
-- [x] Create `packages/convex` with `package.json` (name `@opensync/convex`),
+- [x] Create `packages/api` with `package.json` (name `@opensync/api`),
       `type: module`, exports for the Convex generated API + dataModel.
-- [x] Move `backup/opensync/convex/**` → `packages/convex/src/` (keep `_generated`,
+- [x] Move `backup/opensync/convex/**` → `packages/api/convex/` (keep `_generated`,
       `convex.config.ts`, `schema.ts`, all functions, `tsconfig.json`).
-- [x] Move `scripts/sync-docs.ts` + `scripts/build-search-index.ts` → `packages/convex`.
+- [x] Move `scripts/sync-docs.ts` + `scripts/build-search-index.ts` → `packages/api`.
       NOTE: these are non-functional stubs (see Resolved Q2); migrate as-is and add a
       header comment marking them as unwired scaffolding.
 - [x] Add scripts: `convex` (`convex dev`), `convex:deploy`, `sync:docs`, `sync:docs:prod`,
       `build:search-index` — wired through `vp run` where appropriate.
 - [x] Add a package entry that re-exports `src/_generated/api` + `dataModel` so the
-      website imports `@opensync/convex` instead of relative `../../convex/...`.
+      website imports `@opensync/api` instead of relative `../../convex/...`.
 - [x] Reconcile deps (convex, @convex-dev/\*, @workos-inc/node, @ai-sdk/openai, glob,
       gray-matter, tsx) into the package; use catalog where shared.
 - [ ] Verify: `convex` typecheck passes; generated API resolves.
@@ -114,8 +114,8 @@ plugins/
 - [x] Create `apps/website/vite.config.ts` with `@vitejs/plugin-react`, `@tailwindcss/vite`,
       and `@ → ./src` alias (port from backup `vite.config.ts`, add Tailwind v4 plugin).
 - [x] Update `index.html` script entry (`/src/main.tsx`) and `#root` mount.
-- [x] Rewrite all `../../convex/_generated/...` imports (~10 files) to `@opensync/convex`.
-- [x] Add `@opensync/convex` as a workspace dependency (`workspace:*`).
+- [x] Rewrite all `../../convex/_generated/...` imports (~10 files) to `@opensync/api`.
+- [x] Add `@opensync/api` as a workspace dependency (`workspace:*`).
 - [x] Update `package.json` scripts: `dev: vp dev`, `build: tsc && vp build`,
       `preview: vp preview` (match existing repo pattern); reconcile all runtime deps
       (react, react-dom, react-router-dom, radix, workos authkit/widgets, convex, lucide,
@@ -145,7 +145,7 @@ plugins/
 - [x] Move `backup/opensync/docs/**` → `apps/docs/` (docs.json, mint.json, \*.mdx, logos, favicon).
 - [x] Add minimal `package.json` for the docs app (Mintlify dev/build via `mintlify` CLI,
       run through `vp run` or `vp dlx mintlify`).
-- [x] Update `packages/convex` `sync-docs` + `build-search-index` stubs to point at
+- [x] Update `packages/api` `sync-docs` + `build-search-index` stubs to point at
       `apps/docs` as source dir (was `process.cwd()/docs`) — even though non-functional,
       keep paths correct.
 - [ ] Verify: Mintlify dev serves.
@@ -169,7 +169,7 @@ dts: { tsgo: true }, format: ['esm'] }` covering `index.ts`, `cli.ts`, `config.t
 ### Phase 5 — Repo wiring & cleanup
 
 - [ ] Update root `vite.config.ts` lint/fmt `overrides` for React (`apps/website/**`),
-      node (`packages/convex/**` scripts), and ignore `src/_generated`.
+      node (`packages/api/**` scripts), and ignore `src/_generated`.
 - [ ] Update root `package.json` scripts as needed (`dev`, `ready`).
 - [ ] Port relevant root metadata (LICENSE, README updates, `.env.example`).
 - [ ] Remove `backup/` once migration verified (or keep until sign-off).

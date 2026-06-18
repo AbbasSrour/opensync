@@ -51,7 +51,7 @@ vp install
 Initialize and deploy the Convex backend:
 
 ```bash
-vp run @opensync/convex#convex
+vp run @opensync/api#convex
 ```
 
 This will:
@@ -169,7 +169,7 @@ Remember to:
 ### "Invalid token" errors
 
 - Verify `WORKOS_CLIENT_ID` is set correctly in Convex environment variables
-- Redeploy: `vp run @opensync/convex#convex:deploy`
+- Redeploy: `vp run @opensync/api#convex:deploy`
 
 ### Sessions not appearing
 

@@ -5,6 +5,7 @@
   "workspaces": {
     "packages": [
       "apps/*",
+      "adapters/*",
       "packages/*",
       "plugins/*",
       "tools/*"

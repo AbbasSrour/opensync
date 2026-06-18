@@ -25,7 +25,7 @@ Before implementing, do not assume; fetch the latest documentation:
 ### Basic Schema Definition
 
 ```typescript
-// packages/convex/src/schema.ts
+// packages/api/convex/schema.ts
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
@@ -223,7 +223,7 @@ users: defineTable({
 #### Backfilling Data
 
 ```typescript
-// packages/convex/src/migrations.ts
+// packages/api/convex/migrations.ts
 import { internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 
@@ -264,7 +264,7 @@ users: defineTable({
 ### Complete E-commerce Schema
 
 ```typescript
-// packages/convex/src/schema.ts
+// packages/api/convex/schema.ts
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
@@ -339,7 +339,7 @@ export default defineSchema({
 ### Using Schema Types in Functions
 
 ```typescript
-// packages/convex/src/products.ts
+// packages/api/convex/products.ts
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { Doc, Id } from "./_generated/dataModel";
@@ -373,7 +373,7 @@ export const get = query({
 
 ## Best Practices
 
-- Never run `vp run @opensync/convex#convex:deploy` unless explicitly instructed
+- Never run `vp run @opensync/api#convex:deploy` unless explicitly instructed
 - Never run any git commands unless explicitly instructed
 - Always define explicit schemas rather than relying on inference
 - Use descriptive index names that include all indexed fields

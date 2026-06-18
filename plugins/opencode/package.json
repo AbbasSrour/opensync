@@ -1,0 +1,48 @@
+{
+  "name": "@opensync/opencode",
+  "version": "0.0.0",
+  "private": true,
+  "description": "OpenCode source observer for OpenSync",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "dist/index.mjs",
+  "types": "dist/index.d.mts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.mts"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "vp pack src/index.ts --format esm --dts --clean",
+    "dev": "vp pack src/index.ts --format esm --dts --watch",
+    "test": "vp test",
+    "install:local": "vp run build",
+    "link:opencode": "npm link && npm link @opensync/opencode --prefix ~/.config/opencode",
+    "unlink:opencode": "npm unlink @opensync/opencode --prefix ~/.config/opencode",
+    "pack:opencode": "vp pack src/index.ts --format esm --dts --clean && npm pack --pack-destination ~/.local/share/opencode/opensync",
+    "install:opencode": "npm install --prefix ~/.config/opencode --no-save ~/.local/share/opencode/opensync/opensync-opencode-*.tgz"
+  },
+  "dependencies": {
+    "@opensync/adapter-opencode": "workspace:*",
+    "@opensync/kit": "workspace:*"
+  },
+  "devDependencies": {
+    "@opencode-ai/plugin": "^1.17.7",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "@opencode-ai/plugin": ">=1.17.0"
+  },
+  "peerDependenciesMeta": {
+    "@opencode-ai/plugin": {
+      "optional": true
+    }
+  }
+}

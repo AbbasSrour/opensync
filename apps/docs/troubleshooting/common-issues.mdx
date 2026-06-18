@@ -76,7 +76,7 @@ Check that Convex auth config includes auto-provision settings.
 **Solution:**
 
 ```bash
-cd packages/convex && vp run convex:env -- set OPENAI_API_KEY sk-...
+cd packages/api && vp run convex:env -- set OPENAI_API_KEY sk-...
 ```
 
 ### No search results
@@ -97,7 +97,7 @@ cd packages/convex && vp run convex:env -- set OPENAI_API_KEY sk-...
 
 **Solution:**
 
-1. Run `vp run @opensync/convex#convex` to see errors locally
+1. Run `vp run @opensync/api#convex` to see errors locally
 2. Fix TypeScript errors
 3. Ensure schema is valid
 

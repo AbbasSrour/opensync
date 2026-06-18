@@ -58,7 +58,7 @@ To add a new plugin source:
 1. Update schema to accept the new source:
 
 ```typescript
-// packages/convex/src/schema.ts
+// packages/api/convex/schema.ts
 source: v.union(
   v.literal("opencode"),
   v.literal("claude-code"),
@@ -71,7 +71,7 @@ source: v.union(
 2. Deploy schema changes:
 
 ```bash
-vp run @opensync/convex#convex:deploy
+vp run @opensync/api#convex:deploy
 ```
 
 3. Create a sync plugin that uses the new source identifier.
@@ -81,7 +81,7 @@ vp run @opensync/convex#convex:deploy
 Add custom fields to sessions:
 
 ```typescript
-// packages/convex/src/schema.ts
+// packages/api/convex/schema.ts
 sessions: defineTable({
   // ... existing fields
   customField: v.optional(v.string()),
@@ -103,7 +103,7 @@ Comment out or remove features you don't need:
 ### Add Custom Endpoint
 
 ```typescript
-// packages/convex/src/http.ts
+// packages/api/convex/http.ts
 http.route({
   path: "/custom-endpoint",
   method: "POST",

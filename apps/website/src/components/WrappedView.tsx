@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery } from "convex/react";
-import { api } from "@opensync/convex";
+import { api } from "@opensync/api";
 import { WrappedTemplate } from "./WrappedTemplates.tsx";
 // import { TEMPLATE_COUNT } from "./WrappedTemplates"; // Uncomment when re-enabling rotate button
 import { useTheme, getThemeClasses } from "../lib/theme.tsx";

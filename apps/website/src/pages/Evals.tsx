@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useQuery, useAction, useMutation } from "convex/react";
-import { api } from "@opensync/convex";
+import { api } from "@opensync/api";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../lib/auth.tsx";
 import { cn } from "../lib/utils.ts";
 import { getSourceLabel, getSourceColorClass } from "../lib/source.ts";
 import { useTheme, getThemeClasses } from "../lib/theme.tsx";
 import { StatCard } from "../components/Charts.tsx";
-import type { Id } from "@opensync/convex";
+import type { Id } from "@opensync/api";
 import {
   Settings,
   User,

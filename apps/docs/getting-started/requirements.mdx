@@ -37,7 +37,7 @@ Convex serves as the entire backend for OpenSync. There is no separate server or
 - **File storage** for daily wrapped images and profile photos
 - **Scheduled functions** for background processing like embedding generation
 
-All backend logic lives in `packages/convex/src/` in this monorepo.
+All backend logic lives in `packages/api/convex/` in this monorepo.
 
 ## What WorkOS handles
 
@@ -86,7 +86,7 @@ All configuration is done through environment variables. Here is the minimum set
 VITE_CONVEX_URL=https://your-deployment.convex.cloud
 VITE_WORKOS_CLIENT_ID=client_...
 
-# Convex backend (set via cd packages/convex && vp run convex:env -- set)
+# Convex backend (set via cd packages/api && vp run convex:env -- set)
 WORKOS_API_KEY=sk_...
 WORKOS_CLIENT_ID=client_...
 WORKOS_COOKIE_PASSWORD=a-random-string-at-least-32-characters
@@ -107,7 +107,7 @@ Sync Plugin (npm package, runs locally)
     |
     v  HTTPS POST /sync/session, /sync/message
     |
-Convex HTTP Endpoints (packages/convex/src/http.ts)
+Convex HTTP Endpoints (packages/api/convex/http.ts)
     |
     v
 Convex Database (sessions, messages, parts, embeddings)

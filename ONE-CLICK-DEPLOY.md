@@ -28,7 +28,7 @@ cd opensync
 vp install
 
 # Initialize Convex (creates a new project)
-vp run @opensync/convex#convex
+vp run @opensync/api#convex
 ```
 
 This will:
@@ -104,7 +104,7 @@ In the [Convex dashboard](https://dashboard.convex.dev):
 ### 5. Deploy Convex backend
 
 ```bash
-vp run @opensync/convex#convex:deploy
+vp run @opensync/api#convex:deploy
 ```
 
 This deploys your backend to production.
@@ -203,12 +203,12 @@ This happens when WorkOS CORS is not configured:
 1. Check WorkOS redirect URI matches your deployed URL exactly
 2. Check `WORKOS_CLIENT_ID` is set in Convex environment variables
 3. Verify CORS is configured (see above)
-4. Run `vp run @opensync/convex#convex:deploy` to sync changes
+4. Run `vp run @opensync/api#convex:deploy` to sync changes
 
 ### "Invalid token" errors
 
 1. Verify `WORKOS_CLIENT_ID` matches between Convex and frontend
-2. Run `vp run @opensync/convex#convex:deploy` after changing Convex env vars
+2. Run `vp run @opensync/api#convex:deploy` after changing Convex env vars
 
 ### Sessions not appearing after plugin setup
 
@@ -219,7 +219,7 @@ This happens when WorkOS CORS is not configured:
 ### Semantic search not working
 
 1. Verify `OPENAI_API_KEY` is set in Convex environment variables
-2. Run `vp run @opensync/convex#convex:deploy`
+2. Run `vp run @opensync/api#convex:deploy`
 3. Wait a minute (embeddings generate asynchronously)
 
 ## Next steps

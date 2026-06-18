@@ -400,7 +400,7 @@ export const researchTopic = action({
 ### Complete Chat Application Schema
 
 ```typescript
-// packages/convex/src/schema.ts
+// packages/api/convex/schema.ts
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
@@ -448,7 +448,7 @@ export default defineSchema({
 
 ```typescript
 import { useQuery, useMutation, useAction } from "convex/react";
-import { api } from "@opensync/convex";
+import { api } from "@opensync/api";
 import { useState, useRef, useEffect } from "react";
 
 function ChatInterface({ threadId }: { threadId: Id<"threads"> }) {
@@ -507,7 +507,7 @@ function ChatInterface({ threadId }: { threadId: Id<"threads"> }) {
 
 ## Best Practices
 
-- Never run `vp run @opensync/convex#convex:deploy` unless explicitly instructed
+- Never run `vp run @opensync/api#convex:deploy` unless explicitly instructed
 - Never run any git commands unless explicitly instructed
 - Store conversation history in Convex for persistence
 - Use streaming for better user experience with long responses

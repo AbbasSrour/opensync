@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { cn } from "../lib/utils.ts";
 import { MessageSquare, ChevronRight, Folder, Clock, Globe, Lock, Cpu } from "lucide-react";
-import type { Id } from "@opensync/convex";
+import type { Id } from "@opensync/api";
 
 interface Session {
   _id: Id<"sessions">;

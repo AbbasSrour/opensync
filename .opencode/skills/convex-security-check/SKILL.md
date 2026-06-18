@@ -64,7 +64,7 @@ Use this checklist to quickly audit your Convex application's security:
 ### Authentication Check
 
 ```typescript
-// packages/convex/src/auth.ts
+// packages/api/convex/auth.ts
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { ConvexError } from "convex/values";
@@ -213,7 +213,7 @@ export const deleteTask = mutation({
 ### Environment Variables Check
 
 ```typescript
-// packages/convex/src/actions.ts
+// packages/api/convex/actions.ts
 "use node";
 
 import { action } from "./_generated/server";
@@ -258,7 +258,7 @@ export const sendEmail = action({
 ### Complete Security Pattern
 
 ```typescript
-// packages/convex/src/secure.ts
+// packages/api/convex/secure.ts
 import { query, mutation, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { ConvexError } from "convex/values";
@@ -355,7 +355,7 @@ export const _setUserRole = internalMutation({
 
 ## Best Practices
 
-- Never run `vp run @opensync/convex#convex:deploy` unless explicitly instructed
+- Never run `vp run @opensync/api#convex:deploy` unless explicitly instructed
 - Never run any git commands unless explicitly instructed
 - Always verify user identity before returning sensitive data
 - Use internal functions for sensitive operations

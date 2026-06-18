@@ -35,7 +35,7 @@ HTTP actions allow you to define HTTP endpoints in Convex that can:
 ### Basic HTTP Router Setup
 
 ```typescript
-// packages/convex/src/http.ts
+// packages/api/convex/http.ts
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 
@@ -59,7 +59,7 @@ export default http;
 ### Request Handling
 
 ```typescript
-// packages/convex/src/http.ts
+// packages/api/convex/http.ts
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 
@@ -130,7 +130,7 @@ export default http;
 Use path prefix matching for dynamic routes:
 
 ```typescript
-// packages/convex/src/http.ts
+// packages/api/convex/http.ts
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 
@@ -158,7 +158,7 @@ export default http;
 ### CORS Configuration
 
 ```typescript
-// packages/convex/src/http.ts
+// packages/api/convex/http.ts
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 
@@ -207,7 +207,7 @@ export default http;
 ### Webhook Handling
 
 ```typescript
-// packages/convex/src/http.ts
+// packages/api/convex/http.ts
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 import { internal } from "./_generated/api";
@@ -317,7 +317,7 @@ export const verifyAndProcessWebhook = internalAction({
 ### Authentication in HTTP Actions
 
 ```typescript
-// packages/convex/src/http.ts
+// packages/api/convex/http.ts
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 import { internal } from "./_generated/api";
@@ -399,7 +399,7 @@ export default http;
 ### Calling Mutations and Queries
 
 ```typescript
-// packages/convex/src/http.ts
+// packages/api/convex/http.ts
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 import { api, internal } from "./_generated/api";
@@ -450,7 +450,7 @@ export default http;
 ### Error Handling
 
 ```typescript
-// packages/convex/src/http.ts
+// packages/api/convex/http.ts
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 
@@ -512,7 +512,7 @@ export default http;
 ### File Downloads
 
 ```typescript
-// packages/convex/src/http.ts
+// packages/api/convex/http.ts
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
@@ -546,7 +546,7 @@ export default http;
 ### Complete Webhook Integration
 
 ```typescript
-// packages/convex/src/http.ts
+// packages/api/convex/http.ts
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 import { internal } from "./_generated/api";
@@ -645,7 +645,7 @@ export const verifyAndProcess = internalAction({
 ### Schema for HTTP API
 
 ```typescript
-// packages/convex/src/schema.ts
+// packages/api/convex/schema.ts
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
@@ -682,7 +682,7 @@ export default defineSchema({
 
 ## Best Practices
 
-- Never run `vp run @opensync/convex#convex:deploy` unless explicitly instructed
+- Never run `vp run @opensync/api#convex:deploy` unless explicitly instructed
 - Never run any git commands unless explicitly instructed
 - Always validate and sanitize incoming request data
 - Use internal functions for database operations

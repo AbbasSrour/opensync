@@ -34,3 +34,4 @@ packages/*/.convex/
 # AI agent worktrees
 .claude/worktrees/
 backup/*
+.vercel

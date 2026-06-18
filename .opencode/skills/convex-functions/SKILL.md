@@ -180,7 +180,7 @@ export const processOrder = action({
 HTTP actions handle webhooks and external requests:
 
 ```typescript
-// packages/convex/src/http.ts
+// packages/api/convex/http.ts
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 import { api, internal } from "./_generated/api";
@@ -326,7 +326,7 @@ export const sendReminder = internalMutation({
 ### Complete Function File
 
 ```typescript
-// packages/convex/src/messages.ts
+// packages/api/convex/messages.ts
 import { query, mutation, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { ConvexError } from "convex/values";
@@ -415,7 +415,7 @@ export const notifySubscribers = internalMutation({
 
 ## Best Practices
 
-- Never run `vp run @opensync/convex#convex:deploy` unless explicitly instructed
+- Never run `vp run @opensync/api#convex:deploy` unless explicitly instructed
 - Never run any git commands unless explicitly instructed
 - Always define args and returns validators
 - Use queries for read operations (they are cached and reactive)

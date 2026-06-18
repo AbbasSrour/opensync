@@ -34,7 +34,7 @@ Before implementing, do not assume; fetch the latest documentation:
 ```typescript
 // React component with real-time data
 import { useQuery } from "convex/react";
-import { api } from "@opensync/convex";
+import { api } from "@opensync/api";
 
 function TaskList({ userId }: { userId: Id<"users"> }) {
   // Automatically subscribes and updates in real-time
@@ -58,7 +58,7 @@ function TaskList({ userId }: { userId: Id<"users"> }) {
 
 ```typescript
 import { useQuery } from "convex/react";
-import { api } from "@opensync/convex";
+import { api } from "@opensync/api";
 
 function UserProfile({ userId }: { userId: Id<"users"> | null }) {
   // Skip query when userId is null
@@ -83,7 +83,7 @@ function UserProfile({ userId }: { userId: Id<"users"> | null }) {
 
 ```typescript
 import { useMutation, useQuery } from "convex/react";
-import { api } from "@opensync/convex";
+import { api } from "@opensync/api";
 
 function TaskManager({ userId }: { userId: Id<"users"> }) {
   const tasks = useQuery(api.tasks.list, { userId });
@@ -120,8 +120,8 @@ Show changes immediately before server confirmation:
 
 ```typescript
 import { useMutation, useQuery } from "convex/react";
-import { api } from "@opensync/convex";
-import { Id } from "@opensync/convex";
+import { api } from "@opensync/api";
+import { Id } from "@opensync/api";
 
 function TaskItem({ task }: { task: Task }) {
   const toggleTask = useMutation(api.tasks.toggle).withOptimisticUpdate(
@@ -150,7 +150,7 @@ function TaskItem({ task }: { task: Task }) {
 
 ```typescript
 import { useMutation } from "convex/react";
-import { api } from "@opensync/convex";
+import { api } from "@opensync/api";
 
 function useCreateTask(userId: Id<"users">) {
   return useMutation(api.tasks.create).withOptimisticUpdate((localStore, args) => {
@@ -176,7 +176,7 @@ function useCreateTask(userId: Id<"users">) {
 ### Cursor-Based Pagination
 
 ```typescript
-// packages/convex/src/messages.ts
+// packages/api/convex/messages.ts
 import { query } from "./_generated/server";
 import { v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
@@ -199,7 +199,7 @@ export const listPaginated = query({
 ```typescript
 // React component with pagination
 import { usePaginatedQuery } from "convex/react";
-import { api } from "@opensync/convex";
+import { api } from "@opensync/api";
 
 function MessageList({ channelId }: { channelId: Id<"channels"> }) {
   const { results, status, loadMore } = usePaginatedQuery(
@@ -231,7 +231,7 @@ function MessageList({ channelId }: { channelId: Id<"channels"> }) {
 ```typescript
 import { usePaginatedQuery } from "convex/react";
 import { useEffect, useRef } from "react";
-import { api } from "@opensync/convex";
+import { api } from "@opensync/api";
 
 function InfiniteMessageList({ channelId }: { channelId: Id<"channels"> }) {
   const { results, status, loadMore } = usePaginatedQuery(
@@ -277,7 +277,7 @@ function InfiniteMessageList({ channelId }: { channelId: Id<"channels"> }) {
 
 ```typescript
 import { useQuery } from "convex/react";
-import { api } from "@opensync/convex";
+import { api } from "@opensync/api";
 
 function Dashboard({ userId }: { userId: Id<"users"> }) {
   // Multiple subscriptions update independently
@@ -308,7 +308,7 @@ function Dashboard({ userId }: { userId: Id<"users"> }) {
 ### Real-time Chat Application
 
 ```typescript
-// packages/convex/src/messages.ts
+// packages/api/convex/messages.ts
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
@@ -363,7 +363,7 @@ export const send = mutation({
 ```typescript
 // ChatRoom.tsx
 import { useQuery, useMutation } from "convex/react";
-import { api } from "@opensync/convex";
+import { api } from "@opensync/api";
 import { useState, useRef, useEffect } from "react";
 
 function ChatRoom({ channelId, userId }: Props) {
@@ -415,7 +415,7 @@ function ChatRoom({ channelId, userId }: Props) {
 
 ## Best Practices
 
-- Never run `vp run @opensync/convex#convex:deploy` unless explicitly instructed
+- Never run `vp run @opensync/api#convex:deploy` unless explicitly instructed
 - Never run any git commands unless explicitly instructed
 - Use "skip" for conditional queries instead of conditionally calling hooks
 - Implement optimistic updates for better perceived performance

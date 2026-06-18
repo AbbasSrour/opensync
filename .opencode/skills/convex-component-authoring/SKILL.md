@@ -218,7 +218,7 @@ export default app;
 ```typescript
 // In the consuming app's code
 import { useQuery, useMutation } from "convex/react";
-import { api } from "@opensync/convex";
+import { api } from "@opensync/api";
 
 function MyApp() {
   // Access component functions through the app's API
@@ -405,7 +405,7 @@ export const checkLimit = mutation({
 ```typescript
 // Usage in consuming app
 import { useMutation } from "convex/react";
-import { api } from "@opensync/convex";
+import { api } from "@opensync/api";
 
 function useRateLimitedAction() {
   const checkLimit = useMutation(api.rateLimiter.checkLimit);
@@ -428,7 +428,7 @@ function useRateLimitedAction() {
 
 ## Best Practices
 
-- Never run `vp run @opensync/convex#convex:deploy` unless explicitly instructed
+- Never run `vp run @opensync/api#convex:deploy` unless explicitly instructed
 - Never run any git commands unless explicitly instructed
 - Keep component tables isolated (don't reference main app tables)
 - Export clear TypeScript types for consumers

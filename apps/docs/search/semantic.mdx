@@ -84,7 +84,7 @@ Semantic search requires an OpenAI API key:
 - **Self-hosted**: Set the `OPENAI_API_KEY` environment variable on your Convex deployment.
 
 ```bash
-cd packages/convex && vp run convex:env -- set OPENAI_API_KEY sk-...
+cd packages/api && vp run convex:env -- set OPENAI_API_KEY sk-...
 ```
 
 Without an OpenAI key, semantic search is disabled and sessions will not have embeddings generated.

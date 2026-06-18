@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useQuery, useMutation, useAction } from "convex/react";
-import { api } from "@opensync/convex";
+import { api } from "@opensync/api";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../lib/auth.tsx";
 import { cn } from "../lib/utils.ts";
@@ -16,7 +16,7 @@ import {
 } from "../components/Charts.tsx";
 import { ConfirmModal } from "../components/ConfirmModal.tsx";
 import { WrappedView } from "../components/WrappedView.tsx";
-import type { Id } from "@opensync/convex";
+import type { Id } from "@opensync/api";
 import {
   Search,
   Settings,

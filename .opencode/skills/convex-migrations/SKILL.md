@@ -27,7 +27,7 @@ Before implementing, do not assume; fetch the latest documentation:
 Convex handles schema evolution differently than traditional databases:
 
 - No explicit migration files or commands
-- Schema changes deploy instantly with `vp run @opensync/convex#convex`
+- Schema changes deploy instantly with `vp run @opensync/api#convex`
 - Existing data is not automatically transformed
 - Use optional fields and backfill mutations for safe migrations
 
@@ -37,7 +37,7 @@ Start with optional fields, then backfill:
 
 ```typescript
 // Step 1: Add optional field to schema
-// packages/convex/src/schema.ts
+// packages/api/convex/schema.ts
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
@@ -85,7 +85,7 @@ export const getUser = query({
 
 ```typescript
 // Step 3: Backfill existing documents
-// packages/convex/src/migrations.ts
+// packages/api/convex/migrations.ts
 import { internalMutation } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { v } from "convex/values";
@@ -137,7 +137,7 @@ function generateDefaultAvatar(name: string): string {
 
 ```typescript
 // Step 4: After backfill completes, make field required
-// packages/convex/src/schema.ts
+// packages/api/convex/schema.ts
 export default defineSchema({
   users: defineTable({
     name: v.string(),
@@ -156,7 +156,7 @@ Remove field usage before removing from schema:
 // Mark as deprecated in code comments
 
 // Step 2: Remove field from schema (make optional first if needed)
-// packages/convex/src/schema.ts
+// packages/api/convex/schema.ts
 export default defineSchema({
   posts: defineTable({
     title: v.string(),
@@ -167,7 +167,7 @@ export default defineSchema({
 });
 
 // Step 3: Optionally clean up existing data
-// packages/convex/src/migrations.ts
+// packages/api/convex/migrations.ts
 export const removeDeprecatedField = internalMutation({
   args: {
     cursor: v.optional(v.string()),
@@ -203,7 +203,7 @@ Renaming requires copying data to new field, then removing old:
 
 ```typescript
 // Step 1: Add new field as optional
-// packages/convex/src/schema.ts
+// packages/api/convex/schema.ts
 export default defineSchema({
   users: defineTable({
     userName: v.string(), // Old field
@@ -273,7 +273,7 @@ Add indexes before using them in queries:
 
 ```typescript
 // Step 1: Add index to schema
-// packages/convex/src/schema.ts
+// packages/api/convex/schema.ts
 export default defineSchema({
   posts: defineTable({
     title: v.string(),
@@ -287,7 +287,7 @@ export default defineSchema({
 });
 
 // Step 2: Deploy schema change
-// Run: vp run @opensync/convex#convex
+// Run: vp run @opensync/api#convex
 
 // Step 3: Now use the index in queries
 export const getPublishedPosts = query({
@@ -325,7 +325,7 @@ Type changes require careful migration:
 // Example: Change from string to number for a "priority" field
 
 // Step 1: Add new field with new type
-// packages/convex/src/schema.ts
+// packages/api/convex/schema.ts
 export default defineSchema({
   tasks: defineTable({
     title: v.string(),
@@ -408,7 +408,7 @@ export default defineSchema({
 Create a reusable migration system:
 
 ```typescript
-// packages/convex/src/schema.ts
+// packages/api/convex/schema.ts
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
@@ -427,7 +427,7 @@ export default defineSchema({
 ```
 
 ```typescript
-// packages/convex/src/migrations.ts
+// packages/api/convex/migrations.ts
 import { internalMutation, internalQuery } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { v } from "convex/values";
@@ -532,7 +532,7 @@ export const failMigration = internalMutation({
 ```
 
 ```typescript
-// packages/convex/src/migrations/addUserTimestamps.ts
+// packages/api/convex/migrations/addUserTimestamps.ts
 import { internalMutation } from "../_generated/server";
 import { internal } from "../_generated/api";
 import { v } from "convex/values";
@@ -614,7 +614,7 @@ export const run = internalMutation({
 ### Schema with Migration Support
 
 ```typescript
-// packages/convex/src/schema.ts
+// packages/api/convex/schema.ts
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
@@ -672,7 +672,7 @@ export default defineSchema({
 
 ## Best Practices
 
-- Never run `vp run @opensync/convex#convex:deploy` unless explicitly instructed
+- Never run `vp run @opensync/api#convex:deploy` unless explicitly instructed
 - Never run any git commands unless explicitly instructed
 - Always start with optional fields when adding new data
 - Backfill data in batches to avoid timeouts

@@ -34,7 +34,7 @@ Before implementing, do not assume; fetch the latest documentation:
 #### Role-Based Access Control (RBAC)
 
 ```typescript
-// packages/convex/src/lib/auth.ts
+// packages/api/convex/lib/auth.ts
 import { QueryCtx, MutationCtx } from "./_generated/server";
 import { ConvexError } from "convex/values";
 import { Doc } from "./_generated/dataModel";
@@ -121,7 +121,7 @@ export async function requirePermission(
 ### Data Access Boundaries Audit
 
 ```typescript
-// packages/convex/src/data.ts
+// packages/api/convex/data.ts
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { getUser, requireRole } from "./lib/auth";
@@ -219,7 +219,7 @@ export const getSharedDocument = query({
 ### Action Isolation Audit
 
 ```typescript
-// packages/convex/src/actions.ts
+// packages/api/convex/actions.ts
 "use node";
 
 import { action, internalAction } from "./_generated/server";
@@ -294,7 +294,7 @@ export const _processPayment = internalAction({
 ### Rate Limiting Audit
 
 ```typescript
-// packages/convex/src/rateLimit.ts
+// packages/api/convex/rateLimit.ts
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { ConvexError } from "convex/values";
@@ -374,7 +374,7 @@ export const sendMessage = mutation({
 ### Sensitive Operations Protection
 
 ```typescript
-// packages/convex/src/admin.ts
+// packages/api/convex/admin.ts
 import { mutation, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { requireRole, requirePermission } from "./lib/auth";
@@ -453,7 +453,7 @@ export const requestDeletionConfirmation = mutation({
 ### Complete Audit Trail System
 
 ```typescript
-// packages/convex/src/audit.ts
+// packages/api/convex/audit.ts
 import { mutation, query, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { getUser, requireRole } from "./lib/auth";
@@ -512,7 +512,7 @@ export const getAuditLogs = query({
 
 ## Best Practices
 
-- Never run `vp run @opensync/convex#convex:deploy` unless explicitly instructed
+- Never run `vp run @opensync/api#convex:deploy` unless explicitly instructed
 - Never run any git commands unless explicitly instructed
 - Implement defense in depth (multiple security layers)
 - Log all sensitive operations for audit trails

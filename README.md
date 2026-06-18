@@ -104,7 +104,7 @@ Clone and deploy your own instance:
 git clone https://github.com/waynesutton/opensync.git
 cd opensync
 vp install
-vp run @opensync/convex#convex
+vp run @opensync/api#convex
 ```
 
 Requires Convex, WorkOS, and OpenAI accounts.

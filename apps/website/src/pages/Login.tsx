@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "../lib/theme.tsx";
 import { useQuery } from "convex/react";
-import { api } from "@opensync/convex";
+import { api } from "@opensync/api";
 import { LegalModal, PRIVACY_POLICY, TERMS_OF_SERVICE } from "../components/LegalModal.tsx";
 
 const ASCII_LOGO = `
