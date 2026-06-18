@@ -231,6 +231,8 @@ export const batchUpsert = internalMutation({
     updated: v.number(),
     skipped: v.number(),
     errors: v.array(v.string()),
+    // IDs of messages inserted or updated this batch (for embedding generation)
+    messageIds: v.array(v.id("messages")),
   }),
   handler: async (ctx, args) => {
     const now = Date.now();
@@ -238,6 +240,7 @@ export const batchUpsert = internalMutation({
     let updated = 0;
     let skipped = 0;
     const errors: Array<string> = [];
+    const messageIds: Array<Id<"messages">> = [];
 
     // Group messages by session for efficient processing
     const messagesBySession = new Map<string, typeof args.messages>();
@@ -306,7 +309,7 @@ export const batchUpsert = internalMutation({
 
             // Early return for dedup
             if (existing && now - existing.createdAt < MESSAGE_DEDUP_MS) {
-              return { action: "skipped" as const, text: "" };
+              return { action: "skipped" as const, text: "", messageId: existing._id };
             }
 
             let messageId: Id<"messages">;
@@ -331,7 +334,7 @@ export const batchUpsert = internalMutation({
                 await Promise.all(existingParts.map((p) => ctx.db.delete(p._id)));
               }
 
-              return { action: "updated" as const, text: "" };
+              return { action: "updated" as const, text: "", messageId };
             }
 
             // Insert new message
@@ -376,9 +379,14 @@ export const batchUpsert = internalMutation({
                 .join(" ");
             }
 
-            return { action: "inserted" as const, text: textContent };
+            return { action: "inserted" as const, text: textContent, messageId };
           } catch (e) {
-            return { action: "error" as const, error: `${msg.externalId}: ${e}`, text: "" };
+            return {
+              action: "error" as const,
+              error: `${msg.externalId}: ${e}`,
+              text: "",
+              messageId: null,
+            };
           }
         }),
       );
@@ -392,8 +400,10 @@ export const batchUpsert = internalMutation({
           inserted++;
           newMessages++;
           if (result.text) textParts.push(result.text);
+          if (result.messageId) messageIds.push(result.messageId);
         } else if (result.action === "updated") {
           updated++;
+          if (result.messageId) messageIds.push(result.messageId);
         } else if (result.action === "skipped") {
           skipped++;
         } else if (result.action === "error") {
@@ -418,6 +428,6 @@ export const batchUpsert = internalMutation({
       }
     }
 
-    return { inserted, updated, skipped, errors };
+    return { inserted, updated, skipped, errors, messageIds };
   },
 });

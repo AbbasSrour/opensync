@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useQuery } from "convex/react";
+import { useQuery, useAction } from "convex/react";
 import { api } from "@opensync/api";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../lib/auth.tsx";
@@ -42,8 +42,44 @@ import {
 // Search mode: sessions or messages
 type SearchMode = "sessions" | "messages";
 
+// Search kind: full-text (keyword) or semantic (vector embeddings)
+type SearchKind = "fulltext" | "semantic";
+
 // Results per page
 const RESULTS_PER_PAGE = 20;
+
+// Max results returned by a semantic (vector) search — it's a flat ranked list,
+// not cursor-paginated like full-text search.
+const SEMANTIC_LIMIT = 30;
+
+// Result shapes returned by the semantic search actions.
+type SemanticSession = {
+  _id: Id<"sessions">;
+  externalId: string;
+  title?: string;
+  projectPath?: string;
+  projectName?: string;
+  model?: string;
+  totalTokens: number;
+  cost: number;
+  isPublic: boolean;
+  messageCount: number;
+  createdAt: number;
+  updatedAt: number;
+};
+
+type SemanticMessage = {
+  _id: Id<"messages">;
+  sessionId: Id<"sessions">;
+  externalId: string;
+  role: "user" | "assistant" | "system" | "tool" | "unknown";
+  textContent?: string;
+  model?: string;
+  createdAt: number;
+  sessionTitle?: string;
+  projectPath?: string;
+  score: number;
+};
 
 export function ContextPage() {
   const { user, signOut } = useAuth();
@@ -55,8 +91,17 @@ export function ContextPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [searchMode, setSearchMode] = useState<SearchMode>("sessions");
+  const [searchKind, setSearchKind] = useState<SearchKind>("fulltext");
   const [cursor, setCursor] = useState(0);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Semantic search state (vector search runs via actions, not reactive queries)
+  const semanticSearchSessions = useAction(api.search.semanticSearch);
+  const semanticSearchMessages = useAction(api.search.semanticSearchMessages);
+  const [semanticSessions, setSemanticSessions] = useState<SemanticSession[]>([]);
+  const [semanticMessages, setSemanticMessages] = useState<SemanticMessage[]>([]);
+  const [semanticLoading, setSemanticLoading] = useState(false);
+  const [semanticError, setSemanticError] = useState<string | null>(null);
 
   // Slide-over panel state
   const [selectedSessionId, setSelectedSessionId] = useState<Id<"sessions"> | null>(null);
@@ -88,20 +133,63 @@ export function ContextPage() {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
-  // Fetch search results using Full Text Search (no OpenAI required)
+  // Fetch full-text search results (reactive queries). Skipped in semantic mode.
   const sessionResults = useQuery(
     api.search.searchSessionsPaginated,
-    searchMode === "sessions" ? { query: debouncedQuery, limit: RESULTS_PER_PAGE, cursor } : "skip",
-  );
-
-  const messageResults = useQuery(
-    api.search.searchMessagesPaginated,
-    searchMode === "messages" && debouncedQuery.trim()
+    searchKind === "fulltext" && searchMode === "sessions"
       ? { query: debouncedQuery, limit: RESULTS_PER_PAGE, cursor }
       : "skip",
   );
 
-  // Pagination handlers
+  const messageResults = useQuery(
+    api.search.searchMessagesPaginated,
+    searchKind === "fulltext" && searchMode === "messages" && debouncedQuery.trim()
+      ? { query: debouncedQuery, limit: RESULTS_PER_PAGE, cursor }
+      : "skip",
+  );
+
+  // Run semantic (vector) search when in semantic mode. Actions aren't reactive,
+  // so we drive them from an effect on the debounced query / mode.
+  useEffect(() => {
+    if (searchKind !== "semantic") return;
+
+    const query = debouncedQuery.trim();
+    if (!query) {
+      setSemanticSessions([]);
+      setSemanticMessages([]);
+      setSemanticError(null);
+      return;
+    }
+
+    let cancelled = false;
+    setSemanticLoading(true);
+    setSemanticError(null);
+
+    const run = async () => {
+      try {
+        if (searchMode === "sessions") {
+          const results = await semanticSearchSessions({ query, limit: SEMANTIC_LIMIT });
+          if (!cancelled) setSemanticSessions(results);
+        } else {
+          const results = await semanticSearchMessages({ query, limit: SEMANTIC_LIMIT });
+          if (!cancelled) setSemanticMessages(results);
+        }
+      } catch (e) {
+        if (!cancelled) setSemanticError(String(e));
+      } finally {
+        if (!cancelled) setSemanticLoading(false);
+      }
+    };
+
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [searchKind, searchMode, debouncedQuery, semanticSearchSessions, semanticSearchMessages]);
+
+  const isSemantic = searchKind === "semantic";
+
+  // Pagination handlers (full-text only; semantic returns a flat ranked list)
   const handleNextPage = () => {
     const nextCursor =
       searchMode === "sessions" ? sessionResults?.nextCursor : messageResults?.nextCursor;
@@ -117,20 +205,28 @@ export function ContextPage() {
   };
 
   const hasNextPage =
-    searchMode === "sessions"
-      ? sessionResults?.nextCursor !== null
-      : messageResults?.nextCursor !== null;
+    !isSemantic &&
+    (searchMode === "sessions"
+      ? sessionResults?.nextCursor != null
+      : messageResults?.nextCursor != null);
 
-  const hasPrevPage = cursor > 0;
+  const hasPrevPage = !isSemantic && cursor > 0;
 
-  const currentResults =
-    searchMode === "sessions" ? sessionResults?.sessions || [] : messageResults?.messages || [];
+  // Active result lists, resolved by kind + mode.
+  const sessionList = isSemantic ? semanticSessions : sessionResults?.sessions || [];
+  const messageList = isSemantic ? semanticMessages : messageResults?.messages || [];
 
-  const totalResults =
-    searchMode === "sessions" ? sessionResults?.total || 0 : messageResults?.total || 0;
+  const currentResults = searchMode === "sessions" ? sessionList : messageList;
 
-  const isLoading =
-    searchMode === "sessions"
+  const totalResults = isSemantic
+    ? currentResults.length
+    : searchMode === "sessions"
+      ? sessionResults?.total || 0
+      : messageResults?.total || 0;
+
+  const isLoading = isSemantic
+    ? semanticLoading
+    : searchMode === "sessions"
       ? sessionResults === undefined && debouncedQuery !== ""
       : messageResults === undefined && debouncedQuery !== "";
 
@@ -274,7 +370,7 @@ export function ContextPage() {
           <div className="text-center mb-8">
             <h1 className={cn("text-2xl font-light mb-2", t.textPrimary)}>Search Your Context</h1>
             <p className={cn("text-sm", t.textMuted)}>
-              Find sessions and messages using full-text search
+              Find sessions and messages using full-text or semantic search
             </p>
           </div>
 
@@ -366,17 +462,58 @@ export function ContextPage() {
             </div>
           </div>
 
-          {/* Results info */}
-          {(debouncedQuery || searchMode === "sessions") && currentResults.length > 0 && (
-            <div className={cn("flex items-center justify-between mb-4 text-sm", t.textMuted)}>
-              <span>
-                Showing {cursor + 1} - {cursor + currentResults.length} of {totalResults} results
-              </span>
-              <span className={cn("text-xs", t.textDim)}>
-                Full-text search (no API key required)
-              </span>
+          {/* Search kind toggle: full-text vs semantic */}
+          <div className="flex justify-center mb-6">
+            <div
+              className={cn("flex items-center gap-1 rounded-lg p-1 border", t.bgToggle, t.border)}
+            >
+              <button
+                onClick={() => {
+                  setSearchKind("fulltext");
+                  setCursor(0);
+                }}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-2 text-sm rounded-md transition-colors",
+                  searchKind === "fulltext"
+                    ? cn(t.bgToggleActive, t.textPrimary)
+                    : cn(t.textSubtle, "hover:opacity-80"),
+                )}
+              >
+                <Search className="h-4 w-4" />
+                Full-text
+              </button>
+              <button
+                onClick={() => {
+                  setSearchKind("semantic");
+                  setCursor(0);
+                }}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-2 text-sm rounded-md transition-colors",
+                  searchKind === "semantic"
+                    ? cn(t.bgToggleActive, t.textPrimary)
+                    : cn(t.textSubtle, "hover:opacity-80"),
+                )}
+              >
+                <Cpu className="h-4 w-4" />
+                Semantic
+              </button>
             </div>
-          )}
+          </div>
+
+          {/* Results info */}
+          {(debouncedQuery || (searchMode === "sessions" && !isSemantic)) &&
+            currentResults.length > 0 && (
+              <div className={cn("flex items-center justify-between mb-4 text-sm", t.textMuted)}>
+                <span>
+                  {isSemantic
+                    ? `${currentResults.length} results, ranked by relevance`
+                    : `Showing ${cursor + 1} - ${cursor + currentResults.length} of ${totalResults} results`}
+                </span>
+                <span className={cn("text-xs", t.textDim)}>
+                  {isSemantic ? "Semantic search (vector embeddings)" : "Full-text search"}
+                </span>
+              </div>
+            )}
 
           {/* Loading state */}
           {isLoading && (
@@ -390,7 +527,7 @@ export function ContextPage() {
             <div className="space-y-3">
               {searchMode === "sessions"
                 ? // Session results
-                  (sessionResults?.sessions || []).map((session) => (
+                  sessionList.map((session) => (
                     <SessionResultCard
                       key={session._id}
                       session={session}
@@ -399,12 +536,12 @@ export function ContextPage() {
                     />
                   ))
                 : // Message results
-                  (messageResults?.messages || []).map((message) => (
+                  messageList.map((message) => (
                     <MessageResultCard
                       key={message._id}
                       message={message}
                       theme={theme}
-                      searchQuery={debouncedQuery}
+                      searchQuery={isSemantic ? "" : debouncedQuery}
                       onClick={() => handleOpenSession(message.sessionId, message._id)}
                     />
                   ))}
@@ -413,14 +550,23 @@ export function ContextPage() {
               {currentResults.length === 0 && !isLoading && (
                 <div className={cn("text-center py-16 rounded-lg border", t.bgCard, t.border)}>
                   <Search className={cn("h-12 w-12 mx-auto mb-4", t.textDim)} />
-                  {searchMode === "messages" && !debouncedQuery.trim() ? (
+                  {(searchMode === "messages" || isSemantic) && !debouncedQuery.trim() ? (
                     <>
                       <h3 className={cn("text-lg font-medium mb-2", t.textPrimary)}>
                         Enter a search query
                       </h3>
                       <p className={cn("text-sm max-w-md mx-auto", t.textMuted)}>
-                        Type something to search through your messages
+                        {isSemantic
+                          ? `Type something to semantically search your ${searchMode}`
+                          : "Type something to search through your messages"}
                       </p>
+                    </>
+                  ) : semanticError ? (
+                    <>
+                      <h3 className={cn("text-lg font-medium mb-2", t.textPrimary)}>
+                        Search failed
+                      </h3>
+                      <p className={cn("text-sm max-w-md mx-auto", t.textMuted)}>{semanticError}</p>
                     </>
                   ) : debouncedQuery.trim() ? (
                     <>
@@ -489,7 +635,9 @@ export function ContextPage() {
       <footer
         className={cn("h-10 border-t flex items-center justify-center px-4", t.border, t.bgPrimary)}
       >
-        <span className={cn("text-xs", t.textDim)}>Powered by Convex Full-Text Search</span>
+        <span className={cn("text-xs", t.textDim)}>
+          Powered by Convex {isSemantic ? "Vector Search" : "Full-Text Search"}
+        </span>
       </footer>
 
       {/* Session Slide-over Panel */}

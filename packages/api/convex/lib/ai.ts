@@ -39,6 +39,36 @@ export async function embed(text: string): Promise<number[]> {
   return data.data[0].embedding;
 }
 
+/**
+ * Generate embeddings for many texts in a single batched /embeddings request.
+ * Returns one vector per input, in the same order as `texts`.
+ */
+export async function embedMany(texts: string[]): Promise<number[][]> {
+  if (texts.length === 0) return [];
+
+  const baseUrl = required("EMBEDDING_BASE_URL").replace(/\/$/, "");
+  const response = await fetch(`${baseUrl}/embeddings`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${required("EMBEDDING_API_KEY")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: EMBEDDING_MODEL,
+      input: texts.map((text) => text.slice(0, 8000)),
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Embedding API error: ${await response.text()}`);
+  }
+
+  const data = await response.json();
+  // Order by `index` to be safe; OpenAI-compatible APIs return it per item.
+  const items = [...data.data].sort((a, b) => a.index - b.index);
+  return items.map((item: { embedding: number[] }) => item.embedding);
+}
+
 // AI SDK model factories below run at module init (RAG is constructed at import
 // time), so they must not throw when env is unset — they read env directly and
 // only fail on actual use, matching AI SDK behavior.

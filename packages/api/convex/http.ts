@@ -167,6 +167,11 @@ http.route({
         createdAt: body.createdAt, // Original timestamp from source
       });
 
+      // Schedule message embedding generation (burst-safe coordinator)
+      await ctx.scheduler.runAfter(0, internal.embeddings.enqueueMessageEmbeddings, {
+        messageIds: [messageId],
+      });
+
       return json({ ok: true, messageId });
     } catch (e) {
       return json({ error: String(e) }, 500);
@@ -210,6 +215,13 @@ http.route({
           });
           messageCount = result.inserted + result.updated;
           errors.push(...result.errors);
+
+          // Schedule message embedding generation for inserted/updated messages
+          if (result.messageIds.length > 0) {
+            await ctx.scheduler.runAfter(0, internal.embeddings.enqueueMessageEmbeddings, {
+              messageIds: result.messageIds,
+            });
+          }
         } catch (e) {
           errors.push(`Messages batch error: ${e}`);
         }
