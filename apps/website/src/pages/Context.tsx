@@ -400,9 +400,10 @@ export function ContextPage() {
             </p>
           </div>
 
-          {/* Search input */}
-          <div className="max-w-2xl mx-auto mb-6">
-            <div className="relative">
+          {/* Search row: input + kind tabs + type dropdown, all on one line */}
+          <div className="max-w-3xl mx-auto mb-6 flex flex-wrap items-center gap-3">
+            {/* Search input */}
+            <div className="relative flex-1 min-w-[240px]">
               <Search
                 className={cn("absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5", t.iconMuted)}
               />
@@ -412,9 +413,11 @@ export function ContextPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={
-                  searchMode === "sessions"
-                    ? "Search sessions by title, content..."
-                    : "Search messages by content..."
+                  searchMode === "messages"
+                    ? "Search messages by content..."
+                    : searchMode === "sessions"
+                      ? "Search sessions by title, content..."
+                      : "Search sessions and messages..."
                 }
                 className={cn(
                   "w-full h-12 pl-12 pr-20 rounded-lg border text-base focus:outline-none transition-colors",
@@ -448,41 +451,14 @@ export function ContextPage() {
                 </button>
               )}
             </div>
-          </div>
 
-          {/* Search controls: type filter chips (left) + kind toggle (right) */}
-          <div className="max-w-2xl mx-auto mb-6 flex flex-wrap items-center justify-between gap-3">
-            {/* Type filter chips: all / sessions / messages */}
-            <div className="flex items-center gap-2">
-              {(
-                [
-                  { value: "all", label: "All", icon: null },
-                  { value: "sessions", label: "Sessions", icon: Folder },
-                  { value: "messages", label: "Messages", icon: MessageSquare },
-                ] as const
-              ).map(({ value, label, icon: Icon }) => (
-                <button
-                  key={value}
-                  onClick={() => {
-                    setSearchMode(value);
-                    setCursor(0);
-                  }}
-                  className={cn(
-                    "flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-full border transition-colors",
-                    searchMode === value
-                      ? cn(t.bgToggleActive, t.textPrimary, t.border)
-                      : cn(t.bgToggle, t.textSubtle, t.border, "hover:opacity-80"),
-                  )}
-                >
-                  {Icon && <Icon className="h-3.5 w-3.5" />}
-                  {label}
-                </button>
-              ))}
-            </div>
-
-            {/* Kind toggle: full-text vs semantic */}
+            {/* Kind tabs: full-text vs semantic */}
             <div
-              className={cn("flex items-center gap-1 rounded-lg p-1 border", t.bgToggle, t.border)}
+              className={cn(
+                "flex items-center gap-1 rounded-lg p-1 border shrink-0",
+                t.bgToggle,
+                t.border,
+              )}
             >
               <button
                 onClick={() => {
@@ -515,6 +491,26 @@ export function ContextPage() {
                 Semantic
               </button>
             </div>
+
+            {/* Type dropdown: all / sessions / messages */}
+            <select
+              value={searchMode}
+              onChange={(e) => {
+                setSearchMode(e.target.value as SearchMode);
+                setCursor(0);
+              }}
+              className={cn(
+                "h-[42px] px-3 rounded-lg border text-sm shrink-0 focus:outline-none transition-colors",
+                t.bgInput,
+                t.border,
+                t.textSecondary,
+                t.borderFocus,
+              )}
+            >
+              <option value="all">All types</option>
+              <option value="sessions">Sessions</option>
+              <option value="messages">Messages</option>
+            </select>
           </div>
 
           {/* Results info */}
