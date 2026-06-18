@@ -37,7 +37,7 @@
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "@types/react-syntax-highlighter": "^15.5.11",
-    "@vitejs/plugin-react": "^4.2.0",
+    "@vitejs/plugin-react": "^5.2.0",
     "tailwindcss": "^4.1.17",
     "typescript": "catalog:",
     "vite": "catalog:",
