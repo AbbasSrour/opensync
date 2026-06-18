@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery, useAction } from "convex/react";
 import { api } from "@opensync/api";
 import { Link, useNavigate } from "react-router-dom";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useAuth } from "../lib/auth.tsx";
 import { cn } from "../lib/utils.ts";
 import { getSourceLabel, getSourceColorClass } from "../lib/source.ts";
@@ -19,6 +20,7 @@ import {
   Command,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Folder,
   MessageSquare,
   Clock,
@@ -147,7 +149,7 @@ export function ContextPage() {
 
   const messageResults = useQuery(
     api.search.searchMessagesPaginated,
-    searchKind === "fulltext" && wantsMessages && debouncedQuery.trim()
+    searchKind === "fulltext" && wantsMessages
       ? { query: debouncedQuery, limit: RESULTS_PER_PAGE, cursor }
       : "skip",
   );
@@ -401,7 +403,7 @@ export function ContextPage() {
           </div>
 
           {/* Search row: input + kind tabs + type dropdown, all on one line */}
-          <div className="max-w-3xl mx-auto mb-6 flex flex-wrap items-center gap-3">
+          <div className="max-w-3xl mx-auto mb-6 flex flex-wrap items-stretch gap-3">
             {/* Search input */}
             <div className="relative flex-1 min-w-[240px]">
               <Search
@@ -455,7 +457,7 @@ export function ContextPage() {
             {/* Kind tabs: full-text vs semantic */}
             <div
               className={cn(
-                "flex items-center gap-1 rounded-lg p-1 border shrink-0",
+                "flex items-center gap-1 h-12 rounded-lg p-1 border shrink-0",
                 t.bgToggle,
                 t.border,
               )}
@@ -466,7 +468,7 @@ export function ContextPage() {
                   setCursor(0);
                 }}
                 className={cn(
-                  "flex items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-colors",
+                  "flex items-center gap-2 h-10 px-3 text-sm rounded-md transition-colors",
                   searchKind === "fulltext"
                     ? cn(t.bgToggleActive, t.textPrimary)
                     : cn(t.textSubtle, "hover:opacity-80"),
@@ -481,7 +483,7 @@ export function ContextPage() {
                   setCursor(0);
                 }}
                 className={cn(
-                  "flex items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-colors",
+                  "flex items-center gap-2 h-10 px-3 text-sm rounded-md transition-colors",
                   searchKind === "semantic"
                     ? cn(t.bgToggleActive, t.textPrimary)
                     : cn(t.textSubtle, "hover:opacity-80"),
@@ -493,28 +495,18 @@ export function ContextPage() {
             </div>
 
             {/* Type dropdown: all / sessions / messages */}
-            <select
+            <SearchModeDropdown
               value={searchMode}
-              onChange={(e) => {
-                setSearchMode(e.target.value as SearchMode);
+              onChange={(value) => {
+                setSearchMode(value);
                 setCursor(0);
               }}
-              className={cn(
-                "h-[42px] px-3 rounded-lg border text-sm shrink-0 focus:outline-none transition-colors",
-                t.bgInput,
-                t.border,
-                t.textSecondary,
-                t.borderFocus,
-              )}
-            >
-              <option value="all">All types</option>
-              <option value="sessions">Sessions</option>
-              <option value="messages">Messages</option>
-            </select>
+              theme={theme}
+            />
           </div>
 
           {/* Results info */}
-          {(debouncedQuery || (wantsSessions && !isSemantic)) && currentResults.length > 0 && (
+          {currentResults.length > 0 && (
             <div className={cn("flex items-center justify-between mb-4 text-sm", t.textMuted)}>
               <span>
                 {isSemantic || !isSingleMode
@@ -699,6 +691,80 @@ export function ContextPage() {
         }}
       />
     </div>
+  );
+}
+
+const SEARCH_MODE_LABELS: Record<SearchMode, { label: string; icon: typeof Search }> = {
+  all: { label: "All types", icon: Search },
+  sessions: { label: "Sessions", icon: Folder },
+  messages: { label: "Messages", icon: MessageSquare },
+};
+
+function SearchModeDropdown({
+  value,
+  onChange,
+  theme,
+}: {
+  value: SearchMode;
+  onChange: (value: SearchMode) => void;
+  theme: "dark" | "tan";
+}) {
+  const t = getThemeClasses(theme);
+  const { label, icon: Icon } = SEARCH_MODE_LABELS[value];
+
+  return (
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild>
+        <button
+          className={cn(
+            "flex items-center justify-between gap-2 h-12 w-36 px-3 rounded-lg border text-sm transition-colors",
+            t.bgInput,
+            t.border,
+            t.textSecondary,
+            t.bgHover,
+            t.borderFocus,
+          )}
+        >
+          <span className="flex items-center gap-2">
+            <Icon className="h-4 w-4" />
+            {label}
+          </span>
+          <ChevronDown className={cn("h-4 w-4 shrink-0", t.iconMuted)} />
+        </button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content
+          align="end"
+          sideOffset={4}
+          className={cn(
+            "min-w-[9rem] rounded-lg border shadow-xl z-50 p-1",
+            t.bgDropdown,
+            t.border,
+          )}
+        >
+          {(Object.keys(SEARCH_MODE_LABELS) as SearchMode[]).map((mode) => {
+            const { label: itemLabel, icon: ItemIcon } = SEARCH_MODE_LABELS[mode];
+            const active = mode === value;
+            return (
+              <DropdownMenu.Item
+                key={mode}
+                onSelect={() => onChange(mode)}
+                className={cn(
+                  "flex items-center justify-between gap-2 px-2 py-2 text-sm rounded-md cursor-pointer outline-none transition-colors",
+                  active ? cn(t.bgToggleActive, t.textPrimary) : cn(t.textSubtle, t.bgHover),
+                )}
+              >
+                <span className="flex items-center gap-2">
+                  <ItemIcon className="h-4 w-4" />
+                  {itemLabel}
+                </span>
+                {active && <Check className={cn("h-4 w-4", t.iconSubtle)} />}
+              </DropdownMenu.Item>
+            );
+          })}
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
   );
 }
 

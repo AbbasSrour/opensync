@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { query, action, internalQuery } from "./_generated/server";
 import { internal, api } from "./_generated/api";
-import type { Id } from "./_generated/dataModel";
+import type { Id, Doc } from "./_generated/dataModel";
 import { embed } from "./lib/ai";
 
 // Type definition for session results
@@ -228,8 +228,6 @@ export const searchMessages = query({
     }),
   ),
   handler: async (ctx, { query: searchQuery, sessionId, limit = 50 }) => {
-    if (!searchQuery.trim()) return [];
-
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return [];
 
@@ -248,8 +246,30 @@ export const searchMessages = query({
 
     const sessionIds = new Set(userSessions.map((s) => s._id));
 
-    let results;
-    if (sessionId) {
+    let results: Doc<"messages">[];
+    if (!searchQuery.trim()) {
+      // Empty query - return recent messages from the user's sessions
+      if (sessionId) {
+        if (!sessionIds.has(sessionId)) return [];
+        results = await ctx.db
+          .query("messages")
+          .withIndex("by_session_created", (q) => q.eq("sessionId", sessionId))
+          .order("desc")
+          .take(limit);
+      } else {
+        const allMessages: Doc<"messages">[] = [];
+        for (const session of userSessions) {
+          const sessionMessages = await ctx.db
+            .query("messages")
+            .withIndex("by_session_created", (q) => q.eq("sessionId", session._id))
+            .order("desc")
+            .take(limit);
+          allMessages.push(...sessionMessages);
+        }
+        allMessages.sort((a, b) => b.createdAt - a.createdAt);
+        results = allMessages.slice(0, limit);
+      }
+    } else if (sessionId) {
       if (!sessionIds.has(sessionId)) return [];
 
       results = await ctx.db
@@ -337,13 +357,33 @@ export const searchMessagesPaginated = query({
     const sessionIds = new Set(userSessions.map((s) => s._id));
     const sessionMap = new Map(userSessions.map((s) => [s._id, s]));
 
-    // Empty query - return nothing (user must search for something)
+    let results: Doc<"messages">[];
     if (!searchQuery.trim()) {
-      return { messages: [], nextCursor: null, total: 0 };
-    }
+      // Empty query - return recent messages from the user's sessions
+      if (sessionId) {
+        if (!sessionIds.has(sessionId)) {
+          return { messages: [], nextCursor: null, total: 0 };
+        }
 
-    let results;
-    if (sessionId) {
+        results = await ctx.db
+          .query("messages")
+          .withIndex("by_session_created", (q) => q.eq("sessionId", sessionId))
+          .order("desc")
+          .take(limit + cursor + 1);
+      } else {
+        const allMessages: Doc<"messages">[] = [];
+        for (const session of userSessions) {
+          const sessionMessages = await ctx.db
+            .query("messages")
+            .withIndex("by_session_created", (q) => q.eq("sessionId", session._id))
+            .order("desc")
+            .take(limit + cursor + 1);
+          allMessages.push(...sessionMessages);
+        }
+        allMessages.sort((a, b) => b.createdAt - a.createdAt);
+        results = allMessages;
+      }
+    } else if (sessionId) {
       // Filter by specific session
       if (!sessionIds.has(sessionId)) {
         return { messages: [], nextCursor: null, total: 0 };
