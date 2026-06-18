@@ -16,6 +16,7 @@ import {
 } from "../components/Charts.tsx";
 import { ConfirmModal } from "../components/ConfirmModal.tsx";
 import { WrappedView } from "../components/WrappedView.tsx";
+import { ProfileSection } from "../components/ProfileSection.tsx";
 import type { Id } from "@opensync/api";
 import {
   Search,
@@ -150,6 +151,7 @@ export function DashboardPage() {
   const modelStats = useQuery(api.analytics.modelStats, { source: sourceArg });
   const projectStats = useQuery(api.analytics.projectStats, { source: sourceArg });
   const providerStats = useQuery(api.analytics.providerStats, { source: sourceArg });
+  const activityStats = useQuery(api.analytics.activityStats, { source: sourceArg });
   const sessionsData = useQuery(api.analytics.sessionsWithDetails, {
     limit: 100,
     sortBy: sortField,
@@ -429,6 +431,7 @@ export function DashboardPage() {
             dailyStats={dailyStats || []}
             modelStats={modelStats || []}
             projectStats={projectStats || []}
+            activityStats={activityStats}
             sessions={displaySessions}
             onSelectSession={(id) => {
               // Navigate to sessions view when clicking a session in overview
@@ -813,6 +816,7 @@ function OverviewView({
   dailyStats,
   modelStats,
   projectStats,
+  activityStats,
   sessions,
   onSelectSession,
   selectedSessionId,
@@ -822,6 +826,7 @@ function OverviewView({
   dailyStats: any[];
   modelStats: any[];
   projectStats: any[];
+  activityStats: any;
   sessions: any[];
   onSelectSession: (id: Id<"sessions"> | null) => void;
   selectedSessionId: Id<"sessions"> | null;
@@ -904,6 +909,9 @@ function OverviewView({
             theme={theme}
           />
         </div>
+
+        {/* Activity / profile section: heatmap, streaks, insights */}
+        <ProfileSection activityStats={activityStats} summaryStats={summaryStats} theme={theme} />
 
         {/* Usage Overview Section */}
         <ConsumptionBreakdown

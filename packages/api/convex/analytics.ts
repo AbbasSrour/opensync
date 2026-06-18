@@ -760,3 +760,245 @@ export const publicPlatformStats = query({
     };
   },
 });
+
+// ── Activity stats: heatmap, streaks, peak day, most active hour, most worked project ─
+// Pure helpers ported from Synara's profileStats.ts (framework-agnostic, safe to reuse).
+
+const HEATMAP_WINDOW_DAYS = 274; // ~9 months, GitHub-style contribution grid.
+
+function localToday(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function addDaysIso(day: string, delta: number): string {
+  const [year = 1970, month = 1, date = 1] = day.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, date) + delta * 86_400_000)
+    .toISOString()
+    .slice(0, 10);
+}
+
+function weekdayOf(day: string): number {
+  const [year = 1970, month = 1, date = 1] = day.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, date)).getUTCDay();
+}
+
+function heatmapIntensity(count: number, max: number): 0 | 1 | 2 | 3 | 4 {
+  if (count <= 0 || max <= 0) return 0;
+  const ratio = count / max;
+  if (ratio <= 0.25) return 1;
+  if (ratio <= 0.5) return 2;
+  if (ratio <= 0.75) return 3;
+  return 4;
+}
+
+function computeStreaks(activeDaysAsc: string[], todayKey: string): {
+  current: number;
+  longest: number;
+} {
+  if (activeDaysAsc.length === 0) return { current: 0, longest: 0 };
+  const set = new Set(activeDaysAsc);
+
+  let longest = 0;
+  let run = 0;
+  let previous: string | null = null;
+  for (const day of activeDaysAsc) {
+    run = previous && addDaysIso(previous, 1) === day ? run + 1 : 1;
+    if (run > longest) longest = run;
+    previous = day;
+  }
+
+  // Keep the streak alive through the current local day.
+  let anchor: string | null = set.has(todayKey)
+    ? todayKey
+    : set.has(addDaysIso(todayKey, -1))
+      ? addDaysIso(todayKey, -1)
+      : null;
+  let current = 0;
+  while (anchor && set.has(anchor)) {
+    current += 1;
+    anchor = addDaysIso(anchor, -1);
+  }
+
+  return { current, longest };
+}
+
+function buildHeatmap(
+  countByDay: Map<string, number>,
+  todayKey: string,
+): Array<{ day: string; count: number; weekday: number; intensity: 0 | 1 | 2 | 3 | 4 }> {
+  const windowStart = addDaysIso(todayKey, -(HEATMAP_WINDOW_DAYS - 1));
+
+  let windowMax = 0;
+  for (const [day, count] of countByDay) {
+    if (day >= windowStart && day <= todayKey && count > windowMax) {
+      windowMax = count;
+    }
+  }
+
+  const heatmap: Array<{
+    day: string;
+    count: number;
+    weekday: number;
+    intensity: 0 | 1 | 2 | 3 | 4;
+  }> = [];
+  for (let offset = 0; offset < HEATMAP_WINDOW_DAYS; offset += 1) {
+    const day = addDaysIso(windowStart, offset);
+    const count = countByDay.get(day) ?? 0;
+    heatmap.push({
+      day,
+      count,
+      weekday: weekdayOf(day),
+      intensity: heatmapIntensity(count, windowMax),
+    });
+  }
+  return heatmap;
+}
+
+// Activity stats for the Dashboard profile section: heatmap, streaks, peak day,
+// most active hour, most worked project, total prompts sent. All derivable from
+// existing sessions table (no schema changes).
+export const activityStats = query({
+  args: {
+    source: v.optional(v.string()), // "opencode" | "claude-code" | undefined (all)
+  },
+  returns: v.union(
+    v.object({
+      heatmap: v.array(
+        v.object({
+          day: v.string(),
+          count: v.number(),
+          weekday: v.number(),
+          intensity: v.union(
+            v.literal(0),
+            v.literal(1),
+            v.literal(2),
+            v.literal(3),
+            v.literal(4),
+          ),
+        }),
+      ),
+      currentStreakDays: v.number(),
+      longestStreakDays: v.number(),
+      peakDay: v.union(
+        v.object({ day: v.string(), tokens: v.number() }),
+        v.null(),
+      ),
+      mostActiveHour: v.union(v.number(), v.null()),
+      mostWorkedProject: v.union(
+        v.object({
+          project: v.string(),
+          promptCount: v.number(),
+          sessionCount: v.number(),
+        }),
+        v.null(),
+      ),
+      promptsToday: v.number(),
+      totalPromptsSent: v.number(),
+    }),
+    v.null(),
+  ),
+  handler: async (ctx, { source }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_workos_id", (q) => q.eq("workosId", identity.subject))
+      .first();
+
+    if (!user) return null;
+
+    let sessions = await ctx.db
+      .query("sessions")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+
+    sessions = filterBySource(sessions, source);
+
+    const todayKey = localToday();
+    const countByDay = new Map<string, number>();
+    const tokensByDay = new Map<string, number>();
+    const hourCounts = Array.from({ length: 24 }, () => 0);
+    const projectCounts: Record<
+      string,
+      { promptCount: number; sessionCount: number }
+    > = {};
+    let totalPromptsSent = 0;
+    let promptsToday = 0;
+
+    for (const s of sessions) {
+      const ts = s.createdAt;
+      const day = new Date(ts).toISOString().slice(0, 10);
+      const hour = new Date(ts).getHours();
+
+      countByDay.set(day, (countByDay.get(day) ?? 0) + 1);
+      tokensByDay.set(day, (tokensByDay.get(day) ?? 0) + s.totalTokens);
+      hourCounts[hour] = (hourCounts[hour] ?? 0) + 1;
+
+      const prompts = s.messageCount ?? 0;
+      totalPromptsSent += prompts;
+      if (day === todayKey) promptsToday += prompts;
+
+      const project = s.projectName || s.projectPath || "unknown";
+      if (!projectCounts[project]) {
+        projectCounts[project] = { promptCount: 0, sessionCount: 0 };
+      }
+      projectCounts[project].promptCount += prompts;
+      projectCounts[project].sessionCount += 1;
+    }
+
+    // Streaks
+    const activeDaysAsc = [...countByDay.entries()]
+      .filter(([, count]) => count > 0)
+      .map(([day]) => day)
+      .sort();
+    const { current: currentStreakDays, longest: longestStreakDays } =
+      computeStreaks(activeDaysAsc, todayKey);
+
+    // Peak day by tokens
+    let peakDay: { day: string; tokens: number } | null = null;
+    for (const [day, tokens] of tokensByDay) {
+      if (peakDay === null || tokens > peakDay.tokens) {
+        peakDay = { day, tokens };
+      }
+    }
+
+    // Most active hour
+    let mostActiveHour: number | null = null;
+    let bestHourCount = 0;
+    for (let hour = 0; hour < 24; hour += 1) {
+      if (hourCounts[hour] > bestHourCount) {
+        bestHourCount = hourCounts[hour];
+        mostActiveHour = hour;
+      }
+    }
+    if (bestHourCount === 0) mostActiveHour = null;
+
+    // Most worked project (by prompt count)
+    let mostWorkedProject: {
+      project: string;
+      promptCount: number;
+      sessionCount: number;
+    } | null = null;
+    for (const [project, stats] of Object.entries(projectCounts)) {
+      if (project === "unknown") continue;
+      if (
+        mostWorkedProject === null ||
+        stats.promptCount > mostWorkedProject.promptCount
+      ) {
+        mostWorkedProject = { project, ...stats };
+      }
+    }
+
+    return {
+      heatmap: buildHeatmap(countByDay, todayKey),
+      currentStreakDays,
+      longestStreakDays,
+      peakDay,
+      mostActiveHour,
+      mostWorkedProject,
+      promptsToday,
+      totalPromptsSent,
+    };
+  },
+});
