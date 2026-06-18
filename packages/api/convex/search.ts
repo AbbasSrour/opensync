@@ -21,17 +21,10 @@ type SessionSearchResult = {
 };
 
 // Type definition for user
+// Only `_id` is consumed by callers; keep this narrow so the return validator
+// doesn't break when the users schema gains fields.
 type UserResult = {
   _id: Id<"users">;
-  _creationTime: number;
-  workosId: string;
-  email?: string;
-  name?: string;
-  avatarUrl?: string;
-  apiKey?: string;
-  apiKeyCreatedAt?: number;
-  createdAt: number;
-  updatedAt: number;
 } | null;
 
 // Full-text search on sessions (no OpenAI required)
@@ -516,26 +509,13 @@ export const hybridSearch = action({
 // Internal queries
 export const getUserByWorkosId = internalQuery({
   args: { workosId: v.string() },
-  returns: v.union(
-    v.null(),
-    v.object({
-      _id: v.id("users"),
-      _creationTime: v.number(),
-      workosId: v.string(),
-      email: v.optional(v.string()),
-      name: v.optional(v.string()),
-      avatarUrl: v.optional(v.string()),
-      apiKey: v.optional(v.string()),
-      apiKeyCreatedAt: v.optional(v.number()),
-      createdAt: v.number(),
-      updatedAt: v.number(),
-    }),
-  ),
+  returns: v.union(v.null(), v.object({ _id: v.id("users") })),
   handler: async (ctx, { workosId }) => {
-    return await ctx.db
+    const user = await ctx.db
       .query("users")
       .withIndex("by_workos_id", (q) => q.eq("workosId", workosId))
       .first();
+    return user ? { _id: user._id } : null;
   },
 });
 

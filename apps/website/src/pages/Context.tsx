@@ -40,7 +40,8 @@ import {
 } from "lucide-react";
 
 // Search mode: sessions or messages
-type SearchMode = "sessions" | "messages";
+// Result filter: show both entity types, or restrict to one.
+type SearchMode = "all" | "sessions" | "messages";
 
 // Search kind: full-text (keyword) or semantic (vector embeddings)
 type SearchKind = "fulltext" | "semantic";
@@ -90,7 +91,7 @@ export function ContextPage() {
   // Search state
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
-  const [searchMode, setSearchMode] = useState<SearchMode>("sessions");
+  const [searchMode, setSearchMode] = useState<SearchMode>("all");
   const [searchKind, setSearchKind] = useState<SearchKind>("fulltext");
   const [cursor, setCursor] = useState(0);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -134,16 +135,19 @@ export function ContextPage() {
   }, [handleKeyDown]);
 
   // Fetch full-text search results (reactive queries). Skipped in semantic mode.
+  const wantsSessions = searchMode === "sessions" || searchMode === "all";
+  const wantsMessages = searchMode === "messages" || searchMode === "all";
+
   const sessionResults = useQuery(
     api.search.searchSessionsPaginated,
-    searchKind === "fulltext" && searchMode === "sessions"
+    searchKind === "fulltext" && wantsSessions
       ? { query: debouncedQuery, limit: RESULTS_PER_PAGE, cursor }
       : "skip",
   );
 
   const messageResults = useQuery(
     api.search.searchMessagesPaginated,
-    searchKind === "fulltext" && searchMode === "messages" && debouncedQuery.trim()
+    searchKind === "fulltext" && wantsMessages && debouncedQuery.trim()
       ? { query: debouncedQuery, limit: RESULTS_PER_PAGE, cursor }
       : "skip",
   );
@@ -167,13 +171,22 @@ export function ContextPage() {
 
     const run = async () => {
       try {
-        if (searchMode === "sessions") {
-          const results = await semanticSearchSessions({ query, limit: SEMANTIC_LIMIT });
-          if (!cancelled) setSemanticSessions(results);
-        } else {
-          const results = await semanticSearchMessages({ query, limit: SEMANTIC_LIMIT });
-          if (!cancelled) setSemanticMessages(results);
+        const tasks: Promise<void>[] = [];
+        if (searchMode === "sessions" || searchMode === "all") {
+          tasks.push(
+            semanticSearchSessions({ query, limit: SEMANTIC_LIMIT }).then((results) => {
+              if (!cancelled) setSemanticSessions(results);
+            }),
+          );
         }
+        if (searchMode === "messages" || searchMode === "all") {
+          tasks.push(
+            semanticSearchMessages({ query, limit: SEMANTIC_LIMIT }).then((results) => {
+              if (!cancelled) setSemanticMessages(results);
+            }),
+          );
+        }
+        await Promise.all(tasks);
       } catch (e) {
         if (!cancelled) setSemanticError(String(e));
       } finally {
@@ -204,31 +217,44 @@ export function ContextPage() {
     }
   };
 
+  // Pagination applies only when a single entity type is selected (full-text).
+  // "all" shows top results of each type grouped, with no cross-type cursor.
+  const isSingleMode = searchMode === "sessions" || searchMode === "messages";
+
   const hasNextPage =
     !isSemantic &&
+    isSingleMode &&
     (searchMode === "sessions"
       ? sessionResults?.nextCursor != null
       : messageResults?.nextCursor != null);
 
-  const hasPrevPage = !isSemantic && cursor > 0;
+  const hasPrevPage = !isSemantic && isSingleMode && cursor > 0;
 
   // Active result lists, resolved by kind + mode.
   const sessionList = isSemantic ? semanticSessions : sessionResults?.sessions || [];
   const messageList = isSemantic ? semanticMessages : messageResults?.messages || [];
 
-  const currentResults = searchMode === "sessions" ? sessionList : messageList;
+  // Combined result count for empty-state / header logic.
+  const currentResults =
+    searchMode === "sessions"
+      ? sessionList
+      : searchMode === "messages"
+        ? messageList
+        : [...sessionList, ...messageList];
 
   const totalResults = isSemantic
     ? currentResults.length
     : searchMode === "sessions"
       ? sessionResults?.total || 0
-      : messageResults?.total || 0;
+      : searchMode === "messages"
+        ? messageResults?.total || 0
+        : (sessionResults?.total || 0) + (messageResults?.total || 0);
 
   const isLoading = isSemantic
     ? semanticLoading
-    : searchMode === "sessions"
-      ? sessionResults === undefined && debouncedQuery !== ""
-      : messageResults === undefined && debouncedQuery !== "";
+    : debouncedQuery !== "" &&
+      ((wantsSessions && sessionResults === undefined) ||
+        (wantsMessages && messageResults === undefined));
 
   // Fetch full session details for slide-over panel
   const selectedSession = useQuery(
@@ -424,46 +450,37 @@ export function ContextPage() {
             </div>
           </div>
 
-          {/* Search mode toggle */}
-          <div className="flex justify-center mb-6">
-            <div
-              className={cn("flex items-center gap-1 rounded-lg p-1 border", t.bgToggle, t.border)}
-            >
-              <button
-                onClick={() => {
-                  setSearchMode("sessions");
-                  setCursor(0);
-                }}
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2 text-sm rounded-md transition-colors",
-                  searchMode === "sessions"
-                    ? cn(t.bgToggleActive, t.textPrimary)
-                    : cn(t.textSubtle, "hover:opacity-80"),
-                )}
-              >
-                <Folder className="h-4 w-4" />
-                Sessions
-              </button>
-              <button
-                onClick={() => {
-                  setSearchMode("messages");
-                  setCursor(0);
-                }}
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2 text-sm rounded-md transition-colors",
-                  searchMode === "messages"
-                    ? cn(t.bgToggleActive, t.textPrimary)
-                    : cn(t.textSubtle, "hover:opacity-80"),
-                )}
-              >
-                <MessageSquare className="h-4 w-4" />
-                Messages
-              </button>
+          {/* Search controls: type filter chips (left) + kind toggle (right) */}
+          <div className="max-w-2xl mx-auto mb-6 flex flex-wrap items-center justify-between gap-3">
+            {/* Type filter chips: all / sessions / messages */}
+            <div className="flex items-center gap-2">
+              {(
+                [
+                  { value: "all", label: "All", icon: null },
+                  { value: "sessions", label: "Sessions", icon: Folder },
+                  { value: "messages", label: "Messages", icon: MessageSquare },
+                ] as const
+              ).map(({ value, label, icon: Icon }) => (
+                <button
+                  key={value}
+                  onClick={() => {
+                    setSearchMode(value);
+                    setCursor(0);
+                  }}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-full border transition-colors",
+                    searchMode === value
+                      ? cn(t.bgToggleActive, t.textPrimary, t.border)
+                      : cn(t.bgToggle, t.textSubtle, t.border, "hover:opacity-80"),
+                  )}
+                >
+                  {Icon && <Icon className="h-3.5 w-3.5" />}
+                  {label}
+                </button>
+              ))}
             </div>
-          </div>
 
-          {/* Search kind toggle: full-text vs semantic */}
-          <div className="flex justify-center mb-6">
+            {/* Kind toggle: full-text vs semantic */}
             <div
               className={cn("flex items-center gap-1 rounded-lg p-1 border", t.bgToggle, t.border)}
             >
@@ -473,7 +490,7 @@ export function ContextPage() {
                   setCursor(0);
                 }}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 text-sm rounded-md transition-colors",
+                  "flex items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-colors",
                   searchKind === "fulltext"
                     ? cn(t.bgToggleActive, t.textPrimary)
                     : cn(t.textSubtle, "hover:opacity-80"),
@@ -488,7 +505,7 @@ export function ContextPage() {
                   setCursor(0);
                 }}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 text-sm rounded-md transition-colors",
+                  "flex items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-colors",
                   searchKind === "semantic"
                     ? cn(t.bgToggleActive, t.textPrimary)
                     : cn(t.textSubtle, "hover:opacity-80"),
@@ -501,19 +518,18 @@ export function ContextPage() {
           </div>
 
           {/* Results info */}
-          {(debouncedQuery || (searchMode === "sessions" && !isSemantic)) &&
-            currentResults.length > 0 && (
-              <div className={cn("flex items-center justify-between mb-4 text-sm", t.textMuted)}>
-                <span>
-                  {isSemantic
-                    ? `${currentResults.length} results, ranked by relevance`
-                    : `Showing ${cursor + 1} - ${cursor + currentResults.length} of ${totalResults} results`}
-                </span>
-                <span className={cn("text-xs", t.textDim)}>
-                  {isSemantic ? "Semantic search (vector embeddings)" : "Full-text search"}
-                </span>
-              </div>
-            )}
+          {(debouncedQuery || (wantsSessions && !isSemantic)) && currentResults.length > 0 && (
+            <div className={cn("flex items-center justify-between mb-4 text-sm", t.textMuted)}>
+              <span>
+                {isSemantic || !isSingleMode
+                  ? `${currentResults.length} results, ranked by relevance`
+                  : `Showing ${cursor + 1} - ${cursor + currentResults.length} of ${totalResults} results`}
+              </span>
+              <span className={cn("text-xs", t.textDim)}>
+                {isSemantic ? "Semantic search (vector embeddings)" : "Full-text search"}
+              </span>
+            </div>
+          )}
 
           {/* Loading state */}
           {isLoading && (
@@ -525,18 +541,46 @@ export function ContextPage() {
           {/* Results */}
           {!isLoading && (
             <div className="space-y-3">
-              {searchMode === "sessions"
-                ? // Session results
-                  sessionList.map((session) => (
+              {/* Sessions group (shown for "sessions" and "all") */}
+              {wantsSessions && sessionList.length > 0 && (
+                <>
+                  {searchMode === "all" && (
+                    <div
+                      className={cn(
+                        "flex items-center gap-2 text-xs font-medium uppercase tracking-wide pt-1",
+                        t.textDim,
+                      )}
+                    >
+                      <Folder className="h-3.5 w-3.5" />
+                      Sessions
+                    </div>
+                  )}
+                  {sessionList.map((session) => (
                     <SessionResultCard
                       key={session._id}
                       session={session}
                       theme={theme}
                       onClick={() => handleOpenSession(session._id)}
                     />
-                  ))
-                : // Message results
-                  messageList.map((message) => (
+                  ))}
+                </>
+              )}
+
+              {/* Messages group (shown for "messages" and "all") */}
+              {wantsMessages && messageList.length > 0 && (
+                <>
+                  {searchMode === "all" && (
+                    <div
+                      className={cn(
+                        "flex items-center gap-2 text-xs font-medium uppercase tracking-wide pt-3",
+                        t.textDim,
+                      )}
+                    >
+                      <MessageSquare className="h-3.5 w-3.5" />
+                      Messages
+                    </div>
+                  )}
+                  {messageList.map((message) => (
                     <MessageResultCard
                       key={message._id}
                       message={message}
@@ -545,6 +589,8 @@ export function ContextPage() {
                       onClick={() => handleOpenSession(message.sessionId, message._id)}
                     />
                   ))}
+                </>
+              )}
 
               {/* Empty state */}
               {currentResults.length === 0 && !isLoading && (
@@ -557,7 +603,9 @@ export function ContextPage() {
                       </h3>
                       <p className={cn("text-sm max-w-md mx-auto", t.textMuted)}>
                         {isSemantic
-                          ? `Type something to semantically search your ${searchMode}`
+                          ? `Type something to semantically search your ${
+                              searchMode === "all" ? "sessions and messages" : searchMode
+                            }`
                           : "Type something to search through your messages"}
                       </p>
                     </>
