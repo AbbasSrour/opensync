@@ -27,6 +27,7 @@ export type MessageUpsertPayload = {
   provider?: string;
   promptTokens?: number;
   completionTokens?: number;
+  cachedTokens?: number;
   durationMs?: number;
   cost?: number;
   sourceCreatedAt?: number;

@@ -60,7 +60,7 @@ import {
 } from "lucide-react";
 
 // View modes
-type ViewMode = "overview" | "sessions" | "evals" | "analytics" | "wrapped";
+type ViewMode = "overview" | "sessions" | "requests" | "evals" | "analytics" | "wrapped";
 type SortField = "updatedAt" | "createdAt" | "totalTokens" | "cost" | "durationMs";
 type SortOrder = "asc" | "desc";
 // Source filter type for filtering by plugin source
@@ -274,20 +274,22 @@ export function DashboardPage() {
             t.border,
           )}
         >
-          {(["overview", "sessions", "analytics", "evals", "wrapped"] as const).map((mode) => (
-            <button
-              key={mode}
-              onClick={() => setViewMode(mode)}
-              className={cn(
-                "px-2 sm:px-3 py-1 text-[11px] sm:text-xs rounded transition-colors capitalize whitespace-nowrap shrink-0",
-                viewMode === mode
-                  ? cn(t.bgToggleActive, t.textPrimary)
-                  : cn(t.textSubtle, "hover:opacity-80"),
-              )}
-            >
-              {mode}
-            </button>
-          ))}
+          {(["overview", "sessions", "requests", "analytics", "evals", "wrapped"] as const).map(
+            (mode) => (
+              <button
+                key={mode}
+                onClick={() => setViewMode(mode)}
+                className={cn(
+                  "px-2 sm:px-3 py-1 text-[11px] sm:text-xs rounded transition-colors capitalize whitespace-nowrap shrink-0",
+                  viewMode === mode
+                    ? cn(t.bgToggleActive, t.textPrimary)
+                    : cn(t.textSubtle, "hover:opacity-80"),
+                )}
+              >
+                {mode}
+              </button>
+            ),
+          )}
         </div>
 
         {/* Spacer */}
@@ -473,6 +475,8 @@ export function DashboardPage() {
             theme={theme}
           />
         )}
+
+        {viewMode === "requests" && <RequestsView source={sourceArg} theme={theme} />}
 
         {viewMode === "analytics" && (
           <AnalyticsView
@@ -2077,6 +2081,327 @@ function TimelineView({
           </button>
         )}
       </div>
+    </div>
+  );
+}
+
+// Requests view - per-request (per-message) activity log
+type RequestSortField = "createdAt" | "promptTokens" | "completionTokens" | "cachedTokens" | "cost";
+const REQUESTS_INITIAL_LOAD = 50;
+const REQUESTS_LOAD_MORE = 50;
+
+// Format a timestamp as UTC for the Requests table
+function formatUtc(ts: number): string {
+  return new Date(ts).toISOString().slice(0, 19).replace("T", " ");
+}
+
+// Requests View - flat list of individual model requests across all sessions
+function RequestsView({ source, theme }: { source?: string; theme: "dark" | "tan" }) {
+  const t = getThemeClasses(theme);
+  const isDark = theme === "dark";
+
+  const [sortField, setSortField] = useState<RequestSortField>("createdAt");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
+  const [filterModel, setFilterModel] = useState<string | undefined>();
+  const [filterProvider, setFilterProvider] = useState<string | undefined>();
+  const [showFilters, setShowFilters] = useState(false);
+  const [displayCount, setDisplayCount] = useState(REQUESTS_INITIAL_LOAD);
+
+  const data = useQuery(api.analytics.requestsList, {
+    limit: 500,
+    sortBy: sortField,
+    sortOrder,
+    filterModel,
+    filterProvider,
+    source,
+  });
+
+  const requests = data?.requests || [];
+  const total = data?.total || 0;
+  const isLoading = data === undefined;
+
+  // Reset pagination when filters/sort change
+  useEffect(() => {
+    setDisplayCount(REQUESTS_INITIAL_LOAD);
+  }, [filterModel, filterProvider, sortField, sortOrder, source]);
+
+  // Build filter options from loaded rows
+  const filterOptions = useMemo(() => {
+    const models = new Set<string>();
+    const providers = new Set<string>();
+    requests.forEach((r) => {
+      if (r.model) models.add(r.model);
+      if (r.provider) providers.add(r.provider);
+    });
+    return {
+      models: Array.from(models).sort(),
+      providers: Array.from(providers).sort(),
+    };
+  }, [requests]);
+
+  const displayed = requests.slice(0, displayCount);
+  const hasMore = requests.length > displayCount;
+  const hasActiveFilters = !!(filterModel || filterProvider);
+
+  const handleSortChange = (field: RequestSortField) => {
+    if (field === sortField) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortOrder("desc");
+    }
+  };
+
+  return (
+    <div className="h-full flex flex-col">
+      {/* Filters bar */}
+      <div
+        className={cn(
+          "shrink-0 px-3 sm:px-4 py-2 sm:py-3 border-b flex items-center gap-2 sm:gap-3 flex-wrap",
+          t.border,
+        )}
+      >
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className={cn(
+            "flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors shrink-0",
+            showFilters || hasActiveFilters
+              ? cn(t.bgToggleActive, t.textSecondary)
+              : cn(t.textSubtle, t.bgHover),
+          )}
+        >
+          <Filter className="h-3 w-3" />
+          <span className="hidden sm:inline">Filters</span>
+          {hasActiveFilters && (
+            <span
+              className={cn(
+                "w-1.5 h-1.5 rounded-full",
+                theme === "dark" ? "bg-blue-500" : "bg-[#EB5601]",
+              )}
+            />
+          )}
+        </button>
+
+        {hasActiveFilters && (
+          <div className="flex items-center gap-2 flex-wrap">
+            {filterModel && (
+              <FilterPill
+                label="Model"
+                value={filterModel}
+                active
+                onClear={() => setFilterModel(undefined)}
+              />
+            )}
+            {filterProvider && (
+              <FilterPill
+                label="Provider"
+                value={filterProvider}
+                active
+                onClear={() => setFilterProvider(undefined)}
+              />
+            )}
+            <button
+              onClick={() => {
+                setFilterModel(undefined);
+                setFilterProvider(undefined);
+              }}
+              className={cn("text-xs", t.textSubtle)}
+            >
+              Clear
+            </button>
+          </div>
+        )}
+
+        <div className="flex-1 min-w-0" />
+
+        <span className={cn("text-xs shrink-0", t.textDim)}>
+          {displayed.length}
+          <span className="hidden sm:inline"> of {total}</span>
+        </span>
+      </div>
+
+      {/* Filter dropdowns */}
+      {showFilters && (
+        <div
+          className={cn(
+            "shrink-0 px-4 py-3 border-b flex items-center gap-4",
+            t.border,
+            t.bgSecondary,
+          )}
+        >
+          <FilterDropdown
+            label="Model"
+            options={filterOptions.models}
+            value={filterModel}
+            onChange={setFilterModel}
+            theme={theme}
+          />
+          <FilterDropdown
+            label="Provider"
+            options={filterOptions.providers}
+            value={filterProvider}
+            onChange={setFilterProvider}
+            theme={theme}
+          />
+        </div>
+      )}
+
+      {/* Column header */}
+      <div
+        className={cn(
+          "shrink-0 hidden sm:grid grid-cols-12 gap-2 px-4 py-2 border-b text-[10px] uppercase tracking-wider",
+          t.borderLight,
+          t.textDim,
+        )}
+      >
+        <div className="col-span-3">Time (UTC)</div>
+        <div className="col-span-3">Model</div>
+        <RequestSortHeader
+          label="Input"
+          field="promptTokens"
+          current={sortField}
+          order={sortOrder}
+          onChange={handleSortChange}
+          className="col-span-1"
+          alignRight
+          theme={theme}
+        />
+        <RequestSortHeader
+          label="Output"
+          field="completionTokens"
+          current={sortField}
+          order={sortOrder}
+          onChange={handleSortChange}
+          className="col-span-1"
+          alignRight
+          theme={theme}
+        />
+        <RequestSortHeader
+          label="Cached"
+          field="cachedTokens"
+          current={sortField}
+          order={sortOrder}
+          onChange={handleSortChange}
+          className="col-span-2"
+          alignRight
+          theme={theme}
+        />
+        <RequestSortHeader
+          label="Cost"
+          field="cost"
+          current={sortField}
+          order={sortOrder}
+          onChange={handleSortChange}
+          className="col-span-2"
+          alignRight
+          theme={theme}
+        />
+      </div>
+
+      {/* Rows */}
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        {isLoading && (
+          <div className={cn("px-4 py-12 text-center text-sm", t.textDim)}>Loading requests...</div>
+        )}
+        {!isLoading &&
+          displayed.map((r) => (
+            <div
+              key={r._id}
+              className={cn(
+                "grid grid-cols-2 sm:grid-cols-12 gap-2 px-4 py-2.5 border-b items-center text-xs",
+                t.borderLight,
+              )}
+            >
+              {/* Time */}
+              <div className={cn("col-span-2 sm:col-span-3 font-mono text-[11px]", t.textMuted)}>
+                {formatUtc(r.createdAt)}
+              </div>
+              {/* Model + provider */}
+              <div className="col-span-2 sm:col-span-3 flex items-center gap-2 min-w-0">
+                <span className={cn("truncate", t.textSecondary)}>{r.model || "unknown"}</span>
+                <span
+                  className={cn(
+                    "shrink-0 px-1.5 py-0.5 rounded text-[9px] font-medium",
+                    isDark ? "bg-zinc-800 text-zinc-400" : "bg-[#ebe9e6] text-[#6b6b6b]",
+                  )}
+                >
+                  {r.provider}
+                </span>
+              </div>
+              {/* Input */}
+              <div className={cn("col-span-1 text-right tabular-nums", t.textMuted)}>
+                {formatNumber(r.promptTokens)}
+              </div>
+              {/* Output */}
+              <div className={cn("col-span-1 text-right tabular-nums", t.textMuted)}>
+                {formatNumber(r.completionTokens)}
+              </div>
+              {/* Cached */}
+              <div className={cn("col-span-2 text-right tabular-nums", t.textDim)}>
+                {r.cachedTokens ? formatNumber(r.cachedTokens) : "—"}
+              </div>
+              {/* Cost */}
+              <div className={cn("col-span-2 text-right tabular-nums", t.textSecondary)}>
+                {r.cost ? `$${r.cost.toFixed(4)}` : "—"}
+              </div>
+            </div>
+          ))}
+
+        {!isLoading && displayed.length === 0 && (
+          <div className={cn("px-4 py-12 text-center text-sm", t.textDim)}>No requests found</div>
+        )}
+
+        {hasMore && (
+          <div className={cn("px-4 py-3 border-t", t.border)}>
+            <button
+              onClick={() => setDisplayCount((prev) => prev + REQUESTS_LOAD_MORE)}
+              className={cn(
+                "w-full py-2 text-xs font-medium rounded transition-colors",
+                isDark
+                  ? "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                  : "bg-[#ebe9e6] text-[#1a1a1a] hover:bg-[#e0deda]",
+              )}
+            >
+              Load more ({requests.length - displayCount} remaining)
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Sort header for the Requests table (uses RequestSortField)
+function RequestSortHeader({
+  label,
+  field,
+  current,
+  order,
+  onChange,
+  className,
+  alignRight,
+  theme,
+}: {
+  label: string;
+  field: RequestSortField;
+  current: RequestSortField;
+  order: SortOrder;
+  onChange: (field: RequestSortField) => void;
+  className?: string;
+  alignRight?: boolean;
+  theme: "dark" | "tan";
+}) {
+  const t = getThemeClasses(theme);
+  const isActive = current === field;
+  return (
+    <div className={cn(className, alignRight && "flex justify-end")}>
+      <button
+        onClick={() => onChange(field)}
+        className={cn("flex items-center gap-1 font-normal transition-colors", t.textMuted)}
+      >
+        {label}
+        {isActive && <ChevronDown className={cn("h-3 w-3", order === "asc" && "rotate-180")} />}
+      </button>
     </div>
   );
 }

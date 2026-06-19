@@ -20,8 +20,11 @@ export const upsert = internalMutation({
     ),
     textContent: v.optional(v.string()),
     model: v.optional(v.string()),
+    provider: v.optional(v.string()),
     promptTokens: v.optional(v.number()),
     completionTokens: v.optional(v.number()),
+    cachedTokens: v.optional(v.number()),
+    cost: v.optional(v.number()),
     durationMs: v.optional(v.number()),
     // Source identifier passed from plugin ("opencode" or "claude-code")
     source: v.optional(v.string()),
@@ -103,10 +106,14 @@ export const upsert = internalMutation({
     if (existing) {
       // Update existing message - patch directly without re-reading
       await ctx.db.patch(existing._id, {
+        userId: existing.userId ?? args.userId,
         textContent: args.textContent ?? existing.textContent,
         model: args.model ?? existing.model,
+        provider: args.provider ?? existing.provider,
         promptTokens: args.promptTokens ?? existing.promptTokens,
         completionTokens: args.completionTokens ?? existing.completionTokens,
+        cachedTokens: args.cachedTokens ?? existing.cachedTokens,
+        cost: args.cost ?? existing.cost,
         durationMs: args.durationMs ?? existing.durationMs,
       });
       messageId = existing._id;
@@ -125,12 +132,16 @@ export const upsert = internalMutation({
       const messageCreatedAt = args.createdAt ?? now;
       messageId = await ctx.db.insert("messages", {
         sessionId,
+        userId: args.userId,
         externalId: args.externalId,
         role: args.role,
         textContent: args.textContent,
         model: args.model,
+        provider: args.provider,
         promptTokens: args.promptTokens,
         completionTokens: args.completionTokens,
+        cachedTokens: args.cachedTokens,
+        cost: args.cost,
         durationMs: args.durationMs,
         createdAt: messageCreatedAt,
       });
@@ -205,12 +216,15 @@ const messageInputValidator = v.object({
     v.literal("unknown"),
   ),
   textContent: v.optional(v.string()),
-  model: v.optional(v.string()),
-  promptTokens: v.optional(v.number()),
-  completionTokens: v.optional(v.number()),
-  durationMs: v.optional(v.number()),
-  source: v.optional(v.string()),
-  parts: v.optional(
+    model: v.optional(v.string()),
+    provider: v.optional(v.string()),
+    promptTokens: v.optional(v.number()),
+    completionTokens: v.optional(v.number()),
+    cachedTokens: v.optional(v.number()),
+    cost: v.optional(v.number()),
+    durationMs: v.optional(v.number()),
+    source: v.optional(v.string()),
+    parts: v.optional(
     v.array(
       v.object({
         type: v.string(),
@@ -317,10 +331,14 @@ export const batchUpsert = internalMutation({
             if (existing) {
               // Update existing
               await ctx.db.patch(existing._id, {
+                userId: existing.userId ?? args.userId,
                 textContent: msg.textContent ?? existing.textContent,
                 model: msg.model ?? existing.model,
+                provider: msg.provider ?? existing.provider,
                 promptTokens: msg.promptTokens ?? existing.promptTokens,
                 completionTokens: msg.completionTokens ?? existing.completionTokens,
+                cachedTokens: msg.cachedTokens ?? existing.cachedTokens,
+                cost: msg.cost ?? existing.cost,
                 durationMs: msg.durationMs ?? existing.durationMs,
               });
               messageId = existing._id;
@@ -340,12 +358,16 @@ export const batchUpsert = internalMutation({
             // Insert new message
             messageId = await ctx.db.insert("messages", {
               sessionId,
+              userId: args.userId,
               externalId: msg.externalId,
               role: msg.role,
               textContent: msg.textContent,
               model: msg.model,
+              provider: msg.provider,
               promptTokens: msg.promptTokens,
               completionTokens: msg.completionTokens,
+              cachedTokens: msg.cachedTokens,
+              cost: msg.cost,
               durationMs: msg.durationMs,
               createdAt: now,
             });

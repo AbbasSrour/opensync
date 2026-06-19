@@ -25,6 +25,7 @@ export type AdapterMessage<TSource extends string = string> = {
   provider?: string;
   promptTokens?: number;
   completionTokens?: number;
+  cachedTokens?: number;
   durationMs?: number;
   cost?: number;
   sourceCreatedAt?: number;

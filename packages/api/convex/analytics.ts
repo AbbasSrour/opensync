@@ -467,6 +467,120 @@ export const sessionsWithDetails = query({
   },
 });
 
+// Per-request (per-message) activity list for the Requests view.
+// One row per model request: Time, Model, Provider, Input, Output, Cached, Cost.
+export const requestsList = query({
+  args: {
+    limit: v.optional(v.number()),
+    sortBy: v.optional(
+      v.union(
+        v.literal("createdAt"),
+        v.literal("cost"),
+        v.literal("promptTokens"),
+        v.literal("completionTokens"),
+        v.literal("cachedTokens"),
+      ),
+    ),
+    sortOrder: v.optional(v.union(v.literal("asc"), v.literal("desc"))),
+    filterModel: v.optional(v.string()),
+    filterProvider: v.optional(v.string()),
+    source: v.optional(v.string()), // "opencode" | "claude-code" | undefined (all)
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return { requests: [], total: 0 };
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_workos_id", (q) => q.eq("workosId", identity.subject))
+      .first();
+
+    if (!user) return { requests: [], total: 0 };
+
+    // Read user's sessions to map sessionId -> session for source filtering and
+    // provider/project context (matches sessionsWithDetails read pattern).
+    const sessions = await ctx.db
+      .query("sessions")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+    const sessionMap = new Map(sessions.map((s) => [s._id, s]));
+
+    // Primary path: per-user message index (most recent first, bounded read).
+    const REQUEST_READ_CAP = 500;
+    let messages = await ctx.db
+      .query("messages")
+      .withIndex("by_user_created", (q) => q.eq("userId", user._id))
+      .order("desc")
+      .take(REQUEST_READ_CAP);
+
+    // Fallback for messages synced before userId existed: gather from sessions.
+    if (messages.length === 0 && sessions.length > 0) {
+      const collected: typeof messages = [];
+      for (const session of sessions) {
+        const sessionMessages = await ctx.db
+          .query("messages")
+          .withIndex("by_session_created", (q) => q.eq("sessionId", session._id))
+          .order("desc")
+          .take(REQUEST_READ_CAP);
+        collected.push(...sessionMessages);
+        if (collected.length >= REQUEST_READ_CAP) break;
+      }
+      messages = collected;
+    }
+
+    // Build rows, enriching provider from message -> session -> model inference.
+    let rows = messages.map((m) => {
+      const session = sessionMap.get(m.sessionId);
+      const provider = inferProvider({
+        model: m.model,
+        provider: m.provider ?? session?.provider,
+      });
+      return {
+        _id: m._id,
+        sessionId: m.sessionId,
+        source: session?.source || "opencode",
+        createdAt: m.createdAt,
+        model: m.model,
+        provider,
+        promptTokens: m.promptTokens ?? 0,
+        completionTokens: m.completionTokens ?? 0,
+        cachedTokens: m.cachedTokens ?? 0,
+        cost: m.cost ?? 0,
+      };
+    });
+
+    // Filter by source (session-level)
+    if (args.source) {
+      rows = rows.filter((r) => r.source === args.source);
+    }
+    if (args.filterModel) {
+      rows = rows.filter((r) => r.model === args.filterModel);
+    }
+    if (args.filterProvider) {
+      rows = rows.filter((r) => r.provider === args.filterProvider);
+    }
+
+    const total = rows.length;
+
+    // Sort
+    const sortBy = args.sortBy || "createdAt";
+    const sortOrder = args.sortOrder || "desc";
+    rows.sort((a, b) => {
+      const aVal = a[sortBy] ?? 0;
+      const bVal = b[sortBy] ?? 0;
+      return sortOrder === "desc"
+        ? (bVal as number) - (aVal as number)
+        : (aVal as number) - (bVal as number);
+    });
+
+    // Limit
+    const limit = args.limit || 100;
+    rows = rows.slice(0, limit);
+
+    return { requests: rows, total };
+  },
+});
+
 // Source distribution stats (OpenCode vs Claude Code)
 export const sourceStats = query({
   args: {},

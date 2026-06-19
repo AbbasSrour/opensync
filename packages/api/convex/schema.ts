@@ -117,6 +117,9 @@ export default defineSchema({
   // Messages within sessions
   messages: defineTable({
     sessionId: v.id("sessions"),
+    // User who owns this message (for per-user request listing). Optional for
+    // backward compatibility with messages synced before this field existed.
+    userId: v.optional(v.id("users")),
     externalId: v.string(),
     role: v.union(
       v.literal("user"),
@@ -127,10 +130,15 @@ export default defineSchema({
     ),
     textContent: v.optional(v.string()),
     model: v.optional(v.string()),
+    provider: v.optional(v.string()),
 
     // Token usage per message
     promptTokens: v.optional(v.number()),
     completionTokens: v.optional(v.number()),
+    cachedTokens: v.optional(v.number()),
+
+    // Cost per request in USD
+    cost: v.optional(v.number()),
 
     // Timing
     durationMs: v.optional(v.number()),
@@ -140,6 +148,7 @@ export default defineSchema({
     .index("by_session", ["sessionId"])
     .index("by_session_created", ["sessionId", "createdAt"])
     .index("by_external_id", ["externalId"])
+    .index("by_user_created", ["userId", "createdAt"])
     .searchIndex("search_messages", {
       searchField: "textContent",
       filterFields: ["sessionId"],

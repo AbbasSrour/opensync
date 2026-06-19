@@ -35,6 +35,7 @@ export function messageRowToRecord(
   const time = recordField(data, "time");
   const model = recordField(data, "model");
   const tokens = recordField(data, "tokens");
+  const cache = recordField(tokens, "cache");
   const created = numberField(time.created) ?? row.time_created;
   const completed = numberField(time.completed);
   const textContent = textContentFromParts(parts);
@@ -50,6 +51,7 @@ export function messageRowToRecord(
     provider: stringField(data, "providerID") ?? stringField(model, "providerID"),
     promptTokens: numberField(tokens.input),
     completionTokens: numberField(tokens.output),
+    cachedTokens: numberField(cache.read),
     durationMs: completed === undefined ? undefined : completed - created,
     cost: numberField(data.cost),
     sourceCreatedAt: created,

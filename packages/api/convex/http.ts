@@ -159,8 +159,11 @@ http.route({
         role: body.role,
         textContent: body.textContent,
         model: body.model,
+        provider: body.provider,
         promptTokens: body.promptTokens,
         completionTokens: body.completionTokens,
+        cachedTokens: body.cachedTokens,
+        cost: body.cost,
         durationMs: body.durationMs,
         source: body.source, // Pass source for auto-created sessions ("opencode" or "claude-code")
         parts: body.parts,
