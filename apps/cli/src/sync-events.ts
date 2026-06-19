@@ -35,6 +35,73 @@ export async function uploadEvents(
   return summary;
 }
 
+export type SessionUnit = {
+  externalId: string;
+  events: SyncEvent[];
+};
+
+export type SyncAllResult = {
+  sessions: number;
+  messages: number;
+  failed: number;
+  syncedSessionIds: string[];
+};
+
+export type UploadSessionUnitsOptions = {
+  concurrency?: number;
+  retry?: RetryOptions;
+  onProgress?: (done: number, total: number) => void;
+};
+
+// Uploads each session together with its own messages as one unit, running
+// several units concurrently. A session is only reported as synced when its
+// session record and every one of its messages upload successfully, so one
+// failed message never marks the whole session as done.
+export async function uploadSessionUnits(
+  config: Required<OpenSyncConfig>,
+  units: SessionUnit[],
+  options: UploadSessionUnitsOptions = {},
+): Promise<SyncAllResult> {
+  const concurrency = Math.max(1, options.concurrency ?? 8);
+  const retry = options.retry ?? {};
+  const result: SyncAllResult = { sessions: 0, messages: 0, failed: 0, syncedSessionIds: [] };
+
+  let next = 0;
+  let done = 0;
+
+  async function worker(): Promise<void> {
+    while (true) {
+      const index = next++;
+      if (index >= units.length) return;
+      const unit = units[index];
+
+      let unitOk = true;
+      let uploadedMessages = 0;
+      for (const event of unit.events) {
+        const ok = await uploadWithRetry(config, event, retry);
+        if (!ok) {
+          unitOk = false;
+          result.failed++;
+          continue;
+        }
+        if (event.kind === "message.upsert") uploadedMessages++;
+      }
+
+      result.messages += uploadedMessages;
+      if (unitOk) {
+        result.sessions++;
+        result.syncedSessionIds.push(unit.externalId);
+      }
+
+      done++;
+      options.onProgress?.(done, units.length);
+    }
+  }
+
+  await Promise.all(Array.from({ length: Math.min(concurrency, units.length) }, () => worker()));
+  return result;
+}
+
 async function uploadWithRetry(
   config: Required<OpenSyncConfig>,
   event: SyncEvent,

@@ -308,11 +308,15 @@ export const upsert = internalMutation({
     completionTokens: v.optional(v.number()),
     cost: v.optional(v.number()),
     durationMs: v.optional(v.number()),
-    createdAt: v.optional(v.number()), // Original timestamp from source
+    createdAt: v.optional(v.number()), // Original creation timestamp from source
+    sourceUpdatedAt: v.optional(v.number()), // Original last-activity timestamp from source
   },
   returns: v.id("sessions"),
   handler: async (ctx, args) => {
     const now = Date.now();
+    // Recency must reflect when the session was last active in the source, not
+    // when it was synced — otherwise backfilled old sessions sort as "recent".
+    const sessionUpdatedAt = args.sourceUpdatedAt ?? args.createdAt ?? now;
 
     // Find existing session using index
     const existing = await ctx.db
@@ -343,7 +347,7 @@ export const upsert = internalMutation({
       }
 
       // Build update object only with changed fields
-      const updates: Record<string, unknown> = { updatedAt: now };
+      const updates: Record<string, unknown> = { updatedAt: sessionUpdatedAt };
 
       if (args.title !== undefined && args.title !== existing.title) {
         updates.title = args.title;
@@ -406,7 +410,7 @@ export const upsert = internalMutation({
       searchableText: args.title,
       messageCount: 0,
       createdAt: sessionCreatedAt,
-      updatedAt: now,
+      updatedAt: sessionUpdatedAt,
     });
   },
 });

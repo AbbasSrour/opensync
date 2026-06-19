@@ -126,7 +126,8 @@ http.route({
         completionTokens: body.completionTokens,
         cost: body.cost,
         durationMs: body.durationMs,
-        createdAt: body.createdAt, // Original timestamp from source
+        createdAt: body.createdAt, // Original creation timestamp from source
+        sourceUpdatedAt: body.sourceUpdatedAt, // Original last-activity timestamp from source
       });
 
       // Schedule embedding generation

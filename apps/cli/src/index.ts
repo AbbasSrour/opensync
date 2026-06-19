@@ -42,7 +42,7 @@ Commands:
   opensync verify
   opensync sync [connectivity test]
   opensync sync --source opencode --new [--dry-run] [adapter params...]
-  opensync sync --source opencode --all [--dry-run] [--force] [adapter params...]
+  opensync sync --source opencode --all [--dry-run] [--force] [--concurrency n] [adapter params...]
   opensync queue inspect [--source opencode]
   opensync queue drain [--source opencode] [--all] [--dry-run] [adapter params...]
   opensync queue flush [--source opencode]

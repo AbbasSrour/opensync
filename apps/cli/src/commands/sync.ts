@@ -6,7 +6,7 @@ import {
 import { adapterForSource } from "../adapters.js";
 import { adapterParams, hasFlag, optionValue } from "../args.js";
 import { readConfig } from "../config.js";
-import { requireConfig, uploadEvents } from "../sync-events.js";
+import { requireConfig, uploadSessionUnits, type SessionUnit } from "../sync-events.js";
 import { addSyncedSessions, clearSyncedSessions, getSyncedSessions } from "../tracking.js";
 import { health, listBackendSessionIds, syncSession } from "../transport.js";
 
@@ -26,7 +26,15 @@ export async function syncCommand(args: string[]): Promise<void> {
     return;
   }
 
-  const params = adapterParams(args, ["--source", "--all", "--new", "--dry-run", "--force"]);
+  const concurrency = parseConcurrency(optionValue(args, "--concurrency"));
+  const params = adapterParams(args, [
+    "--source",
+    "--all",
+    "--new",
+    "--dry-run",
+    "--force",
+    "--concurrency",
+  ]);
   const sessions = adapter.listSessions({ params });
   const config = requireConfig(readConfig());
   if (force && !dryRun) clearSyncedSessions();
@@ -57,17 +65,48 @@ export async function syncCommand(args: string[]): Promise<void> {
     return;
   }
 
-  const result = await uploadEvents(config, [
-    ...sessionsToSync.map(sessionRecordToEvent),
-    ...messages.map(messageRecordToEvent),
-  ]);
-  if (result.failed === 0) addSyncedSessions(sessionsToSync.map((session) => session.externalId));
+  const messagesBySession = new Map<string, typeof messages>();
+  for (const message of messages) {
+    const existing = messagesBySession.get(message.sessionExternalId) ?? [];
+    existing.push(message);
+    messagesBySession.set(message.sessionExternalId, existing);
+  }
+  const units: SessionUnit[] = sessionsToSync.map((session) => ({
+    externalId: session.externalId,
+    events: [
+      sessionRecordToEvent(session),
+      ...(messagesBySession.get(session.externalId) ?? []).map(messageRecordToEvent),
+    ],
+  }));
+
+  const result = await uploadSessionUnits(config, units, {
+    concurrency,
+    onProgress: (done, total) => {
+      process.stdout.write(`\rUploading sessions: ${done}/${total}`);
+      if (done === total) process.stdout.write("\n");
+    },
+  });
+  // Track only sessions that fully uploaded (session record + all its messages),
+  // so a single failed message never marks the whole session as synced.
+  if (result.syncedSessionIds.length > 0) addSyncedSessions(result.syncedSessionIds);
   console.log(`Uploaded sessions: ${result.sessions}`);
   console.log(`Uploaded messages: ${result.messages}`);
   if (result.failed > 0) {
     console.log(`Failed uploads: ${result.failed}`);
     process.exitCode = 1;
   }
+}
+
+const DEFAULT_CONCURRENCY = 8;
+
+function parseConcurrency(value: string | undefined): number {
+  if (value === undefined) return DEFAULT_CONCURRENCY;
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed < 1) {
+    console.error(`Invalid --concurrency "${value}"; using ${DEFAULT_CONCURRENCY}.`);
+    return DEFAULT_CONCURRENCY;
+  }
+  return parsed;
 }
 
 async function connectivityTest(): Promise<void> {

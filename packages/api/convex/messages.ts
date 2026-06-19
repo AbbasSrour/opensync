@@ -189,9 +189,12 @@ export const upsert = internalMutation({
       }
     }
 
-    // Single combined patch for session updates (avoids multiple writes)
+    // Single combined patch for session updates (avoids multiple writes).
+    // Deliberately does NOT touch updatedAt: session recency is owned by
+    // session-level sync and derived from the source timestamp, so message
+    // syncs must not bump it to the sync time.
     if (shouldUpdateSessionStats || newSearchableText) {
-      const sessionUpdate: Record<string, unknown> = { updatedAt: now };
+      const sessionUpdate: Record<string, unknown> = {};
 
       if (shouldUpdateSessionStats) {
         // Only update messageCount. Session tokens are set exclusively by
@@ -231,6 +234,7 @@ const messageInputValidator = v.object({
     cost: v.optional(v.number()),
     durationMs: v.optional(v.number()),
     source: v.optional(v.string()),
+    createdAt: v.optional(v.number()), // Original timestamp from source
     parts: v.optional(
     v.array(
       v.object({
@@ -379,7 +383,7 @@ export const batchUpsert = internalMutation({
               cachedTokens: msg.cachedTokens,
               cost: msg.cost,
               durationMs: msg.durationMs,
-              createdAt: now,
+              createdAt: msg.createdAt ?? now,
             });
 
             // Insert parts in parallel
@@ -452,10 +456,11 @@ export const batchUpsert = internalMutation({
             ? `${sessionSearchableText} ${textParts.join(" ")}`.slice(0, 10000)
             : sessionSearchableText;
 
+        // Does NOT touch updatedAt: session recency is owned by session-level
+        // sync and derived from the source timestamp.
         await ctx.db.patch(sessionId, {
           messageCount: sessionMessageCount + newMessages,
           searchableText: newSearchable || undefined,
-          updatedAt: now,
         });
       }
     }

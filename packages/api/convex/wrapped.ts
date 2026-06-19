@@ -143,11 +143,19 @@ export const get24HourStats = internalQuery({
     // Filter to last 24 hours
     const recentSessions = sessions.filter((s) => s.createdAt >= cutoff);
 
+    // Count actual message rows in the window by their source createdAt, instead
+    // of summing the denormalized session.messageCount (which is a monotonic
+    // counter that inflates on resync and ignores message-level dates).
+    const recentMessages = await ctx.db
+      .query("messages")
+      .withIndex("by_user_created", (q) => q.eq("userId", userId).gte("createdAt", cutoff))
+      .collect();
+    const totalMessages = recentMessages.length;
+
     // Aggregate stats
     let totalTokens = 0;
     let promptTokens = 0;
     let completionTokens = 0;
-    let totalMessages = 0;
     let cost = 0;
 
     const modelMap: Record<string, number> = {};
@@ -157,7 +165,6 @@ export const get24HourStats = internalQuery({
       totalTokens += session.totalTokens;
       promptTokens += session.promptTokens;
       completionTokens += session.completionTokens;
-      totalMessages += session.messageCount || 0;
       cost += session.cost;
 
       // Model aggregation
@@ -217,10 +224,18 @@ export const getWrappedStats = query({
 
     const recentSessions = sessions.filter((s) => s.createdAt >= cutoff);
 
+    // Count actual message rows in the window by their source createdAt, instead
+    // of summing the denormalized session.messageCount (which is a monotonic
+    // counter that inflates on resync and ignores message-level dates).
+    const recentMessages = await ctx.db
+      .query("messages")
+      .withIndex("by_user_created", (q) => q.eq("userId", user._id).gte("createdAt", cutoff))
+      .collect();
+    const totalMessages = recentMessages.length;
+
     let totalTokens = 0;
     let promptTokens = 0;
     let completionTokens = 0;
-    let totalMessages = 0;
     let cost = 0;
 
     const modelMap: Record<string, number> = {};
@@ -230,7 +245,6 @@ export const getWrappedStats = query({
       totalTokens += session.totalTokens;
       promptTokens += session.promptTokens;
       completionTokens += session.completionTokens;
-      totalMessages += session.messageCount || 0;
       cost += session.cost;
 
       const model = session.model || "unknown";
