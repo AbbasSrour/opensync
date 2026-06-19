@@ -77,7 +77,10 @@ describe("OpenCode record normalization", () => {
       sessionExternalId: "ses_1",
       externalId: "msg_1",
       role: "assistant",
-      textContent: "hello world",
+      parts: [
+        { type: "text", content: { text: "hello " } },
+        { type: "text", content: { text: "world" } },
+      ],
       model: "claude-sonnet-4",
       provider: "anthropic",
       promptTokens: 4,
@@ -87,6 +90,63 @@ describe("OpenCode record normalization", () => {
       sourceCreatedAt: 1100,
       sourceUpdatedAt: 1500,
     });
+  });
+
+  it("splits opencode tool parts into canonical tool-call and tool-result parts", () => {
+    const record = messageRowToRecord(
+      {
+        id: "msg_tool",
+        session_id: "ses_1",
+        time_created: 1000,
+        data: JSON.stringify({ role: "assistant" }),
+      },
+      [
+        {
+          id: "part_tool",
+          message_id: "msg_tool",
+          session_id: "ses_1",
+          time_created: 1000,
+          data: JSON.stringify({
+            type: "tool",
+            tool: "bash",
+            callID: "call_1",
+            state: { status: "completed", input: { command: "ls" }, output: "file.txt" },
+          }),
+        },
+      ],
+    );
+
+    expect(record.parts).toEqual([
+      { type: "tool-call", content: { callId: "call_1", name: "bash", args: { command: "ls" } } },
+      {
+        type: "tool-result",
+        content: { callId: "call_1", name: "bash", result: "file.txt", isError: false },
+      },
+    ]);
+  });
+
+  it("preserves unknown opencode part types losslessly", () => {
+    const record = messageRowToRecord(
+      {
+        id: "msg_x",
+        session_id: "ses_1",
+        time_created: 1000,
+        data: JSON.stringify({ role: "assistant" }),
+      },
+      [
+        {
+          id: "part_x",
+          message_id: "msg_x",
+          session_id: "ses_1",
+          time_created: 1000,
+          data: JSON.stringify({ type: "compaction", foo: "bar" }),
+        },
+      ],
+    );
+
+    expect(record.parts).toEqual([
+      { type: "unknown", content: { type: "compaction", foo: "bar" } },
+    ]);
   });
 
   it("uses source message creation time instead of local sync time", () => {
@@ -138,6 +198,7 @@ describe("OpenCode record normalization", () => {
         sessionExternalId: "ses_1",
         externalId: "msg_1",
         role: "user",
+        parts: [],
         sourceCreatedAt: 2,
       }),
     ).toMatchObject({

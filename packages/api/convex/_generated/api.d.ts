@@ -15,6 +15,7 @@ import type * as embeddings from "../embeddings.js";
 import type * as evals from "../evals.js";
 import type * as http from "../http.js";
 import type * as lib_ai from "../lib/ai.js";
+import type * as lib_parts from "../lib/parts.js";
 import type * as messages from "../messages.js";
 import type * as rag from "../rag.js";
 import type * as search from "../search.js";
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   evals: typeof evals;
   http: typeof http;
   "lib/ai": typeof lib_ai;
+  "lib/parts": typeof lib_parts;
   messages: typeof messages;
   rag: typeof rag;
   search: typeof search;

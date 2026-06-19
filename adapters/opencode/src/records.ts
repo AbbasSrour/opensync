@@ -1,5 +1,11 @@
 import { basename } from "node:path";
-import type { AdapterMessage, AdapterSession, MessageRole } from "@opensync/kit";
+import {
+  joinTextParts,
+  type AdapterMessage,
+  type AdapterSession,
+  type MessagePart,
+  type MessageRole,
+} from "@opensync/kit";
 import {
   createOpenCodeEvent,
   type OpenCodeMessageUpsertEvent,
@@ -38,15 +44,16 @@ export function messageRowToRecord(
   const cache = recordField(tokens, "cache");
   const created = numberField(time.created) ?? row.time_created;
   const completed = numberField(time.completed);
-  const textContent = textContentFromParts(parts);
+  const messageParts = partsFromRows(parts);
   const role = normalizeRole(stringField(data, "role"));
+  const textContent = joinTextParts(messageParts);
 
   return {
     source: "opencode",
     sessionExternalId: row.session_id,
     externalId: row.id,
     role: role === "unknown" && textContent ? inferRole(textContent) : role,
-    textContent,
+    parts: messageParts,
     model: stringField(data, "modelID") ?? stringField(model, "modelID"),
     provider: stringField(data, "providerID") ?? stringField(model, "providerID"),
     promptTokens: numberField(tokens.input),
@@ -81,15 +88,72 @@ export function messageRecordToEvent(
   });
 }
 
-function textContentFromParts(parts: OpenCodePartRow[]): string | undefined {
-  const text = [...parts]
-    .sort((a, b) => a.time_created - b.time_created || a.id.localeCompare(b.id))
-    .map((part) => parseJsonRecord(part.data))
-    .filter((data) => stringField(data, "type") === "text")
-    .map((data) => stringField(data, "text") ?? "")
-    .join("");
+// Normalize OpenCode native part rows into canonical OpenSync message parts.
+// OpenCode stores a tool's call and result together in a single "tool" part;
+// we split it into separate canonical "tool-call" and "tool-result" parts so
+// every client shares one vocabulary. Unrecognized native types are preserved
+// losslessly as "unknown".
+function partsFromRows(parts: OpenCodePartRow[]): MessagePart[] {
+  const ordered = [...parts].sort(
+    (a, b) => a.time_created - b.time_created || a.id.localeCompare(b.id),
+  );
 
-  return text || undefined;
+  const result: MessagePart[] = [];
+  for (const row of ordered) {
+    const data = parseJsonRecord(row.data);
+    const type = stringField(data, "type");
+
+    switch (type) {
+      case "text":
+        result.push({ type: "text", content: { text: stringField(data, "text") ?? "" } });
+        break;
+      case "reasoning":
+        result.push({ type: "reasoning", content: { text: stringField(data, "text") ?? "" } });
+        break;
+      case "tool": {
+        const callId = stringField(data, "callID") ?? stringField(data, "callId") ?? "";
+        const name = stringField(data, "tool") ?? "unknown";
+        const state = recordField(data, "state");
+        result.push({
+          type: "tool-call",
+          content: { callId, name, args: state.input ?? {} },
+        });
+        if ("output" in state || stringField(state, "status") === "completed") {
+          result.push({
+            type: "tool-result",
+            content: {
+              callId,
+              name,
+              result: state.output ?? state.metadata ?? null,
+              isError: stringField(state, "status") === "error",
+            },
+          });
+        }
+        break;
+      }
+      case "file":
+        result.push({
+          type: "file",
+          content: {
+            mime: stringField(data, "mime"),
+            filename: stringField(data, "filename"),
+            url: stringField(data, "url"),
+          },
+        });
+        break;
+      case "step-start":
+        result.push({ type: "step-start", content: {} });
+        break;
+      case "step-finish":
+        result.push({ type: "step-finish", content: {} });
+        break;
+      default:
+        result.push({ type: "unknown", content: data });
+        break;
+    }
+  }
+
+  return result;
 }
 
 function normalizeRole(role: string | undefined): MessageRole {

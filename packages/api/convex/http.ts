@@ -158,7 +158,6 @@ http.route({
         sessionExternalId: body.sessionExternalId,
         externalId: body.externalId,
         role: body.role,
-        textContent: body.textContent,
         model: body.model,
         provider: body.provider,
         promptTokens: body.promptTokens,
@@ -167,7 +166,7 @@ http.route({
         cost: body.cost,
         durationMs: body.durationMs,
         source: body.source, // Pass source for auto-created sessions ("opencode" or "claude-code")
-        parts: body.parts,
+        parts: body.parts ?? [], // Canonical message parts (source of truth for text)
         createdAt: body.createdAt, // Original timestamp from source
       });
 
@@ -215,7 +214,10 @@ http.route({
         try {
           const result = await ctx.runMutation(internal.messages.batchUpsert, {
             userId: auth.user._id,
-            messages: body.messages,
+            messages: body.messages.map((m: Record<string, unknown>) => ({
+              ...m,
+              parts: m.parts ?? [], // Canonical parts default for resilience
+            })),
           });
           messageCount = result.inserted + result.updated;
           errors.push(...result.errors);

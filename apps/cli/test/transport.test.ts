@@ -27,6 +27,7 @@ describe("Convex sync payload mapping", () => {
           sessionExternalId: "ses_1",
           externalId: "msg_1",
           role: "user",
+          parts: [{ type: "text", content: { text: "hello" } }],
           sourceCreatedAt: 456,
         },
       }),
@@ -36,6 +37,7 @@ describe("Convex sync payload mapping", () => {
       role: "user",
       source: "opencode",
       createdAt: 456,
+      parts: [{ type: "text", content: { text: "hello" } }],
     });
   });
 });

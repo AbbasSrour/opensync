@@ -222,7 +222,7 @@ export const getMessagesForEmbedding = internalQuery({
 
     for (const messageId of messageIds) {
       const message = await ctx.db.get(messageId);
-      if (!message || !message.textContent) continue;
+      if (!message || !message.searchText) continue;
       if (!EMBEDDABLE_ROLES.has(message.role)) continue;
 
       const session = await ctx.db.get(message.sessionId);
@@ -237,7 +237,7 @@ export const getMessagesForEmbedding = internalQuery({
         messageId,
         sessionId: message.sessionId,
         userId: session.userId,
-        textContent: message.textContent,
+        textContent: message.searchText,
         existingHash: existing ? existing.textHash : null,
       });
     }
@@ -368,7 +368,7 @@ export const getMessagesNeedingEmbeddings = internalQuery({
         .collect();
 
       for (const message of messages) {
-        if (!message.textContent) continue;
+        if (!message.searchText) continue;
         if (!EMBEDDABLE_ROLES.has(message.role)) continue;
 
         const embedding = await ctx.db

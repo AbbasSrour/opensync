@@ -275,24 +275,26 @@ export const searchMessages = query({
       results = await ctx.db
         .query("messages")
         .withSearchIndex("search_messages", (q) =>
-          q.search("textContent", searchQuery).eq("sessionId", sessionId),
+          q.search("searchText", searchQuery).eq("sessionId", sessionId),
         )
         .take(limit);
     } else {
       results = await ctx.db
         .query("messages")
-        .withSearchIndex("search_messages", (q) => q.search("textContent", searchQuery))
+        .withSearchIndex("search_messages", (q) => q.search("searchText", searchQuery))
         .take(limit * 2);
 
       results = results.filter((msg) => sessionIds.has(msg.sessionId));
     }
 
-    // Attach session info
+    // Attach session info. Expose derived text as `textContent` for consumers.
     return Promise.all(
       results.slice(0, limit).map(async (msg) => {
         const session = await ctx.db.get(msg.sessionId);
+        const { searchText, ...rest } = msg;
         return {
-          ...msg,
+          ...rest,
+          textContent: searchText,
           sessionTitle: session?.title,
           projectPath: session?.projectPath,
         };
@@ -392,14 +394,14 @@ export const searchMessagesPaginated = query({
       results = await ctx.db
         .query("messages")
         .withSearchIndex("search_messages", (q) =>
-          q.search("textContent", searchQuery).eq("sessionId", sessionId),
+          q.search("searchText", searchQuery).eq("sessionId", sessionId),
         )
         .take(limit + cursor + 1);
     } else {
       // Search across all user's sessions
       results = await ctx.db
         .query("messages")
-        .withSearchIndex("search_messages", (q) => q.search("textContent", searchQuery))
+        .withSearchIndex("search_messages", (q) => q.search("searchText", searchQuery))
         .take((limit + cursor + 1) * 2);
 
       // Filter to only user's sessions
@@ -409,11 +411,13 @@ export const searchMessagesPaginated = query({
     const paginatedResults = results.slice(cursor, cursor + limit);
     const hasMore = results.length > cursor + limit;
 
-    // Attach session info
+    // Attach session info. Expose derived text as `textContent` for consumers.
     const messagesWithSession = paginatedResults.map((msg) => {
       const session = sessionMap.get(msg.sessionId);
+      const { searchText, ...rest } = msg;
       return {
-        ...msg,
+        ...rest,
+        textContent: searchText,
         sessionTitle: session?.title,
         projectPath: session?.projectPath,
         projectName: session?.projectName,
@@ -751,7 +755,7 @@ export const loadMessagesFromEmbeddings = internalQuery({
         sessionId: message.sessionId,
         externalId: message.externalId,
         role: message.role,
-        textContent: message.textContent,
+        textContent: message.searchText,
         model: message.model,
         createdAt: message.createdAt,
         sessionTitle: session?.title,

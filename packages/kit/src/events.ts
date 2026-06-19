@@ -1,3 +1,5 @@
+import type { MessagePart } from "./parts.js";
+
 export type DurableEventKind = "session.upsert" | "message.upsert" | "session.finalize";
 export type SourceChangeResource = "session" | "message";
 export type SourceChangeAction = "changed" | "deleted";
@@ -22,7 +24,7 @@ export type MessageUpsertPayload = {
   sessionExternalId: string;
   externalId: string;
   role: MessageRole;
-  textContent?: string;
+  parts: MessagePart[];
   model?: string;
   provider?: string;
   promptTokens?: number;

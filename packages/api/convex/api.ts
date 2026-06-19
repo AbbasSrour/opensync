@@ -184,7 +184,7 @@ export const getSession = internalQuery({
           id: msg._id,
           externalId: msg.externalId,
           role: msg.role,
-          textContent: msg.textContent,
+          textContent: msg.searchText,
           model: msg.model,
           promptTokens: msg.promptTokens,
           completionTokens: msg.completionTokens,
@@ -343,9 +343,9 @@ export const exportSession = internalQuery({
           }
         }
 
-        // Fallback: use message.textContent if no parts have content
-        if (!hasContent && msg.textContent) {
-          md += `${msg.textContent}\n\n`;
+        // Fallback for legacy messages without parts: use derived searchText.
+        if (!hasContent && msg.searchText) {
+          md += `${msg.searchText}\n\n`;
         }
       }
 
@@ -369,8 +369,8 @@ export const exportSession = internalQuery({
           .map((p) => getTextContent(p.content))
           .filter((t) => t);
 
-        // Use textContent as fallback if no text parts
-        const content = textParts.length > 0 ? textParts.join("\n") : msg.textContent || "";
+        // Fallback to derived searchText if no text parts (legacy messages).
+        const content = textParts.length > 0 ? textParts.join("\n") : msg.searchText || "";
 
         lines.push(
           JSON.stringify({
@@ -399,8 +399,8 @@ export const exportSession = internalQuery({
         .map((p) => getTextContent(p.content))
         .filter((t) => t);
 
-      // Use textContent as fallback if no text parts
-      const content = textParts.length > 0 ? textParts.join("\n") : msg.textContent || "";
+      // Fallback to derived searchText if no text parts (legacy messages).
+      const content = textParts.length > 0 ? textParts.join("\n") : msg.searchText || "";
 
       openaiMessages.push({
         role: msg.role,

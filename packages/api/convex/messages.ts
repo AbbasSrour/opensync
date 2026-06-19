@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { internalMutation } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
+import { joinTextParts } from "./lib/parts";
 
 // Dedup window to prevent rapid updates causing write conflicts
 const MESSAGE_DEDUP_MS = 5 * 1000;
@@ -18,7 +19,6 @@ export const upsert = internalMutation({
       v.literal("tool"),
       v.literal("unknown"),
     ),
-    textContent: v.optional(v.string()),
     model: v.optional(v.string()),
     provider: v.optional(v.string()),
     promptTokens: v.optional(v.number()),
@@ -28,13 +28,12 @@ export const upsert = internalMutation({
     durationMs: v.optional(v.number()),
     // Source identifier passed from plugin ("opencode" or "claude-code")
     source: v.optional(v.string()),
-    parts: v.optional(
-      v.array(
-        v.object({
-          type: v.string(),
-          content: v.any(),
-        }),
-      ),
+    // Canonical message parts. Source of truth for all message text.
+    parts: v.array(
+      v.object({
+        type: v.string(),
+        content: v.any(),
+      }),
     ),
     createdAt: v.optional(v.number()), // Original timestamp from source
   },
@@ -110,11 +109,14 @@ export const upsert = internalMutation({
     let messageId: Id<"messages">;
     let shouldUpdateSessionStats = false;
 
+    // Derive flat text from canonical parts (source of truth for all text).
+    const searchText = joinTextParts(args.parts);
+
     if (existing) {
       // Update existing message - patch directly without re-reading
       await ctx.db.patch(existing._id, {
         userId: existing.userId ?? args.userId,
-        textContent: args.textContent ?? existing.textContent,
+        searchText,
         model: args.model ?? existing.model,
         provider: args.provider ?? existing.provider,
         promptTokens: args.promptTokens ?? existing.promptTokens,
@@ -142,7 +144,7 @@ export const upsert = internalMutation({
         userId: args.userId,
         externalId: args.externalId,
         role: args.role,
-        textContent: args.textContent,
+        searchText,
         model: args.model,
         provider: args.provider,
         promptTokens: args.promptTokens,
@@ -156,7 +158,7 @@ export const upsert = internalMutation({
     }
 
     // Insert parts in parallel
-    if (args.parts && args.parts.length > 0) {
+    if (args.parts.length > 0) {
       await Promise.all(
         args.parts.map((part, i) =>
           ctx.db.insert("parts", {
@@ -169,24 +171,11 @@ export const upsert = internalMutation({
       );
     }
 
-    // Build searchable text from parts
+    // Build session searchable text from this message's derived text.
     let newSearchableText: string | undefined;
-    if (args.parts) {
-      const textParts = args.parts
-        .filter((p) => p.type === "text")
-        .map((p) => {
-          const content = p.content;
-          if (!content) return "";
-          if (typeof content === "string") return content;
-          return content.text || content.content || "";
-        })
-        .filter((t) => t)
-        .join(" ");
-
-      if (textParts) {
-        const currentText = sessionSearchableText || "";
-        newSearchableText = `${currentText} ${textParts}`.slice(0, 10000);
-      }
+    if (searchText) {
+      const currentText = sessionSearchableText || "";
+      newSearchableText = `${currentText} ${searchText}`.slice(0, 10000);
     }
 
     // Single combined patch for session updates (avoids multiple writes).
@@ -225,23 +214,21 @@ const messageInputValidator = v.object({
     v.literal("tool"),
     v.literal("unknown"),
   ),
-  textContent: v.optional(v.string()),
-    model: v.optional(v.string()),
-    provider: v.optional(v.string()),
-    promptTokens: v.optional(v.number()),
-    completionTokens: v.optional(v.number()),
-    cachedTokens: v.optional(v.number()),
-    cost: v.optional(v.number()),
-    durationMs: v.optional(v.number()),
-    source: v.optional(v.string()),
-    createdAt: v.optional(v.number()), // Original timestamp from source
-    parts: v.optional(
-    v.array(
-      v.object({
-        type: v.string(),
-        content: v.any(),
-      }),
-    ),
+  model: v.optional(v.string()),
+  provider: v.optional(v.string()),
+  promptTokens: v.optional(v.number()),
+  completionTokens: v.optional(v.number()),
+  cachedTokens: v.optional(v.number()),
+  cost: v.optional(v.number()),
+  durationMs: v.optional(v.number()),
+  source: v.optional(v.string()),
+  createdAt: v.optional(v.number()), // Original timestamp from source
+  // Canonical message parts. Source of truth for all message text.
+  parts: v.array(
+    v.object({
+      type: v.string(),
+      content: v.any(),
+    }),
   ),
 });
 
@@ -342,11 +329,14 @@ export const batchUpsert = internalMutation({
 
             let messageId: Id<"messages">;
 
+            // Derive flat text from canonical parts (source of truth).
+            const searchText = joinTextParts(msg.parts);
+
             if (existing) {
               // Update existing
               await ctx.db.patch(existing._id, {
                 userId: existing.userId ?? args.userId,
-                textContent: msg.textContent ?? existing.textContent,
+                searchText,
                 model: msg.model ?? existing.model,
                 provider: msg.provider ?? existing.provider,
                 promptTokens: msg.promptTokens ?? existing.promptTokens,
@@ -366,6 +356,20 @@ export const batchUpsert = internalMutation({
                 await Promise.all(existingParts.map((p) => ctx.db.delete(p._id)));
               }
 
+              // Re-insert parts so updated messages keep parts in sync.
+              if (msg.parts.length > 0) {
+                await Promise.all(
+                  msg.parts.map((part, i) =>
+                    ctx.db.insert("parts", {
+                      messageId,
+                      type: part.type,
+                      content: part.content,
+                      order: i,
+                    }),
+                  ),
+                );
+              }
+
               return { action: "updated" as const, text: "", messageId };
             }
 
@@ -375,7 +379,7 @@ export const batchUpsert = internalMutation({
               userId: args.userId,
               externalId: msg.externalId,
               role: msg.role,
-              textContent: msg.textContent,
+              searchText,
               model: msg.model,
               provider: msg.provider,
               promptTokens: msg.promptTokens,
@@ -387,7 +391,7 @@ export const batchUpsert = internalMutation({
             });
 
             // Insert parts in parallel
-            if (msg.parts && msg.parts.length > 0) {
+            if (msg.parts.length > 0) {
               await Promise.all(
                 msg.parts.map((part, i) =>
                   ctx.db.insert("parts", {
@@ -400,22 +404,7 @@ export const batchUpsert = internalMutation({
               );
             }
 
-            // Extract searchable text
-            let textContent = "";
-            if (msg.parts) {
-              textContent = msg.parts
-                .filter((p) => p.type === "text")
-                .map((p) => {
-                  const content = p.content;
-                  if (!content) return "";
-                  if (typeof content === "string") return content;
-                  return content.text || content.content || "";
-                })
-                .filter((t) => t)
-                .join(" ");
-            }
-
-            return { action: "inserted" as const, text: textContent, messageId };
+            return { action: "inserted" as const, text: searchText, messageId };
           } catch (e) {
             return {
               action: "error" as const,

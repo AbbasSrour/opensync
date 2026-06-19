@@ -280,9 +280,9 @@ export const getMarkdown = query({
         }
       }
 
-      // Fallback: if no parts content, use message.textContent
-      if (!hasContent && message.textContent) {
-        md += `${message.textContent}\n\n`;
+      // Fallback for legacy messages without parts: use derived searchText.
+      if (!hasContent && message.searchText) {
+        md += `${message.searchText}\n\n`;
       }
     }
 
@@ -438,13 +438,13 @@ export const getForEmbedding = internalMutation({
     const messageTexts: string[] = [];
 
     for (const msg of messages) {
-      // First try textContent
-      if (msg.textContent) {
-        messageTexts.push(msg.textContent);
+      // Prefer the server-derived searchText (joined from text parts).
+      if (msg.searchText) {
+        messageTexts.push(msg.searchText);
         continue;
       }
 
-      // Fallback to parts if textContent is empty
+      // Fallback to parts for legacy messages without searchText.
       const parts = await ctx.db
         .query("parts")
         .withIndex("by_message", (q) => q.eq("messageId", msg._id))

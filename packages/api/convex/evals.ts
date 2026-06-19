@@ -1338,7 +1338,11 @@ export const getExportData = query({
           .query("messages")
           .withIndex("by_session_created", (q) => q.eq("sessionId", session._id))
           .collect();
-        messagesBySession[session._id] = messages;
+        // Expose derived searchText as `textContent` for export consumers.
+        messagesBySession[session._id] = messages.map(({ searchText, ...rest }) => ({
+          ...rest,
+          textContent: searchText,
+        }));
       }),
     );
 

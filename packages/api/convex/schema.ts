@@ -128,7 +128,10 @@ export default defineSchema({
       v.literal("tool"),
       v.literal("unknown"),
     ),
-    textContent: v.optional(v.string()),
+    // Server-derived flat text joined from this message's text parts. Internal
+    // only: used to back the full-text search index. Clients never send this;
+    // it is computed from `parts` on upsert.
+    searchText: v.optional(v.string()),
     model: v.optional(v.string()),
     provider: v.optional(v.string()),
 
@@ -150,7 +153,7 @@ export default defineSchema({
     .index("by_session_external", ["sessionId", "externalId"])
     .index("by_user_created", ["userId", "createdAt"])
     .searchIndex("search_messages", {
-      searchField: "textContent",
+      searchField: "searchText",
       filterFields: ["sessionId"],
     }),
 

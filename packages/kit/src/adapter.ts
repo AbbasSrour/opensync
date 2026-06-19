@@ -1,4 +1,5 @@
 import type { MessageRole } from "./events.js";
+import type { MessagePart } from "./parts.js";
 
 export type AdapterSession<TSource extends string = string> = {
   source: TSource;
@@ -20,7 +21,7 @@ export type AdapterMessage<TSource extends string = string> = {
   sessionExternalId: string;
   externalId: string;
   role: MessageRole;
-  textContent?: string;
+  parts: MessagePart[];
   model?: string;
   provider?: string;
   promptTokens?: number;
