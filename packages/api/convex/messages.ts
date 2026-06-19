@@ -42,17 +42,6 @@ export const upsert = internalMutation({
   handler: async (ctx, args) => {
     const now = Date.now();
 
-    // Check if message already exists (idempotency check first)
-    const existing = await ctx.db
-      .query("messages")
-      .withIndex("by_external_id", (q) => q.eq("externalId", args.externalId))
-      .first();
-
-    // Early return if message exists and was recently updated (idempotent)
-    if (existing && now - existing.createdAt < MESSAGE_DEDUP_MS) {
-      return existing._id;
-    }
-
     // Find session using index
     let session = await ctx.db
       .query("sessions")
@@ -65,6 +54,24 @@ export const upsert = internalMutation({
     let sessionId: Id<"sessions">;
     let sessionMessageCount: number;
     let sessionSearchableText: string | undefined;
+
+    // Look up an existing message by its session-scoped identity. A message is
+    // unique within its session, and the session is already user-scoped, so this
+    // makes resync idempotent without relying on the optional message.userId.
+    const existingSessionId = session?._id;
+    const existing = existingSessionId
+      ? await ctx.db
+          .query("messages")
+          .withIndex("by_session_external", (q) =>
+            q.eq("sessionId", existingSessionId).eq("externalId", args.externalId),
+          )
+          .first()
+      : null;
+
+    // Early return if message exists and was recently updated (idempotent)
+    if (existing && now - existing.createdAt < MESSAGE_DEDUP_MS) {
+      return existing._id;
+    }
 
     // Auto-create session if it doesn't exist (handles out-of-order sync)
     if (!session) {
@@ -315,10 +322,13 @@ export const batchUpsert = internalMutation({
       const results = await Promise.all(
         messages.map(async (msg) => {
           try {
-            // Check if message exists
+            // Check if message exists, scoped to its session (session is already
+            // user-scoped) so resync is idempotent without relying on userId.
             const existing = await ctx.db
               .query("messages")
-              .withIndex("by_external_id", (q) => q.eq("externalId", msg.externalId))
+              .withIndex("by_session_external", (q) =>
+                q.eq("sessionId", sessionId).eq("externalId", msg.externalId),
+              )
               .first();
 
             // Early return for dedup
