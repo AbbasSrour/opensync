@@ -14,9 +14,9 @@ share card, editable local identity) are deferred to a planned-features doc.
 ## Placement decision
 
 - **Landing target: Dashboard (`/dashboard`)** — the authenticated app home.
-- **Confirmed: new section inside the existing Overview view** (the Dashboard
-  landing). No new tab. Placed alongside the stat tiles and recent sessions so
-  it's visible immediately on sign-in.
+- **Confirmed: rendered inside the Analytics view** on the Dashboard (the
+  "analytics" view-mode tab), at the top of the body before the Token Breakdown
+  grid. Overview is left untouched.
 
 ## Scope — first pass (in scope)
 
@@ -73,19 +73,22 @@ These are pure functions with no Synara-specific deps — safe to port verbatim.
 
 ### 2. UI — `apps/website/src/components/`
 
-- New `ActivityHeatmap.tsx` — GitHub-style grid. Port Synara's component shape
-  but adapt to OpenSync's theme system (`getThemeClasses`, `cn`, lucide icons)
-  instead of Synara's shadcn/Radix stack. Inline-px sizing kept simple.
-- New `ProfileSection.tsx` — composes: stat tiles (streaks, peak day, prompts),
-  heatmap, insights list (most active hour, most worked project). Consumes the
-  new `activityStats` query plus existing `summaryStats`.
+- `ActivityHeatmap.tsx` — GitHub-style grid ported from
+  `fishdev20/shadcn-heatmap`'s `HeatmapCalendar`, adapted to OpenSync's theme
+  system (`getThemeClasses` + theme-aware color ramps instead of shadcn tokens).
+  Full-width `fill` mode via flex columns with `aspect-square w-full` cells.
+  Weekday axis labels (Mon/Wed/Fri), month labels with min-spacing, level
+  bucketing, legend, ARIA roles, click handlers.
+- `ActivityPanel.tsx` (renamed from `ProfileSection`) — composes: stat tiles
+  (streaks, peak day, prompts), heatmap, insights list (most active hour, most
+  worked project). Consumes the new `activityStats` query + existing
+  `summaryStats`.
 
 ### 3. Dashboard integration — `apps/website/src/pages/Dashboard.tsx`
 
-- Add `const activityStats = useQuery(api.analytics.activityStats, { source: sourceArg });`
-  next to existing analytics queries.
-- Render `<ProfileSection>` inside `OverviewView` (placement TBD per question
-  above), passing `activityStats`, `summaryStats`, `theme`.
+- `activityStats` query fetched at the top level alongside other analytics.
+- `<ActivityPanel>` rendered inside the **Analytics view** (not Overview),
+  at the top of the Analytics body, before the Token Breakdown grid.
 
 ### 4. Planned-features doc — `plans/profile-feature-deferred.md`
 

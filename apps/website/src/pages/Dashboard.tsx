@@ -16,7 +16,7 @@ import {
 } from "../components/Charts.tsx";
 import { ConfirmModal } from "../components/ConfirmModal.tsx";
 import { WrappedView } from "../components/WrappedView.tsx";
-import { ProfileSection } from "../components/ProfileSection.tsx";
+import { ActivityPanel } from "../components/ActivityPanel.tsx";
 import type { Id } from "@opensync/api";
 import {
   Search,
@@ -431,7 +431,6 @@ export function DashboardPage() {
             dailyStats={dailyStats || []}
             modelStats={modelStats || []}
             projectStats={projectStats || []}
-            activityStats={activityStats}
             sessions={displaySessions}
             onSelectSession={(id) => {
               // Navigate to sessions view when clicking a session in overview
@@ -481,6 +480,7 @@ export function DashboardPage() {
             modelStats={modelStats || []}
             projectStats={projectStats || []}
             providerStats={providerStats || []}
+            activityStats={activityStats}
             theme={theme}
           />
         )}
@@ -816,7 +816,6 @@ function OverviewView({
   dailyStats,
   modelStats,
   projectStats,
-  activityStats,
   sessions,
   onSelectSession,
   selectedSessionId,
@@ -826,7 +825,6 @@ function OverviewView({
   dailyStats: any[];
   modelStats: any[];
   projectStats: any[];
-  activityStats: any;
   sessions: any[];
   onSelectSession: (id: Id<"sessions"> | null) => void;
   selectedSessionId: Id<"sessions"> | null;
@@ -909,9 +907,6 @@ function OverviewView({
             theme={theme}
           />
         </div>
-
-        {/* Activity / profile section: heatmap, streaks, insights */}
-        <ProfileSection activityStats={activityStats} summaryStats={summaryStats} theme={theme} />
 
         {/* Usage Overview Section */}
         <ConsumptionBreakdown
@@ -2585,12 +2580,14 @@ function AnalyticsView({
   modelStats,
   projectStats,
   providerStats,
+  activityStats,
   theme,
 }: {
   summaryStats: any;
   modelStats: any[];
   projectStats: any[];
   providerStats: any[];
+  activityStats: any;
   theme: "dark" | "tan";
 }) {
   const t = getThemeClasses(theme);
@@ -3090,6 +3087,9 @@ function AnalyticsView({
             </div>
           )}
         </div>
+
+        {/* Activity panel: heatmap, streaks, insights */}
+        <ActivityPanel activityStats={activityStats} summaryStats={summaryStats} theme={theme} />
       </div>
     </div>
   );

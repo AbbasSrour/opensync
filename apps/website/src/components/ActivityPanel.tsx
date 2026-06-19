@@ -1,4 +1,4 @@
-import { ActivityHeatmap, type HeatmapCell } from "./ActivityHeatmap.tsx";
+import { ActivityHeatmap } from "./ActivityHeatmap.tsx";
 import { StatCard } from "./Charts.tsx";
 import { cn } from "../lib/utils.ts";
 import { getThemeClasses } from "../lib/theme.tsx";
@@ -9,7 +9,7 @@ import { Flame, Clock, Folder, MessageSquare, Calendar, Trophy } from "lucide-re
 // Synara's ProfileSettingsPanel, adapted to OpenSync's theme + data shape.
 
 export interface ActivityStatsData {
-  heatmap: HeatmapCell[];
+  heatmap: Array<{ day: string; count: number }>;
   currentStreakDays: number;
   longestStreakDays: number;
   peakDay: { day: string; tokens: number } | null;
@@ -33,13 +33,13 @@ export interface SummaryStatsData {
   uniqueProjects: number;
 }
 
-interface ProfileSectionProps {
+interface ActivityPanelProps {
   activityStats: ActivityStatsData | null | undefined;
   summaryStats: SummaryStatsData | null | undefined;
   theme: "dark" | "tan";
 }
 
-export function ProfileSection({ activityStats, summaryStats, theme }: ProfileSectionProps) {
+export function ActivityPanel({ activityStats, summaryStats, theme }: ActivityPanelProps) {
   const t = getThemeClasses(theme);
 
   // Loading state
@@ -113,20 +113,19 @@ export function ProfileSection({ activityStats, summaryStats, theme }: ProfileSe
       {/* Heatmap */}
       {hasHeatmap && (
         <div className="mb-5">
-          <p className={cn("text-[11px] mb-2", t.textDim)}>Last 9 months</p>
+          <p className={cn("text-[11px] mb-2", t.textDim)}>Last 12 months</p>
           <ActivityHeatmap
-            cells={heatmap}
+            data={heatmap.map((cell) => ({ date: cell.day, value: cell.count }))}
             theme={theme}
-            tooltip
+            fill
+            cellGap={3}
             tooltipUnit="sessions"
-            showMonths
-            monthsPosition="bottom"
           />
         </div>
       )}
 
       {/* Insights */}
-      <div className={cn("rounded-md border p-3", t.bgSecondary, t.borderLight)}>
+      <div className={cn("border-t pt-3", t.borderLight)}>
         <p className={cn("text-[11px] font-normal mb-2.5", t.textMuted)}>Insights</p>
         <dl className="flex flex-col gap-2">
           <InsightRow
