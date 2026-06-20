@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vite-plus/test";
 import {
   messageRecordToEvent,
+  messageRowSyncStatus,
   messageRowToRecord,
   sessionRecordToEvent,
   sessionRowToRecord,
@@ -158,6 +159,37 @@ describe("OpenCode record normalization", () => {
     });
 
     expect(record.sourceCreatedAt).toBe(1234);
+  });
+
+  it("marks assistant messages without completion time as incomplete", () => {
+    expect(
+      messageRowSyncStatus({
+        id: "msg_in_progress",
+        session_id: "ses_1",
+        time_created: 1000,
+        data: JSON.stringify({
+          role: "assistant",
+          modelID: "gpt-5.5",
+          providerID: "openai",
+          time: { created: 1000 },
+        }),
+      }),
+    ).toBe("incomplete");
+  });
+
+  it("marks completed assistant messages as ready even without usage", () => {
+    expect(
+      messageRowSyncStatus({
+        id: "msg_failed",
+        session_id: "ses_1",
+        time_created: 1000,
+        data: JSON.stringify({
+          role: "assistant",
+          error: { message: "stopped" },
+          time: { created: 1000, completed: 1100 },
+        }),
+      }),
+    ).toBe("ready");
   });
 
   it("infers unknown roles from text content", () => {

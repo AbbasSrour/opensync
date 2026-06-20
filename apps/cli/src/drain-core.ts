@@ -1,6 +1,6 @@
 import type { SourceChangeEvent } from "@opensync/kit";
 import type { QueueEntry } from "./queue.js";
-import type { SyncEvent, UploadSummary } from "./sync-events.js";
+import type { ResolveQueuedEventResult, SyncEvent, UploadSummary } from "./sync-events.js";
 
 // References that never resolve (e.g. a row deleted before drain, or a transient
 // observation) are dead-lettered once they are older than this, so a single
@@ -17,6 +17,7 @@ export type DrainResult = {
   sessions: number;
   messages: number;
   missing: number;
+  incomplete: number;
   malformed: number;
   deadLettered: number;
   uploaded?: { sessions: number; messages: number; failed: number };
@@ -26,13 +27,14 @@ export type DrainResult = {
 // Injected dependencies for the pure drain core, so ordering/commit/staleness
 // logic can be tested without filesystem or network access.
 export type DrainDeps = {
-  resolve: (event: SourceChangeEvent) => SyncEvent | null;
+  resolve: (event: SourceChangeEvent) => SyncEvent | null | ResolveQueuedEventResult;
   upload: (event: SyncEvent) => Promise<UploadSummary>;
 };
 
 export type DrainPlan = {
   result: DrainResult;
   deadLetter: string[];
+  deferred: string[];
   committedOffset: number;
 };
 
@@ -54,6 +56,7 @@ export async function drainEntries(
     sessions: 0,
     messages: 0,
     missing: 0,
+    incomplete: 0,
     malformed: 0,
     deadLettered: 0,
     advancedOffset: false,
@@ -67,19 +70,25 @@ export async function drainEntries(
         continue;
       }
       const resolved = deps.resolve(entry.event);
-      if (!resolved) {
+      const resolution = normalizeResolution(resolved);
+      if (resolution.status === "missing") {
         result.missing++;
         continue;
       }
+      if (resolution.status === "incomplete") {
+        result.incomplete++;
+        continue;
+      }
       result.resolved++;
-      if (resolved.kind === "session.upsert") result.sessions++;
-      if (resolved.kind === "message.upsert") result.messages++;
+      if (resolution.event.kind === "session.upsert") result.sessions++;
+      if (resolution.event.kind === "message.upsert") result.messages++;
     }
-    return { result, deadLetter: [], committedOffset: startOffset };
+    return { result, deadLetter: [], deferred: [], committedOffset: startOffset };
   }
 
   const uploaded = { sessions: 0, messages: 0, failed: 0 };
   const deadLetter: string[] = [];
+  const deferred: string[] = [];
   let committedOffset = startOffset;
 
   // Process references in order. Stop at the first reference that cannot be
@@ -94,7 +103,14 @@ export async function drainEntries(
     }
 
     const resolved = deps.resolve(entry.event);
-    if (!resolved) {
+    const resolution = normalizeResolution(resolved);
+    if (resolution.status === "incomplete") {
+      result.incomplete++;
+      deferred.push(entry.raw);
+      committedOffset = entry.endOffset;
+      continue;
+    }
+    if (resolution.status === "missing") {
       result.missing++;
       if (now - entry.event.observedAt < STALE_REFERENCE_MS) break;
       result.deadLettered++;
@@ -103,7 +119,7 @@ export async function drainEntries(
       continue;
     }
 
-    const summary = await deps.upload(resolved);
+    const summary = await deps.upload(resolution.event);
     if (summary.failed > 0) {
       uploaded.failed += summary.failed;
       break;
@@ -111,11 +127,19 @@ export async function drainEntries(
     uploaded.sessions += summary.sessions;
     uploaded.messages += summary.messages;
     result.resolved++;
-    if (resolved.kind === "session.upsert") result.sessions++;
-    if (resolved.kind === "message.upsert") result.messages++;
+    if (resolution.event.kind === "session.upsert") result.sessions++;
+    if (resolution.event.kind === "message.upsert") result.messages++;
     committedOffset = entry.endOffset;
   }
 
   result.uploaded = uploaded;
-  return { result, deadLetter, committedOffset };
+  return { result, deadLetter, deferred, committedOffset };
+}
+
+function normalizeResolution(
+  resolved: SyncEvent | null | ResolveQueuedEventResult,
+): ResolveQueuedEventResult {
+  if (!resolved) return { status: "missing" };
+  if ("status" in resolved) return resolved;
+  return { status: "ready", event: resolved };
 }

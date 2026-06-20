@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { internalMutation } from "./_generated/server";
+import { internalMutation, internalQuery } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { joinTextParts } from "./lib/parts";
 
@@ -455,5 +455,73 @@ export const batchUpsert = internalMutation({
     }
 
     return { inserted, updated, skipped, errors, messageIds };
+  },
+});
+
+export const syncMetadata = internalQuery({
+  args: {
+    userId: v.id("users"),
+    messages: v.array(
+      v.object({
+        sessionExternalId: v.string(),
+        externalId: v.string(),
+      }),
+    ),
+  },
+  returns: v.array(
+    v.object({
+      sessionExternalId: v.string(),
+      externalId: v.string(),
+      model: v.optional(v.string()),
+      provider: v.optional(v.string()),
+      promptTokens: v.optional(v.number()),
+      completionTokens: v.optional(v.number()),
+      cachedTokens: v.optional(v.number()),
+      cost: v.optional(v.number()),
+      durationMs: v.optional(v.number()),
+      createdAt: v.number(),
+    }),
+  ),
+  handler: async (ctx, args) => {
+    const sessionIds = new Map<string, Id<"sessions">>();
+    const result = [];
+
+    for (const input of args.messages) {
+      let sessionId = sessionIds.get(input.sessionExternalId);
+      if (!sessionId) {
+        const session = await ctx.db
+          .query("sessions")
+          .withIndex("by_user_external", (q) =>
+            q.eq("userId", args.userId).eq("externalId", input.sessionExternalId),
+          )
+          .first();
+        if (!session) continue;
+        sessionId = session._id;
+        sessionIds.set(input.sessionExternalId, sessionId);
+      }
+
+      const message = await ctx.db
+        .query("messages")
+        .withIndex("by_session_external", (q) =>
+          q.eq("sessionId", sessionId).eq("externalId", input.externalId),
+        )
+        .first();
+      if (!message) continue;
+
+      result.push({
+        sessionExternalId: input.sessionExternalId,
+        externalId: message.externalId,
+        model: message.model,
+        provider: message.provider,
+        promptTokens: message.promptTokens,
+        completionTokens: message.completionTokens,
+        cachedTokens: message.cachedTokens,
+        cost: message.cost,
+        durationMs: message.durationMs,
+        createdAt: message.createdAt,
+      });
+    }
+
+    return result;
   },
 });

@@ -485,6 +485,48 @@ export const listExternalIds = internalQuery({
   },
 });
 
+export const syncMetadata = internalQuery({
+  args: {
+    userId: v.id("users"),
+    externalIds: v.array(v.string()),
+  },
+  returns: v.array(
+    v.object({
+      externalId: v.string(),
+      model: v.optional(v.string()),
+      provider: v.optional(v.string()),
+      promptTokens: v.number(),
+      completionTokens: v.number(),
+      cost: v.number(),
+      durationMs: v.optional(v.number()),
+      createdAt: v.number(),
+      updatedAt: v.number(),
+    }),
+  ),
+  handler: async (ctx, args) => {
+    const result = [];
+    for (const externalId of args.externalIds) {
+      const session = await ctx.db
+        .query("sessions")
+        .withIndex("by_user_external", (q) => q.eq("userId", args.userId).eq("externalId", externalId))
+        .first();
+      if (!session) continue;
+      result.push({
+        externalId: session.externalId,
+        model: session.model,
+        provider: session.provider,
+        promptTokens: session.promptTokens,
+        completionTokens: session.completionTokens,
+        cost: session.cost,
+        durationMs: session.durationMs,
+        createdAt: session.createdAt,
+        updatedAt: session.updatedAt,
+      });
+    }
+    return result;
+  },
+});
+
 // Export all user data as CSV
 export const exportAllDataCSV = query({
   args: {},

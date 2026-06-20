@@ -15,6 +15,10 @@ export function deadLetterPath(source = "opencode"): string {
   return join(stateDir, `${source}.dead-letter.jsonl`);
 }
 
+export function deferredPath(source = "opencode"): string {
+  return join(stateDir, `${source}.deferred.jsonl`);
+}
+
 export function inspectQueue(source = "opencode") {
   const path = queuePath(source);
   const offset = readOffset(source);
@@ -27,6 +31,10 @@ export type QueueEntry = {
   raw: string;
   event: SourceChangeEvent | null;
   endOffset: number;
+};
+
+export type DeferredQueueEntry = QueueEntry & {
+  attempts: number;
 };
 
 export type QueueRead = {
@@ -98,6 +106,60 @@ export function appendDeadLetter(source: string, entries: string[]): void {
   if (entries.length === 0) return;
   mkdirSync(stateDir, { recursive: true });
   writeFileSync(deadLetterPath(source), `${entries.join("\n")}\n`, { encoding: "utf8", flag: "a" });
+}
+
+export function appendDeferred(source: string, entries: string[]): void {
+  if (entries.length === 0) return;
+  mkdirSync(stateDir, { recursive: true });
+  const lines = entries.map((raw) => JSON.stringify({ event: parseEvent(raw), attempts: 0 }));
+  writeFileSync(deferredPath(source), `${lines.join("\n")}\n`, { encoding: "utf8", flag: "a" });
+}
+
+export function readDeferredQueue(
+  source = "opencode",
+): QueueRead & { entries: DeferredQueueEntry[] } {
+  const path = deferredPath(source);
+  if (!existsSync(path)) return { source, path, entries: [], startOffset: 0, endOffset: 0 };
+  const parsed = parseDeferredBuffer(readFileSync(path));
+  return { source, path, ...parsed };
+}
+
+export function writeDeferred(source: string, entries: DeferredQueueEntry[]): void {
+  mkdirSync(stateDir, { recursive: true });
+  writeFileSync(
+    deferredPath(source),
+    entries.length === 0
+      ? ""
+      : `${entries.map((entry) => JSON.stringify({ event: entry.event, attempts: entry.attempts })).join("\n")}\n`,
+    "utf8",
+  );
+}
+
+function parseDeferredBuffer(buffer: Buffer): {
+  entries: DeferredQueueEntry[];
+  startOffset: number;
+  endOffset: number;
+} {
+  const parsed = parseQueueBuffer(buffer, 0);
+  return {
+    ...parsed,
+    entries: parsed.entries.map((entry) => {
+      try {
+        const value = JSON.parse(entry.raw) as { event?: unknown; attempts?: unknown };
+        if (value && typeof value === "object" && "event" in value) {
+          const rawEvent = JSON.stringify(value.event);
+          return {
+            ...entry,
+            raw: rawEvent,
+            event: parseEvent(rawEvent),
+            attempts:
+              typeof value.attempts === "number" && value.attempts >= 0 ? value.attempts : 0,
+          };
+        }
+      } catch {}
+      return { ...entry, attempts: 0 };
+    }),
+  };
 }
 
 export function flushQueue(source = "opencode"): { path: string; existed: boolean } {

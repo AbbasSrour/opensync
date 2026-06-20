@@ -44,6 +44,18 @@ function deps(present: Set<string>, uploadResults?: Map<string, UploadSummary>):
   };
 }
 
+function incompleteDeps(incomplete: Set<string>, present = new Set<string>()): DrainDeps {
+  return {
+    resolve: (event) =>
+      incomplete.has(event.externalId)
+        ? { status: "incomplete" }
+        : present.has(event.externalId)
+          ? { status: "ready", event: sessionEvent(event.externalId) }
+          : { status: "missing" },
+    upload: () => Promise.resolve({ sessions: 1, messages: 0, failed: 0 }),
+  };
+}
+
 const ctx = { source: "opencode", path: "/tmp/q.jsonl", now: NOW };
 
 describe("drainEntries", () => {
@@ -114,6 +126,25 @@ describe("drainEntries", () => {
     expect(plan.deadLetter).toEqual(["bad-json"]);
     expect(plan.result.resolved).toBe(1);
     expect(plan.committedOffset).toBe(20);
+  });
+
+  it("defers incomplete references and keeps advancing the main queue", async () => {
+    const entries = [
+      entry(sessionRef("a"), 10),
+      entry(sessionRef("streaming"), 20, "streaming-raw"),
+      entry(sessionRef("c"), 30),
+    ];
+    const plan = await drainEntries(
+      entries,
+      0,
+      incompleteDeps(new Set(["streaming"]), new Set(["a", "c"])),
+      ctx,
+    );
+
+    expect(plan.result.resolved).toBe(2);
+    expect(plan.result.incomplete).toBe(1);
+    expect(plan.deferred).toEqual(["streaming-raw"]);
+    expect(plan.committedOffset).toBe(30);
   });
 
   it("dry run reports counts without uploading or advancing", async () => {

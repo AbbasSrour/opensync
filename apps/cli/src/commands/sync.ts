@@ -3,12 +3,13 @@ import {
   resolveOpenCodeDbPath,
   sessionRecordToEvent,
 } from "@opensync/adapter-opencode";
+import type { AdapterMessage, AdapterSession } from "@opensync/kit";
 import { adapterForSource } from "../adapters.js";
 import { adapterParams, hasFlag, optionValue } from "../args.js";
 import { readConfig } from "../config.js";
 import { requireConfig, uploadSessionUnits, type SessionUnit } from "../sync-events.js";
 import { addSyncedSessions, clearSyncedSessions, getSyncedSessions } from "../tracking.js";
-import { health, listBackendSessionIds, syncSession } from "../transport.js";
+import { health, listBackendSessionIds, syncMetadata, syncSession } from "../transport.js";
 
 export async function syncCommand(args: string[]): Promise<void> {
   const source = optionValue(args, "--source") ?? "opencode";
@@ -48,12 +49,24 @@ export async function syncCommand(args: string[]): Promise<void> {
   const messages = adapter
     .listMessages(undefined, { params })
     .filter((message) => sessionIds.has(message.sessionExternalId));
-  const events = [...sessions.map(sessionRecordToEvent), ...messages.map(messageRecordToEvent)];
+  let diffedSessions = sessionsToSync;
+  let diffedMessages = messages;
+
+  if (!dryRun && config) {
+    const diff = await diffAgainstBackend(config, sessionsToSync, messages);
+    diffedSessions = diff.sessions;
+    diffedMessages = diff.messages;
+  }
+
+  const events = [
+    ...diffedSessions.map(sessionRecordToEvent),
+    ...diffedMessages.map(messageRecordToEvent),
+  ];
 
   console.log(`${adapter.source} input: ${resolveOpenCodeDbPath(params.db)}`);
   console.log(`Normalized events: ${events.length}`);
-  console.log(`  sessions: ${sessionsToSync.length}`);
-  console.log(`  messages: ${messages.length}`);
+  console.log(`  sessions: ${diffedSessions.length}`);
+  console.log(`  messages: ${diffedMessages.length}`);
   console.log(`  skipped sessions: ${sessions.length - sessionsToSync.length}`);
 
   if (dryRun) return;
@@ -66,18 +79,24 @@ export async function syncCommand(args: string[]): Promise<void> {
   }
 
   const messagesBySession = new Map<string, typeof messages>();
-  for (const message of messages) {
+  for (const message of diffedMessages) {
     const existing = messagesBySession.get(message.sessionExternalId) ?? [];
     existing.push(message);
     messagesBySession.set(message.sessionExternalId, existing);
   }
-  const units: SessionUnit[] = sessionsToSync.map((session) => ({
-    externalId: session.externalId,
-    events: [
-      sessionRecordToEvent(session),
-      ...(messagesBySession.get(session.externalId) ?? []).map(messageRecordToEvent),
-    ],
-  }));
+  const sessionsById = new Map(sessionsToSync.map((session) => [session.externalId, session]));
+  const unitSessionIds = new Set([
+    ...diffedSessions.map((session) => session.externalId),
+    ...diffedMessages.map((message) => message.sessionExternalId),
+  ]);
+  const units: SessionUnit[] = [...unitSessionIds].flatMap((sessionId) => {
+    const session = sessionsById.get(sessionId);
+    if (!session) return [];
+    const sessionChanged = diffedSessions.some((item) => item.externalId === sessionId);
+    const sessionEvents = sessionChanged ? [sessionRecordToEvent(session)] : [];
+    const messageEvents = (messagesBySession.get(sessionId) ?? []).map(messageRecordToEvent);
+    return [{ externalId: session.externalId, events: [...sessionEvents, ...messageEvents] }];
+  });
 
   const result = await uploadSessionUnits(config, units, {
     concurrency,
@@ -95,6 +114,75 @@ export async function syncCommand(args: string[]): Promise<void> {
     console.log(`Failed uploads: ${result.failed}`);
     process.exitCode = 1;
   }
+}
+
+async function diffAgainstBackend<TSource extends string>(
+  config: NonNullable<ReturnType<typeof requireConfig>>,
+  sessions: AdapterSession<TSource>[],
+  messages: AdapterMessage<TSource>[],
+) {
+  const backendSessions = new Map<string, Record<string, unknown>>();
+  const backendMessages = new Map<string, Record<string, unknown>>();
+  const pageSize = 500;
+
+  for (let index = 0; index < Math.max(sessions.length, messages.length); index += pageSize) {
+    const result = await syncMetadata(config, {
+      sessions: sessions.slice(index, index + pageSize).map((session) => session.externalId),
+      messages: messages.slice(index, index + pageSize).map((message) => ({
+        sessionExternalId: message.sessionExternalId,
+        externalId: message.externalId,
+      })),
+    });
+    if (!result.ok) continue;
+    const data = result.data as {
+      sessions?: Array<Record<string, unknown> & { externalId: string }>;
+      messages?: Array<Record<string, unknown> & { sessionExternalId: string; externalId: string }>;
+    };
+    for (const session of data.sessions ?? []) backendSessions.set(session.externalId, session);
+    for (const message of data.messages ?? []) {
+      backendMessages.set(`${message.sessionExternalId}:${message.externalId}`, message);
+    }
+  }
+
+  return {
+    sessions: sessions.filter(
+      (session) => !sameSession(session, backendSessions.get(session.externalId)),
+    ),
+    messages: messages.filter(
+      (message) =>
+        !sameMessage(
+          message,
+          backendMessages.get(`${message.sessionExternalId}:${message.externalId}`),
+        ),
+    ),
+  };
+}
+
+function sameSession(session: AdapterSession, existing?: Record<string, unknown>) {
+  if (!existing) return false;
+  return (
+    existing.model === session.model &&
+    existing.provider === session.provider &&
+    existing.promptTokens === (session.promptTokens ?? 0) &&
+    existing.completionTokens === (session.completionTokens ?? 0) &&
+    existing.cost === (session.cost ?? 0) &&
+    existing.createdAt === session.sourceCreatedAt &&
+    existing.updatedAt === (session.sourceUpdatedAt ?? session.sourceCreatedAt)
+  );
+}
+
+function sameMessage(message: AdapterMessage, existing?: Record<string, unknown>) {
+  if (!existing) return false;
+  return (
+    existing.model === message.model &&
+    existing.provider === message.provider &&
+    existing.promptTokens === message.promptTokens &&
+    existing.completionTokens === message.completionTokens &&
+    existing.cachedTokens === message.cachedTokens &&
+    existing.cost === message.cost &&
+    existing.durationMs === message.durationMs &&
+    existing.createdAt === message.sourceCreatedAt
+  );
 }
 
 const DEFAULT_CONCURRENCY = 8;

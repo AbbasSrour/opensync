@@ -66,6 +66,14 @@ export function messageRowToRecord(
   };
 }
 
+export function messageRowSyncStatus(row: OpenCodeMessageRow): "ready" | "incomplete" {
+  const data = parseJsonRecord(row.data);
+  const role = normalizeRole(stringField(data, "role"));
+  if (role !== "assistant") return "ready";
+  const time = recordField(data, "time");
+  return numberField(time.completed) === undefined ? "incomplete" : "ready";
+}
+
 export function sessionRecordToEvent(
   session: AdapterSession<"opencode">,
 ): OpenCodeSessionUpsertEvent {

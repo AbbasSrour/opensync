@@ -8,7 +8,7 @@ import {
   type AdapterSession,
 } from "@opensync/kit";
 import { Database } from "bun:sqlite";
-import { messageRowToRecord, sessionRowToRecord } from "./records.js";
+import { messageRowSyncStatus, messageRowToRecord, sessionRowToRecord } from "./records.js";
 import type { OpenCodeMessageRow, OpenCodePartRow, OpenCodeSessionRow } from "./types.js";
 
 export function resolveOpenCodeDbPath(explicitPath?: string): string {
@@ -67,9 +67,9 @@ export class OpenCodeAdapter extends SourceAdapter<"opencode"> {
         : readMessageRows(db);
       const parts = readPartRows(db);
       const partsByMessage = groupPartsByMessage(parts);
-      return messages.map((message) =>
-        messageRowToRecord(message, partsByMessage.get(message.id) ?? []),
-      );
+      return messages
+        .filter((message) => messageRowSyncStatus(message) === "ready")
+        .map((message) => messageRowToRecord(message, partsByMessage.get(message.id) ?? []));
     } finally {
       db.close();
     }
@@ -84,8 +84,23 @@ export class OpenCodeAdapter extends SourceAdapter<"opencode"> {
     );
     try {
       const message = readMessageRow(db, externalId);
-      if (!message) return null;
+      if (!message || messageRowSyncStatus(message) !== "ready") return null;
       return messageRowToRecord(message, readPartRowsForMessage(db, message.id));
+    } finally {
+      db.close();
+    }
+  }
+
+  getMessageSyncStatus(
+    externalId: string,
+    options: AdapterReadOptions = {},
+  ): "ready" | "incomplete" | "missing" {
+    const db = openDatabase(
+      resolveOpenCodeDbPath(readDbParam(options) ?? readDbParam(this.defaultOptions)),
+    );
+    try {
+      const message = readMessageRow(db, externalId);
+      return message ? messageRowSyncStatus(message) : "missing";
     } finally {
       db.close();
     }

@@ -37,6 +37,7 @@ async function drain(args: string[]): Promise<void> {
     console.log(`  sessions: ${result.sessions}`);
     console.log(`  messages: ${result.messages}`);
     console.log(`  missing: ${result.missing}`);
+    console.log(`  incomplete: ${result.incomplete}`);
     console.log(`  malformed: ${result.malformed}`);
     console.log(`  dead-lettered: ${result.deadLettered}`);
 

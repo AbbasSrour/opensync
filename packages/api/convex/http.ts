@@ -245,6 +245,31 @@ http.route({
   }),
 });
 
+http.route({
+  path: "/sync/metadata",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const auth = await authenticate(ctx, request);
+    if (auth.error) return json({ error: auth.error }, auth.status);
+
+    try {
+      const body = await request.json();
+      const sessions = await ctx.runQuery(internal.sessions.syncMetadata, {
+        userId: auth.user._id,
+        externalIds: Array.isArray(body.sessions) ? body.sessions : [],
+      });
+      const messages = await ctx.runQuery(internal.messages.syncMetadata, {
+        userId: auth.user._id,
+        messages: Array.isArray(body.messages) ? body.messages : [],
+      });
+
+      return json({ ok: true, sessions, messages });
+    } catch (e) {
+      return json({ error: String(e) }, 500);
+    }
+  }),
+});
+
 // List all session external IDs for the authenticated user
 http.route({
   path: "/sync/sessions/list",

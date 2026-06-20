@@ -947,6 +947,34 @@ Verification:
 
 ## Current status
 
+### New sync cost-reduction direction — paged diff + full batch accumulation
+
+Decision: improve `sync --all` / repair sync cost by scanning local OpenCode data in
+pages, comparing each page against lightweight Convex metadata, and accumulating
+only changed records into upload batches. Do **not** flush an upload batch just
+because a local scan page ended; keep carrying changed records across multiple
+pages until the upload batch is full, then flush. Flush a partial batch only at
+the end of the full scan.
+
+Required backend support:
+
+- Add metadata lookup endpoint/query for a set of session/message external IDs.
+- Return lightweight sync metadata only, ideally `{ externalId, fingerprint }`.
+- Avoid returning stored message parts/bodies from Convex.
+
+Required CLI/adapter support:
+
+- Page local reads from OpenCode instead of materializing all sessions/messages at
+  once for large syncs.
+- Compute local fingerprints after transport-size normalization/truncation so the
+  comparison matches what would be stored.
+- Accumulate changed sessions/messages into upload batches across scan pages.
+- Continue using `/sync/batch` for upload.
+
+Expected savings: repeated syncs avoid unchanged message writes, part
+delete/reinsert churn, embedding reschedules, and repeated oversized/failing
+payload attempts. First sync still writes all records.
+
 Implemented and verified at package level: `@opensync/kit`, `@opensync/adapter-opencode`,
 `@opensync/opencode` (plugin), `@opensync/cli`. `vp test` (24 tests) and `vp check`
 (0 errors) pass. Builds pass for all four packages.
